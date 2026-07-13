@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LostFoundPetReporter.CoreDb", "LostFoundPetReporter.CoreDb.csproj", "{95A2DAE7-FACB-456F-90A6-CA5389D5526B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95A2DAE7-FACB-456F-90A6-CA5389D5526B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95A2DAE7-FACB-456F-90A6-CA5389D5526B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95A2DAE7-FACB-456F-90A6-CA5389D5526B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95A2DAE7-FACB-456F-90A6-CA5389D5526B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D27FCDAE-DE90-4C81-8107-79DCCCF8AD00}
+	EndGlobalSection
+EndGlobal

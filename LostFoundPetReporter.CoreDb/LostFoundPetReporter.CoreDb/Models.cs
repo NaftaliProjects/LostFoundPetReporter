@@ -53,6 +53,7 @@ namespace LostFoundPetReporter.CoreDb
             public AnimalDescription LostPetDesc { get; set; }
             public User FoundReporter { get; }
             public String FoundCoordinates { get; set; }
+            public int LostReportId { get; set; }
             public List<FoundReportExtFiles> Extfiles { get; set; }
 
         }

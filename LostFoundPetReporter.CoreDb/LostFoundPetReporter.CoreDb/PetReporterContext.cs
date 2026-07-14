@@ -7,7 +7,7 @@ namespace LostFoundPetReporter.CoreDb
 {
     public class PetReporterContext : DbContext
     {
-        public PetReporterContext(DbContextOptions<PetReporterContextContext> options) : base(options)
+        public PetReporterContext(DbContextOptions<PetReporterContext> options) : base(options)
         {
 
         }
@@ -17,12 +17,12 @@ namespace LostFoundPetReporter.CoreDb
 
     public class PetReporterContextFactory : IDesignTimeDbContextFactory<PetReporterContext>
     {
-        public PetReporterContext CreateDbContext(stringp[] args)
+        public PetReporterContext CreateDbContext(string[] args)
         {
-            var optionBuilder = new DbContextOptionBuilder<PetReporterContext>();
+            var optionBuilder = new DbContextOptionsBuilder<PetReporterContext>();
             var connectionString = @"server=.,5433;Database=LFPR;User Id=sa;Password=P@ssw0rd;Encrypt=False;";
             optionBuilder.UseSqlServer(connectionString);
-            return new PetReporterContextFactory(optionBuilder.Options);
+            return new PetReporterContext(optionBuilder.Options);
         }
     }
 }

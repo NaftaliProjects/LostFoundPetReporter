@@ -1,1 +1,2 @@
-﻿Console.WriteLine("Hello, World!");
+﻿global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Design;

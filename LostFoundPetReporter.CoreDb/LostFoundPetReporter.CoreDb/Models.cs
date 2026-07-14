@@ -38,11 +38,12 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// SubModel for FoundReport to hold images data related to a FoundReport
         /// </summary>
-        public class FoundReportExtFiles
+        public class FoundReportExtFile
         {
             public String FilePath { get; set; }
             public String FileName { get; set; }
             public String Description { get; set; }
+            public int FoundReportId { get; set; }
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace LostFoundPetReporter.CoreDb
             public User FoundReporter { get; }
             public String FoundCoordinates { get; set; }
             public int LostReportId { get; set; }
-            public List<FoundReportExtFiles> Extfiles { get; set; }
+            public List<FoundReportExtFile> Extfiles { get; set; }
 
         }
 
@@ -67,8 +68,20 @@ namespace LostFoundPetReporter.CoreDb
             public AnimalDescription LostPetDesc { get; set; }
             public User LostReporter { get; }
             public String LastSeenCoordinates { get; set; }
-
+            public List<LostReportExtFile> Extfiles { get; set; }
             public List<FoundReport> foundReports = new List<FoundReport>();
+        }
+
+
+        /// <summary>
+        /// SubModel for FoundReport to hold images data related to a FoundReport
+        /// </summary>
+        public class LostReportExtFile
+        {
+            public String FilePath { get; set; }
+            public String FileName { get; set; }
+            public String Description { get; set; }
+            public int LostReportId { get; set; }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static LostFoundPetReporter.CoreDb.Models;
 
 
 namespace LostFoundPetReporter.CoreDb
@@ -11,6 +12,13 @@ namespace LostFoundPetReporter.CoreDb
         {
 
         }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<LostReport> LostReports { get; set; }
+        public DbSet<FoundReport> FoundReports { get; set; }
+        public DbSet<FoundReportExtFile> FoundReportExtFiles { get; set; }
+        public DbSet<LostReportExtFile> LostReportExtFiles { get; set; }
+
     }
 
 

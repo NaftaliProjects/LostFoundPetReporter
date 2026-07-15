@@ -13,7 +13,7 @@ namespace LostFoundPetReporter.CoreDb
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnModelCreating(DbContextOptionsBuilder optionsBuilder)
         {
             ModelBuilder modelBuilder = new ModelBuilder();
             modelBuilder.Entity<User>(entity =>
@@ -42,6 +42,16 @@ namespace LostFoundPetReporter.CoreDb
             {
                 entity.ToTable("LostReportExtFiles");
             });
+
+            modelBuilder.Entity<LostFoundMatch>()
+            .HasOne(m => m.LostReport)
+            .WithMany(r => r.Matches)
+            .HasForeignKey(m => m.LostReportId);
+
+            modelBuilder.Entity<LostFoundMatch>()
+            .HasOne(m => m.FoundReport)
+            .WithMany(r => r.Matches)
+            .HasForeignKey(m => m.FoundReportId);
 
         }
 

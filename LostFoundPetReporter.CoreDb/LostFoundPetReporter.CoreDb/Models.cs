@@ -79,7 +79,7 @@ namespace LostFoundPetReporter.CoreDb
             public String FoundCoordinates { get; set; } = "";
 
             //Foreign keys 
-            required public int UserId { get; set; }
+            public int UserId { get; set; }
 
 
             //Nevigation properties 
@@ -88,7 +88,7 @@ namespace LostFoundPetReporter.CoreDb
             public List<FoundReportExtFile> ExtFiles { get; set; } = new();
             [Required]
             required public AnimalDescription PetDescription { get; set; }
-            public List<LostReport> LostReports  { get; set; } = new ();
+            public List<LostFoundMatch> Matches { get; set; } = new();
 
         }
 
@@ -108,12 +108,23 @@ namespace LostFoundPetReporter.CoreDb
             //Nevigation properties
             [Required]
             required public User User { get; set; }
-            public AnimalDescription PetDescription { get; set; }
+            required public AnimalDescription PetDescription { get; set; }
             public List<LostReportExtFile> ExtFiles { get; set; } = new();
-            public List<FoundReport> FoundReports  { get; set; } = new();
+            public List<LostFoundMatch> Matches { get; set; } = new();
         }
 
-        
+        /// <summary>
+        /// Costume and extandable Many To Many Table for Lost/Found Report tables 
+        /// </summary>
+        public class LostFoundMatch : BaseModel
+        {
+            public int LostReportId { get; set; }
+            public int FoundReportId { get; set; }
+
+            required public LostReport LostReport { get; set; }
+            required public FoundReport FoundReport { get; set; }
+        }
+
 
 
         /// <summary>
@@ -125,6 +136,7 @@ namespace LostFoundPetReporter.CoreDb
             public String FilePath { get; set; }
             public String FileName { get; set; }
             public String Description { get; set; }
+
             //Foreign keys 
             public int LostReportId { get; set; }
         }

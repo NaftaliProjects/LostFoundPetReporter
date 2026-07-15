@@ -18,7 +18,9 @@ namespace LostFoundPetReporter.CoreDb
         /// </summary>
         public class User : BaseModel
         {
+            
             public String Name { get; set; }
+            public String Password { get; set; }
             public String Email { get; set; }
             public String Phone { get; set; }
 
@@ -27,7 +29,8 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// Hold Description of a Pet in a LostReport or a FoundReport 
         /// </summary>
-        public class AnimalDescription
+        /// [Owned]
+        public class AnimalDescription 
         {
             public String Name { get; set; }
             public String Color { get; set; }
@@ -38,7 +41,7 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// SubModel for FoundReport to hold images data related to a FoundReport
         /// </summary>
-        public class FoundReportExtFile
+        public class FoundReportExtFile : BaseModel
         {
             public String FilePath { get; set; }
             public String FileName { get; set; }
@@ -49,12 +52,14 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// A found report from any user will be save in the appropriate LostReport
         /// </summary>
-        public class FoundReport
+        public class FoundReport : BaseModel
         {
             public AnimalDescription LostPetDesc { get; set; }
-            public User FoundReporter { get; }
+           
             public String FoundCoordinates { get; set; }
+            public int UserId { get; set; }
             public int LostReportId { get; set; }
+            public User FoundReporter { get; set; }
             public List<FoundReportExtFile> Extfiles { get; set; }
 
         }
@@ -63,11 +68,13 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// Lost report from users that lost their pets and need help in finding it
         /// </summary>
-        public class LostReport
+        public class LostReport : BaseModel
         {
             public AnimalDescription LostPetDesc { get; set; }
-            public User LostReporter { get; }
+            
             public String LastSeenCoordinates { get; set; }
+            public User LostReporter { get; set; }
+            public int UserId { get; set; }
             public List<LostReportExtFile> Extfiles { get; set; }
             public List<FoundReport> foundReports = new List<FoundReport>();
         }
@@ -76,7 +83,7 @@ namespace LostFoundPetReporter.CoreDb
         /// <summary>
         /// SubModel for FoundReport to hold images data related to a FoundReport
         /// </summary>
-        public class LostReportExtFile
+        public class LostReportExtFile : BaseModel
         {
             public String FilePath { get; set; }
             public String FileName { get; set; }

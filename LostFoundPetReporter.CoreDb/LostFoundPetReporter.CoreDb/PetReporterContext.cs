@@ -13,6 +13,38 @@ namespace LostFoundPetReporter.CoreDb
 
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            ModelBuilder modelBuilder = new ModelBuilder();
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+            });
+
+            modelBuilder.Entity<LostReport>(entity =>
+            {
+                entity.ToTable("LostReports");
+                entity.OwnsOne(lr => lr.LostPetDesc);
+            });
+
+            modelBuilder.Entity<FoundReport>(entity =>
+            {
+                entity.ToTable("FoundReports");
+                entity.OwnsOne(lr => lr.LostPetDesc);
+            });
+
+            modelBuilder.Entity<FoundReportExtFile>(entity =>
+            {
+                entity.ToTable("FoundReportExtFiles");
+            });
+
+            modelBuilder.Entity<LostReportExtFile>(entity =>
+            {
+                entity.ToTable("LostReportExtFiles");
+            });
+
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<LostReport> LostReports { get; set; }
         public DbSet<FoundReport> FoundReports { get; set; }

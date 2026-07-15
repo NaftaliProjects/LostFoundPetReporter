@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using static LostFoundPetReporter.CoreDb.Models;
 
 namespace LostFoundPetReporter.CoreDb
 {
@@ -10,6 +12,7 @@ namespace LostFoundPetReporter.CoreDb
         public abstract class BaseModel
         {
             public int Id { get; set; }
+            [Timestamp]
             public Byte[] TimeStamp { get; set; }
         }
 
@@ -18,7 +21,7 @@ namespace LostFoundPetReporter.CoreDb
         /// </summary>
         public class User : BaseModel
         {
-            
+            //properties
             public String Name { get; set; }
             public String Password { get; set; }
             public String Email { get; set; }
@@ -26,41 +29,66 @@ namespace LostFoundPetReporter.CoreDb
 
         }
 
+
+
         /// <summary>
-        /// Hold Description of a Pet in a LostReport or a FoundReport 
+        /// Holds the description of a pet in a LostReport or a FoundReport.
+        /// <para>
+        /// Colors examples:
+        /// - "Red"
+        /// - "White,Black,Grey"
+        /// </para>
         /// </summary>
-        /// [Owned]
+        [Owned]
         public class AnimalDescription 
         {
-            public String Name { get; set; }
-            public String Color { get; set; }
-            public String Type { get; set; }
-            public String SubType { get; set; }
+            //properties
+            public String Name { get; set; } = "";
+            public String Colors { get; set; } = "";
+            public String Type { get; set; } = "";
+            public String Breed { get; set; } = "";
         }
+
+  
 
         /// <summary>
         /// SubModel for FoundReport to hold images data related to a FoundReport
         /// </summary>
         public class FoundReportExtFile : BaseModel
         {
-            public String FilePath { get; set; }
-            public String FileName { get; set; }
-            public String Description { get; set; }
-            public int FoundReportId { get; set; }
+            //properties
+            [Required]
+            required public String FilePath { get; set; }
+            [Required]
+            required public String FileName { get; set; }
+            public String Description { get; set; } = "";
+
+            //Foreign keys 
+            [Required]
+            required public int FoundReportId { get; set; }
         }
+
+ 
 
         /// <summary>
         /// A found report from any user will be save in the appropriate LostReport
         /// </summary>
         public class FoundReport : BaseModel
         {
-            public AnimalDescription LostPetDesc { get; set; }
-           
-            public String FoundCoordinates { get; set; }
-            public int UserId { get; set; }
-            public int LostReportId { get; set; }
-            public User FoundReporter { get; set; }
-            public List<FoundReportExtFile> Extfiles { get; set; }
+            //properties
+            public String FoundCoordinates { get; set; } = "";
+
+            //Foreign keys 
+            required public int UserId { get; set; }
+
+
+            //Nevigation properties 
+            [Required]
+            required public User User { get; set; }
+            public List<FoundReportExtFile> ExtFiles { get; set; } = new();
+            [Required]
+            required public AnimalDescription PetDescription { get; set; }
+            public List<LostReport> LostReports  { get; set; } = new ();
 
         }
 
@@ -70,14 +98,22 @@ namespace LostFoundPetReporter.CoreDb
         /// </summary>
         public class LostReport : BaseModel
         {
-            public AnimalDescription LostPetDesc { get; set; }
-            
-            public String LastSeenCoordinates { get; set; }
-            public User LostReporter { get; set; }
+            //properties
+            public String LastSeenCoordinates { get; set; } = "";
+
+
+            //Foreign keys 
             public int UserId { get; set; }
-            public List<LostReportExtFile> Extfiles { get; set; }
-            public List<FoundReport> foundReports = new List<FoundReport>();
+
+            //Nevigation properties
+            [Required]
+            required public User User { get; set; }
+            public AnimalDescription PetDescription { get; set; }
+            public List<LostReportExtFile> ExtFiles { get; set; } = new();
+            public List<FoundReport> FoundReports  { get; set; } = new();
         }
+
+        
 
 
         /// <summary>
@@ -85,10 +121,14 @@ namespace LostFoundPetReporter.CoreDb
         /// </summary>
         public class LostReportExtFile : BaseModel
         {
+            //properties
             public String FilePath { get; set; }
             public String FileName { get; set; }
             public String Description { get; set; }
+            //Foreign keys 
             public int LostReportId { get; set; }
         }
+
+
     }
 }

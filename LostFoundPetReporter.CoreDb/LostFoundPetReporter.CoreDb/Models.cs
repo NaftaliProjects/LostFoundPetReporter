@@ -76,7 +76,8 @@ namespace LostFoundPetReporter.CoreDb
         public class FoundReport : BaseModel
         {
             //properties
-            public String FoundCoordinates { get; set; } = "";
+            public String Coordinates { get; set; } = "";
+            public DateTime dateTime { get; set; }
 
             //Foreign keys 
             public int UserId { get; set; }
@@ -99,7 +100,8 @@ namespace LostFoundPetReporter.CoreDb
         public class LostReport : BaseModel
         {
             //properties
-            public String LastSeenCoordinates { get; set; } = "";
+            public String Coordinates { get; set; } = "";
+            public DateTime dateTime { get; set; }
 
 
             //Foreign keys 

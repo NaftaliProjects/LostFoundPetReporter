@@ -13,7 +13,7 @@ namespace LostFoundPetReporter.CoreDb
 
         }
 
-        protected override void OnModelCreating(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ModelBuilder modelBuilder = new ModelBuilder();
             modelBuilder.Entity<User>(entity =>
@@ -24,13 +24,13 @@ namespace LostFoundPetReporter.CoreDb
             modelBuilder.Entity<LostReport>(entity =>
             {
                 entity.ToTable("LostReports");
-                entity.OwnsOne(lr => lr.LostPetDesc);
+                entity.OwnsOne(lr => lr.PetDescription);
             });
 
             modelBuilder.Entity<FoundReport>(entity =>
             {
                 entity.ToTable("FoundReports");
-                entity.OwnsOne(lr => lr.LostPetDesc);
+                entity.OwnsOne(lr => lr.PetDescription);
             });
 
             modelBuilder.Entity<FoundReportExtFile>(entity =>

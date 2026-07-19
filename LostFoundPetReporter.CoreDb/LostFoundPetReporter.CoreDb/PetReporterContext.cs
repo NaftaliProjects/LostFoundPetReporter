@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static LostFoundPetReporter.CoreDb.Models;
+using  LostFoundPetReporter.CoreDb.Models;
 
 
 namespace LostFoundPetReporter.CoreDb
@@ -15,7 +15,6 @@ namespace LostFoundPetReporter.CoreDb
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            ModelBuilder modelBuilder = new ModelBuilder();
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("Users");
@@ -30,7 +29,7 @@ namespace LostFoundPetReporter.CoreDb
             modelBuilder.Entity<FoundReport>(entity =>
             {
                 entity.ToTable("FoundReports");
-                entity.OwnsOne(lr => lr.PetDescription);
+                entity.OwnsOne(fr => fr.PetDescription);
             });
 
             modelBuilder.Entity<FoundReportExtFile>(entity =>

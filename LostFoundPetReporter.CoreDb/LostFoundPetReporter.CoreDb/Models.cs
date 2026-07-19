@@ -26,7 +26,7 @@ namespace LostFoundPetReporter.CoreDb.Models
         [Required]
         required public String Name { get; set; }
         [Required]
-        required public String Password { get; set; }
+        required public String HashedPassword { get; set; }
         public String Email { get; set; } = "";
         public String Phone { get; set; } = "";
 

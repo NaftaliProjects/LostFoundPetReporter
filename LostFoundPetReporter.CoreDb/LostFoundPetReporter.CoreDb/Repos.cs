@@ -12,8 +12,8 @@ namespace LostFoundPetReporter.CoreDb.repos
     public abstract class BaseViewRepo<T> : IBaseViewRepo<T> where T : class, new()
     {
         private readonly bool _disoposeContext;
-        public PetReporterContext Context { get; }
-        public DbSet<T> Table { get; }
+        protected PetReporterContext Context { get; }
+        protected DbSet<T> Table { get; }
 
         protected BaseViewRepo(PetReporterContext context)
         {
@@ -58,6 +58,7 @@ namespace LostFoundPetReporter.CoreDb.repos
             => Table.FromSqlRaw(sql);
         public virtual IEnumerable<T> GetAll() 
             => Table.AsQueryable();
+
         public virtual IEnumerable<T> GetAllIgnoreQueryFillters() 
             => Table.AsQueryable().IgnoreQueryFilters();
 
@@ -142,9 +143,141 @@ namespace LostFoundPetReporter.CoreDb.repos
         }
 
         public override IEnumerable<User> GetAll()
-            => Table.OrderBy(u => u.Name); 
+            => Table.OrderBy(u => u.Name);
+        public override IEnumerable<User> GetAllIgnoreQueryFillters()
+            => Table.OrderBy(u => u.Name);
+        public  IEnumerable<User> GetAllBy(int id)
+            => Table.Where(u => u.Id == id);
+
+        public override User Find(int? id)
+            => Table
+                .IgnoreQueryFilters()
+                .Where(x => x.Id == id)
+                .FirstOrDefault();
+                
+
+    }
+
+
+
+    public class FoundReportReo : BaseRepo<FoundReport>, IFoundReportRepo
+    {
+        public FoundReportReo(PetReporterContext context) : base(context)
+        {
+        }
+
+        internal FoundReportReo(DbContextOptions<PetReporterContext> options) : base(options)
+        {
+        }
+
+        internal IOrderedQueryable<FoundReport> BuildBaseQuery()
+            => Table.Include(x => x.FoundReportExtFilesNevigation).OrderBy(o=>o.dateTime);
+
+        public override IEnumerable<FoundReport> GetAll()
+            => BuildBaseQuery();
+        public override IEnumerable<FoundReport> GetAllIgnoreQueryFillters()
+            => BuildBaseQuery().IgnoreQueryFilters();
+        public IEnumerable<FoundReport> GetAllBy(int id)
+            => Table.Where(u => u.Id == id);
+
+        public override FoundReport Find(int? id)
+            => Table
+                .IgnoreQueryFilters()
+                .Where(x => x.Id == id)
+                .FirstOrDefault();
+
+        public IEnumerable<FoundReport> GetByUserId(int userId)
+            => BuildBaseQuery().Where(u => u.UserId == userId);
 
 
     }
 
+
+    public class LostReportReo : BaseRepo<LostReport>, ILostReportRepo
+    {
+        public LostReportReo(PetReporterContext context) : base(context)
+        {
+        }
+
+        internal LostReportReo(DbContextOptions<PetReporterContext> options) : base(options)
+        {
+        }
+
+        internal IOrderedQueryable<LostReport> BuildBaseQuery()
+            => Table.Include(x => x.LostReportExtFilesNevigation).OrderBy(o => o.dateTime);
+
+        public override IEnumerable<LostReport> GetAll()
+            => BuildBaseQuery();
+        public override IEnumerable<LostReport> GetAllIgnoreQueryFillters()
+            => BuildBaseQuery().IgnoreQueryFilters();
+        public IEnumerable<LostReport> GetAllBy(int id)
+            => Table.Where(u => u.Id == id);
+
+        public override LostReport Find(int? id)
+            => Table
+                .IgnoreQueryFilters()
+                .Where(x => x.Id == id)
+                .FirstOrDefault();
+
+        public IEnumerable<LostReport> GetByUserId(int userId)
+            => BuildBaseQuery().Where(u => u.UserId == userId);
+    }
+
+
+    public class LostFoundMatchRepo : BaseRepo<LostFoundMatch>, ILostFoundMatchRepo
+    {
+        public LostFoundMatchRepo(PetReporterContext context) : base(context)
+        {
+        }
+
+        internal LostFoundMatchRepo(DbContextOptions<PetReporterContext> options) : base(options)
+        {
+        }
+
+        /// <summary>
+        /// Builds the base query with eager loading for both Lost and Found reports 
+        /// and their navigation properties.
+        /// </summary>
+        protected virtual IQueryable<LostFoundMatch> BuildBaseQuery(bool ignoreFilters = false)
+        {
+            var query = Table.AsQueryable();
+
+            if (ignoreFilters)
+            {
+                query = query.IgnoreQueryFilters();
+            }
+
+            return query
+                // Include LostReport and its external files
+                .Include(m => m.LostReportNevigation)
+                    .ThenInclude(l => l.LostReportExtFilesNevigation)
+                // Include FoundReport and its external files
+                .Include(m => m.FoundReportNevigation)
+                    .ThenInclude(f => f.FoundReportExtFilesNevigation)
+                .OrderByDescending(m => m.Id); // Or order by a CreatedDate if present
+        }
+
+        public override IEnumerable<LostFoundMatch> GetAll()
+            => BuildBaseQuery().ToList();
+
+        public override IEnumerable<LostFoundMatch> GetAllIgnoreQueryFillters()
+            => BuildBaseQuery(ignoreFilters: true).ToList();
+
+        public override LostFoundMatch? Find(int? id)
+            => BuildBaseQuery(ignoreFilters: true)
+                .FirstOrDefault(m => m.Id == id);
+
+        public IEnumerable<LostFoundMatch> GetByLostReportId(int lostReportId)
+            => BuildBaseQuery()
+                .Where(m => m.LostReportId == lostReportId)
+                .ToList();
+
+        public IEnumerable<LostFoundMatch> GetByFoundReportId(int foundReportId)
+            => BuildBaseQuery()
+                .Where(m => m.FoundReportId == foundReportId)
+                .ToList();
+
+        public bool MatchExists(int lostReportId, int foundReportId)
+            => Table.Any(m => m.LostReportId == lostReportId && m.FoundReportId == foundReportId);
+    }
 }

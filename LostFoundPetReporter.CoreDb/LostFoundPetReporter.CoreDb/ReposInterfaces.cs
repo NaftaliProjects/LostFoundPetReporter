@@ -6,13 +6,23 @@ using System.Text;
 
 namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 {
+    public interface IRepositoryFactory
+    {
+        TRepo CreateRepository<TRepo>() where TRepo : class;
+    }
+
     public interface IBaseViewRepo<T> : IDisposable where T : class, new()
     {
-        PetReporterContext Context { get; }
         IEnumerable<T> ExcuteSqlString(string sql);
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAllIgnoreQueryFillters();
+
+        // in the book they added the EF implementation here but i want to try to decouple , lets see if this will result in an error
+        //PetReporterContext Context { get; }
+        
     }
+
+
 
     public interface IBaseRepo<T> : IBaseViewRepo<T> where T : BaseModel, new()
     {
@@ -32,37 +42,26 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
     public interface IUserRepo : IBaseRepo<User>
     {
         IEnumerable<User> GetAllBy(int id);
-        string GetUserName(int id);
-        User GetByEmail(string email);
     }
 
     public interface IFoundReportRepo : IBaseRepo<FoundReport>
     {
         IEnumerable<FoundReport> GetByUserId(int userId);
-        IEnumerable<FoundReport> GetReportsWithFiles();
-        IEnumerable<FoundReport> GetByPetType(string petType);
+
     }
 
     public interface ILostReportRepo : IBaseRepo<LostReport>
     {
         IEnumerable<LostReport> GetByUserId(int userId);
-        IEnumerable<LostReport> GetReportsWithFiles();
-        IEnumerable<LostReport> GetByPetType(string petType);
     }
 
     public interface ILostFoundMatchRepo : IBaseRepo<LostFoundMatch>
     {
-        IEnumerable<LostFoundMatch> GetMatchesByLostReportId(int lostReportId);
-        IEnumerable<LostFoundMatch> GetMatchesByFoundReportId(int foundReportId);
+        IEnumerable<LostFoundMatch> GetByLostReportId(int lostReportId);
+        IEnumerable<LostFoundMatch> GetByFoundReportId(int foundReportId);
+        bool MatchExists(int lostReportId, int foundReportId);
     }
 
-    public interface IFoundReportExtFileRepo : IBaseRepo<FoundReportExtFile>
-    {
-        IEnumerable<FoundReportExtFile> GetFilesByFoundReportId(int foundReportId);
-    }
 
-    public interface ILostReportExtFileRepo : IBaseRepo<LostReportExtFile>
-    {
-        IEnumerable<LostReportExtFile> GetFilesByLostReportId(int lostReportId);
-    }
+
 }

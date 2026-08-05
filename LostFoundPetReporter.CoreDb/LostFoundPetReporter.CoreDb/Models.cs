@@ -83,10 +83,10 @@ namespace LostFoundPetReporter.CoreDb.Models
 
 
         //Nevigation properties 
-        public User User { get; set; }
-        public List<FoundReportExtFile> ExtFiles { get; set; } = new();
+        public User UserNevigation { get; set; }
+        public List<FoundReportExtFile> FoundReportExtFilesNevigation { get; set; } = new();
         public AnimalDescription PetDescription { get; set; } = new();
-        public List<LostFoundMatch> Matches { get; set; } = new();
+        public List<LostFoundMatch> LostFoundMatchNevigation { get; set; } = new();
 
     }
 
@@ -107,8 +107,8 @@ namespace LostFoundPetReporter.CoreDb.Models
         //Nevigation properties
         public User User { get; set; }
         public AnimalDescription PetDescription { get; set; } = new();
-        public List<LostReportExtFile> ExtFiles { get; set; } = new();
-        public List<LostFoundMatch> Matches { get; set; } = new();
+        public List<LostReportExtFile> LostReportExtFilesNevigation { get; set; } = new();
+        public List<LostFoundMatch> LostFoundMatchNevigation { get; set; } = new();
     }
 
     /// <summary>
@@ -119,8 +119,8 @@ namespace LostFoundPetReporter.CoreDb.Models
         public int LostReportId { get; set; }
         public int FoundReportId { get; set; }
 
-        public LostReport LostReport { get; set; }
-        public FoundReport FoundReport { get; set; }
+        public LostReport LostReportNevigation { get; set; }
+        public FoundReport FoundReportNevigation { get; set; }
     }
 
 

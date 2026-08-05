@@ -57,16 +57,21 @@ namespace LostFoundPetReporter.CoreDb
                 entity.Property(p => p.FileName).HasMaxLength(30);
             });
 
-            modelBuilder.Entity<LostFoundMatch>()
-            .HasOne(m => m.LostReport)
-            .WithMany(r => r.Matches)
-            .HasForeignKey(m => m.LostReportId);
+            modelBuilder.Entity<LostFoundMatch>(builder =>
+            {
+                builder.HasIndex(m => new { m.LostReportId, m.FoundReportId })
+                       .IsUnique();
 
-            modelBuilder.Entity<LostFoundMatch>()
-            .HasOne(m => m.FoundReport)
-            .WithMany(r => r.Matches)
-            .HasForeignKey(m => m.FoundReportId)
-            .OnDelete(DeleteBehavior.NoAction);
+                builder.HasOne(m => m.LostReportNevigation)
+                       .WithMany(r => r.LostFoundMatchNevigation)
+                       .HasForeignKey(m => m.LostReportId)
+                       .OnDelete(DeleteBehavior.Cascade); 
+
+                builder.HasOne(m => m.FoundReportNevigation)
+                       .WithMany(r => r.LostFoundMatchNevigation)
+                       .HasForeignKey(m => m.FoundReportId)
+                       .OnDelete(DeleteBehavior.NoAction); 
+            });
 
         }
 

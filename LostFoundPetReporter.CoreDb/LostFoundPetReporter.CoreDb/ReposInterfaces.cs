@@ -1,8 +1,5 @@
-﻿using LostFoundPetReporter.CoreDb.repos;
+﻿
 using LostFoundPetReporter.CoreDb.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 {

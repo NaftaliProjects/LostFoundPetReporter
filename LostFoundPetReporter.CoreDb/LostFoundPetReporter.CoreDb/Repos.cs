@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
-using Microsoft.EntityFrameworkCore.Query;
 
-namespace LostFoundPetReporter.CoreDb.repos
+
+namespace LostFoundPetReporter.CoreDb.Repos
 {
     
 
@@ -161,13 +159,13 @@ namespace LostFoundPetReporter.CoreDb.repos
 
 
 
-    public class FoundReportReo : BaseRepo<FoundReport>, IFoundReportRepo
+    public class FoundReportRepo : BaseRepo<FoundReport>, IFoundReportRepo
     {
-        public FoundReportReo(PetReporterContext context) : base(context)
+        public FoundReportRepo(PetReporterContext context) : base(context)
         {
         }
 
-        internal FoundReportReo(DbContextOptions<PetReporterContext> options) : base(options)
+        internal FoundReportRepo(DbContextOptions<PetReporterContext> options) : base(options)
         {
         }
 
@@ -194,13 +192,13 @@ namespace LostFoundPetReporter.CoreDb.repos
     }
 
 
-    public class LostReportReo : BaseRepo<LostReport>, ILostReportRepo
+    public class LostReportRepo : BaseRepo<LostReport>, ILostReportRepo
     {
-        public LostReportReo(PetReporterContext context) : base(context)
+        public LostReportRepo(PetReporterContext context) : base(context)
         {
         }
 
-        internal LostReportReo(DbContextOptions<PetReporterContext> options) : base(options)
+        internal LostReportRepo(DbContextOptions<PetReporterContext> options) : base(options)
         {
         }
 

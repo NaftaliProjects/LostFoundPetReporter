@@ -13,13 +13,11 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 
     public interface IBaseViewRepo<T> : IDisposable where T : class, new()
     {
+        PetReporterContext Context { get; }
         IEnumerable<T> ExcuteSqlString(string sql);
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAllIgnoreQueryFillters();
 
-        // in the book they added the EF implementation here but i want to try to decouple , lets see if this will result in an error
-        //PetReporterContext Context { get; }
-        
     }
 
 

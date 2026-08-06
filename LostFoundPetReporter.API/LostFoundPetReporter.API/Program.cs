@@ -1,5 +1,8 @@
 global using LostFoundPetReporter.CoreDb;
 global using Microsoft.EntityFrameworkCore;
+using LostFoundPetReporter.Services.DataServices.API;
+using LostFoundPetReporter.Services.DataServices.API.Services.DataServices.Api;
+using LostFoundPetReporter.Services.DataServices.Interfaces;
 
 
 
@@ -20,6 +23,10 @@ builder.Services.AddDbContextPool<PetReporterContext>(
         options => options.UseSqlServer(connetionString,
             sqlOptions => sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
     );
+
+builder.Services.AddScoped<IUserDataService, UserApiDataService>();
+builder.Services.AddScoped<ILostReportDataService, LostReportApiDataService>();
+builder.Services.AddScoped<IFoundReportDataService, FoundReportApiDataService>();
 
 var app = builder.Build();
 

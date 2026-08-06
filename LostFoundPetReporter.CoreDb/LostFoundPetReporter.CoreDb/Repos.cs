@@ -11,8 +11,9 @@ namespace LostFoundPetReporter.CoreDb.repos
 
     public abstract class BaseViewRepo<T> : IBaseViewRepo<T> where T : class, new()
     {
+
         private readonly bool _disoposeContext;
-        protected PetReporterContext Context { get; }
+        public PetReporterContext Context { get; }
         protected DbSet<T> Table { get; }
 
         protected BaseViewRepo(PetReporterContext context)

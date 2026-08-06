@@ -10,7 +10,7 @@ namespace LostFoundPetReporter.API.Controllers
     public class ReportController : ControllerBase
     {
         [HttpGet("{id?}")]
-        public async IActionResult GetReports(int? id)
+        public async Task<IActionResult> GetReports(int? id)
         {
        
             return Ok(new String("Hi"));
@@ -18,15 +18,17 @@ namespace LostFoundPetReporter.API.Controllers
         }
 
         [HttpPost("{id?}")]
-        public async IActionResult CreateNewReport(int? id)
+        public async Task<IActionResult> CreateNewReport(int? id)
         {
             //return a view
+            return Ok(new String("Hi"));
         }
 
         [HttpPut("{id?}")]
-        public async IActionResult UpdateReport(int? id)
+        public async Task<IActionResult> UpdateReport(int? id)
         {
             //return a view
+            return Ok(new String("Hi"));
         }
     }
 }

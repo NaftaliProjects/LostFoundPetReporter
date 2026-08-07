@@ -1,13 +1,12 @@
 ﻿using LostFoundPetReporter.CoreDb.Models;
-using Microsoft.AspNetCore.Mvc;
+
 
 
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class ReportController : ControllerBase
+    public class ReportController : BaseCrudController
     {
         [HttpGet("{id?}")]
         public async Task<IActionResult> GetReports(int? id)

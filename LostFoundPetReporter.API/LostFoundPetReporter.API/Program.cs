@@ -1,5 +1,11 @@
 global using LostFoundPetReporter.CoreDb;
 global using Microsoft.EntityFrameworkCore;
+global using System.Text.Json.Serialization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ApiExplorer;
+global using Microsoft.AspNetCore.Mvc.Versioning;
+global using LostFoundPetReporter.API.ApiVersionSupport;
+
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using LostFoundPetReporter.Services.DataServices.Dal;
@@ -9,11 +15,25 @@ using LostFoundPetReporter.Services.DataServices.Interfaces;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+      {
+          options.JsonSerializerOptions.PropertyNamingPolicy = null;
+          options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+          options.JsonSerializerOptions.WriteIndented = true;
+          options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+      });
+
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
+//Add Api versioning
+builder.Services.AddLostFoundPetReporterApiVersionConfiguration(new ApiVersion(1, 0));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -40,10 +60,12 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "LostFoundPetReporter API V1");
+    options.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
 

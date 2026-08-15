@@ -36,18 +36,18 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 
     public interface IUserRepo : IBaseRepo<User>
     {
-        IEnumerable<User> GetAllBy(int id);
+        IEnumerable<User> GetAllByUserId(int id);
     }
 
     public interface IFoundReportRepo : IBaseRepo<FoundReport>
     {
-        IEnumerable<FoundReport> GetByUserId(int userId);
+        IEnumerable<FoundReport> GetAllByUserId(int userId);
 
     }
 
     public interface ILostReportRepo : IBaseRepo<LostReport>
     {
-        IEnumerable<LostReport> GetByUserId(int userId);
+        IEnumerable<LostReport> GetAllByUserId(int userId);
     }
 
     public interface ILostFoundMatchRepo : IBaseRepo<LostFoundMatch>

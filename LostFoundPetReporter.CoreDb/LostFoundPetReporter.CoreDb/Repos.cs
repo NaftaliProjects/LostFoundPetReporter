@@ -145,7 +145,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
             => Table.OrderBy(u => u.Name);
         public override IEnumerable<User> GetAllIgnoreQueryFillters()
             => Table.OrderBy(u => u.Name);
-        public  IEnumerable<User> GetAllBy(int id)
+        public  IEnumerable<User> GetAllByUserId(int id)
             => Table.Where(u => u.Id == id);
 
         public override User Find(int? id)
@@ -185,7 +185,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
                 .Where(x => x.Id == id)
                 .FirstOrDefault();
 
-        public IEnumerable<FoundReport> GetByUserId(int userId)
+        public IEnumerable<FoundReport> GetAllByUserId(int userId)
             => BuildBaseQuery().Where(u => u.UserId == userId);
 
 
@@ -218,7 +218,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
                 .Where(x => x.Id == id)
                 .FirstOrDefault();
 
-        public IEnumerable<LostReport> GetByUserId(int userId)
+        public IEnumerable<LostReport> GetAllByUserId(int userId)
             => BuildBaseQuery().Where(u => u.UserId == userId);
     }
 

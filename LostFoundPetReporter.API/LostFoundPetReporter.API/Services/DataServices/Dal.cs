@@ -65,7 +65,7 @@ namespace LostFoundPetReporter.Services.DataServices.Dal
 
         public async Task<IEnumerable<LostReport>> GetAllByUserIdAsync(int? UserId)
             => UserId.HasValue
-                ? _repo.GetByUserId(UserId.Value)
+                ? _repo.GetAllByUserId(UserId.Value)
                 : MainRepo.GetAllIgnoreQueryFillters();
     }
 

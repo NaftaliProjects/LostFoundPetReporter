@@ -1,13 +1,22 @@
 global using LostFoundPetReporter.CoreDb;
+global using LostFoundPetReporter.CoreDb.Models;
+
+
 global using Microsoft.EntityFrameworkCore;
-global using System.Text.Json.Serialization;
-global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.ApiExplorer;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Versioning;
+
+global using System.Text.Json.Serialization;
+
 global using LostFoundPetReporter.API.ApiVersionSupport;
+
+global using LostFoundPetReporter.API.Controllers.Base;
+
 
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+
 using LostFoundPetReporter.Services.DataServices.Dal;
 using LostFoundPetReporter.Services.DataServices.Interfaces;
 

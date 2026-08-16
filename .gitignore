@@ -12,3 +12,8 @@
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+
+# Exclude sensitive settings files
+appsettings.json
+appsettings.*.json

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     [DbContext(typeof(PetReporterContext))]
-    [Migration("20260719133511_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260816181849_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -84,7 +83,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -111,7 +109,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -119,7 +116,8 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.HasIndex("FoundReportId");
 
-                    b.HasIndex("LostReportId");
+                    b.HasIndex("LostReportId", "FoundReportId")
+                        .IsUnique();
 
                     b.ToTable("LostFoundMatches");
                 });
@@ -138,7 +136,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -183,7 +180,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -224,7 +220,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<byte[]>("TimeStamp")
                         .IsConcurrencyToken()
-                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
@@ -235,7 +230,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReport", b =>
                 {
-                    b.HasOne("LostFoundPetReporter.CoreDb.Models.User", "User")
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.User", "UserNevigation")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -273,13 +268,13 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     b.Navigation("PetDescription")
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("UserNevigation");
                 });
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReportExtFile", b =>
                 {
                     b.HasOne("LostFoundPetReporter.CoreDb.Models.FoundReport", null)
-                        .WithMany("ExtFiles")
+                        .WithMany("FoundReportExtFilesNevigation")
                         .HasForeignKey("FoundReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -287,21 +282,21 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostFoundMatch", b =>
                 {
-                    b.HasOne("LostFoundPetReporter.CoreDb.Models.FoundReport", "FoundReport")
-                        .WithMany("Matches")
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.FoundReport", "FoundReportNevigation")
+                        .WithMany("LostFoundMatchNevigation")
                         .HasForeignKey("FoundReportId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("LostFoundPetReporter.CoreDb.Models.LostReport", "LostReport")
-                        .WithMany("Matches")
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.LostReport", "LostReportNevigation")
+                        .WithMany("LostFoundMatchNevigation")
                         .HasForeignKey("LostReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FoundReport");
+                    b.Navigation("FoundReportNevigation");
 
-                    b.Navigation("LostReport");
+                    b.Navigation("LostReportNevigation");
                 });
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostReport", b =>
@@ -350,7 +345,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostReportExtFile", b =>
                 {
                     b.HasOne("LostFoundPetReporter.CoreDb.Models.LostReport", null)
-                        .WithMany("ExtFiles")
+                        .WithMany("LostReportExtFilesNevigation")
                         .HasForeignKey("LostReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -358,16 +353,16 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReport", b =>
                 {
-                    b.Navigation("ExtFiles");
+                    b.Navigation("FoundReportExtFilesNevigation");
 
-                    b.Navigation("Matches");
+                    b.Navigation("LostFoundMatchNevigation");
                 });
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostReport", b =>
                 {
-                    b.Navigation("ExtFiles");
+                    b.Navigation("LostFoundMatchNevigation");
 
-                    b.Navigation("Matches");
+                    b.Navigation("LostReportExtFilesNevigation");
                 });
 #pragma warning restore 612, 618
         }

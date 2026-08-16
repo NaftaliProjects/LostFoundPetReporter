@@ -39,7 +39,7 @@ namespace LostFoundPetReporter.Services.DataServices.Dal
 
 
 
-
+    /*
 
     public class UserDalDataService : DalDataServiceBase<User>, IUserDataService
     {
@@ -56,7 +56,7 @@ namespace LostFoundPetReporter.Services.DataServices.Dal
        
     }
 
-
+    */
     public class LostReportDalDataService : DalDataServiceBase<LostReport>, ILostReportDataService
     {
         private readonly ILostReportRepo _repo;
@@ -69,7 +69,7 @@ namespace LostFoundPetReporter.Services.DataServices.Dal
                 : MainRepo.GetAllIgnoreQueryFillters();
     }
 
-
+    /*
     public class FoundReportDalDataService : DalDataServiceBase<FoundReport>, IFoundReportDataService
     {
         private readonly IFoundReportRepo _repo;
@@ -81,4 +81,5 @@ namespace LostFoundPetReporter.Services.DataServices.Dal
                 ? _repo.GetByUserId(UserId.Value)
                 : MainRepo.GetAllIgnoreQueryFillters();
     }
+    */
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     HashedPassword = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,7 +41,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -67,7 +67,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -90,7 +90,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     FileName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     FoundReportId = table.Column<int>(type: "int", nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -111,7 +111,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LostReportId = table.Column<int>(type: "int", nullable: false),
                     FoundReportId = table.Column<int>(type: "int", nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -139,7 +139,7 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     FileName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     LostReportId = table.Column<int>(type: "int", nullable: false),
-                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    TimeStamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -168,9 +168,10 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                 column: "FoundReportId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LostFoundMatches_LostReportId",
+                name: "IX_LostFoundMatches_LostReportId_FoundReportId",
                 table: "LostFoundMatches",
-                column: "LostReportId");
+                columns: new[] { "LostReportId", "FoundReportId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LostReportExtFiles_LostReportId",

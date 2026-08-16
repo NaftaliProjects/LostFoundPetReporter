@@ -28,8 +28,12 @@ using LostFoundPetReporter.Services.DataServices.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+    {
+        // Prevents ASP.NET from automatically requiring non-nullable navigation properties
+        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+    })
+   .AddJsonOptions(options =>
       {
           options.JsonSerializerOptions.PropertyNamingPolicy = null;
           options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
@@ -37,7 +41,7 @@ builder.Services.AddControllers()
           options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
       });
 
-builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
@@ -50,21 +54,33 @@ builder.Services.AddOpenApi();
 
 //add DI DB Context
 var connetionString = builder.Configuration.GetConnectionString("TestENV");
-builder.Services.AddDbContextPool<PetReporterContext>(
-        options => options.UseSqlServer(connetionString,
-            sqlOptions => sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
-    );
+builder.Services.AddDbContext<PetReporterContext>(options =>
+    options.UseSqlServer(connetionString, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
+);
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ILostReportRepo, LostReportRepo>();
 builder.Services.AddScoped<IFoundReportRepo, FoundReportRepo>();
 
+/*
 builder.Services.AddScoped<IUserDataService, UserDalDataService>();
 builder.Services.AddScoped<ILostReportDataService, LostReportDalDataService>();
 builder.Services.AddScoped<IFoundReportDataService, FoundReportDalDataService>();
+*/
 
 builder.Services.AddEndpointsApiExplorer();
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 

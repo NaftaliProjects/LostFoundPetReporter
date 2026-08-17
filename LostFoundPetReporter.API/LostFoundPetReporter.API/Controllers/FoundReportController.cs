@@ -1,4 +1,5 @@
-﻿using LostFoundPetReporter.CoreDb.Models;
+﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
@@ -7,7 +8,7 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class FoundReportController : BaseCrudController<FoundReport, FoundReportController>
+    public class FoundReportController : BaseCrudController<FoundReport, FoundReportController, FoundReportDto, CreateFoundReportDto>
     {
         public FoundReportController(IFoundReportRepo repo) : base(repo)
         {
@@ -28,6 +29,27 @@ namespace LostFoundPetReporter.API.Controllers
                 return Ok(((IFoundReportRepo)MainRepo).GetAllByUserId(id.Value));
             }
             return Ok(MainRepo.GetAllIgnoreQueryFillters());
+        }
+
+        protected override FoundReportDto MapToResponseDto(FoundReport entity)
+        {
+            return new FoundReportDto
+            {
+                Id = entity.Id,
+                Coordinates = entity.Coordinates,
+                dateTime = entity.dateTime,
+                UserId = entity.UserId
+            };
+        }
+
+        protected override FoundReport MapToEntity(CreateFoundReportDto createDto)
+        {
+            return new FoundReport
+            {
+                Coordinates = createDto.Coordinates,
+                dateTime = createDto.dateTime,
+                UserId = createDto.UserId
+            };
         }
     }
 }

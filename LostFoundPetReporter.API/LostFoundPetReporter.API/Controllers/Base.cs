@@ -2,13 +2,14 @@
 
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using LostFoundPetReporter.API.DTO;
 
 namespace LostFoundPetReporter.API.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public abstract class BaseCrudController<TEntity, TController> : ControllerBase
+    public abstract class BaseCrudController<TEntity, TController , TResponseDto, TCreateDto> : ControllerBase
         where TEntity : BaseModel, new()
         where TController : class
     {
@@ -20,6 +21,9 @@ namespace LostFoundPetReporter.API.Controllers.Base
             MainRepo = repo;
         }
 
+        protected abstract TResponseDto MapToResponseDto(TEntity entity);
+        protected abstract TEntity MapToEntity(TCreateDto createDto);
+
         /// <summary>
         /// GETS ALL RECORDS.
         /// <summary>
@@ -28,7 +32,9 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [HttpGet]
         public ActionResult<IEnumerable<TEntity>> GetAll()
         {
-            return Ok(MainRepo.GetAllIgnoreQueryFillters());
+            var entities = MainRepo.GetAllIgnoreQueryFillters();
+            var dtos = entities.Select(MapToResponseDto);
+            return Ok(dtos);
         }
 
         /// <summary>
@@ -41,11 +47,13 @@ namespace LostFoundPetReporter.API.Controllers.Base
         public ActionResult<IEnumerable<TEntity>> GetOne(int id)
         {
             var entity = MainRepo.Find(id);
+          
             if (entity == null)
             {
                 return NoContent();
             }
-            return Ok(entity);
+
+            return Ok(MapToResponseDto(entity));
         }
 
 
@@ -104,14 +112,17 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> Added Record</returns>
         [ApiVersion("1.0")]
         [HttpPost()]
-        public ActionResult<IEnumerable<TEntity>> AddOne(TEntity entity)
+        public ActionResult<IEnumerable<TEntity>> AddOne(TCreateDto createDto)
         {
+            var entity = MapToEntity(createDto);
+
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
             try
             {
+                
                 MainRepo.Add(entity);
             }
             catch (Exception ex)

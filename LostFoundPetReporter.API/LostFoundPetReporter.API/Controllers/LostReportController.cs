@@ -1,4 +1,5 @@
-﻿using LostFoundPetReporter.CoreDb.Models;
+﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 
@@ -6,7 +7,7 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class LostReportController : BaseCrudController<LostReport, LostReportController>
+    public class LostReportController : BaseCrudController<LostReport, LostReportController ,LostReportDto, CreateLostReportDto>
     {
         public LostReportController(ILostReportRepo repo) : base(repo)
         {
@@ -24,9 +25,32 @@ namespace LostFoundPetReporter.API.Controllers
         {
             if (id.HasValue && id.Value > 0)
             {
+                var entities = ((ILostReportRepo)MainRepo).GetAllByUserId(id.Value);
+                var dtos = entities.Select(MapToResponseDto);
                 return Ok(((ILostReportRepo)MainRepo).GetAllByUserId(id.Value));
             }
             return Ok(MainRepo.GetAllIgnoreQueryFillters());
+        }
+
+        protected override LostReportDto MapToResponseDto(LostReport entity)
+        {
+            return new LostReportDto
+            {
+                Id = entity.Id,
+                Coordinates = entity.Coordinates,
+                dateTime = entity.dateTime,
+                UserId = entity.UserId
+            };
+        }
+
+        protected override LostReport MapToEntity(CreateLostReportDto createDto)
+        {
+            return new LostReport
+            {
+                Coordinates = createDto.Coordinates,
+                dateTime = createDto.dateTime,
+                UserId = createDto.UserId
+            };
         }
     }
 }

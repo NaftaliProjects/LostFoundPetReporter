@@ -21,7 +21,7 @@ namespace LostFoundPetReporter.API.Controllers
         /// <returns> All LostReports for a user</returns>
         [ApiVersion("1.0")]
         [HttpGet("ByUser/{id}")]
-        public ActionResult<IEnumerable<LostReport>> GetLostReportsByUserId(int? id)
+        public ActionResult<IEnumerable<LostReportDto>> GetLostReportsByUserId(int? id)
         {
             if (id.HasValue && id.Value > 0)
             {

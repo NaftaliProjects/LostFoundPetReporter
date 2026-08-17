@@ -30,7 +30,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> ALL records</returns>>
         [ApiVersion("1.0")]
         [HttpGet]
-        public ActionResult<IEnumerable<TEntity>> GetAll()
+        public ActionResult<IEnumerable<TResponseDto>> GetAll()
         {
             var entities = MainRepo.GetAllIgnoreQueryFillters();
             var dtos = entities.Select(MapToResponseDto);
@@ -44,7 +44,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> Single Record</returns>
         [ApiVersion("1.0")]
         [HttpGet("{id}")]
-        public ActionResult<IEnumerable<TEntity>> GetOne(int id)
+        public ActionResult<IEnumerable<TResponseDto>> GetOne(int id)
         {
             var entity = MainRepo.Find(id);
           
@@ -149,21 +149,25 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> Nothing</returns>
         [ApiVersion("1.0")]
         [HttpDelete("{id}")]
-        public ActionResult<IEnumerable<TEntity>> DeleteOne(int id, TEntity entity)
+        public ActionResult DeleteOne(int id)
         {
-            if (id != entity.Id)
+            var entity = MainRepo.Find(id);
+
+            if (entity == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
             try
             {
                 MainRepo.Delete(entity);
             }
             catch (Exception ex)
             {
-                return new BadRequestObjectResult(ex.GetBaseException()?.Message);
+                return BadRequest(ex.GetBaseException()?.Message);
             }
-            return Ok(entity);
+
+            return NoContent();
         }
     }
 }

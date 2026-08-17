@@ -41,15 +41,13 @@ builder.Services.AddControllers(options =>
           options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
       });
 
-//builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 //Add Api versioning
 builder.Services.AddLostFoundPetReporterApiVersionConfiguration(new ApiVersion(1, 0));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
 
 
 //add DI DB Context
@@ -69,7 +67,7 @@ builder.Services.AddScoped<ILostReportDataService, LostReportDalDataService>();
 builder.Services.AddScoped<IFoundReportDataService, FoundReportDalDataService>();
 */
 
-builder.Services.AddEndpointsApiExplorer();
+
 
 
 builder.Services.AddCors(options =>

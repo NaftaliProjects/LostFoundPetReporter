@@ -22,7 +22,7 @@ namespace LostFoundPetReporter.API.Controllers
         /// <returns> All FoundReport for a user</returns>
         [ApiVersion("1.0")]
         [HttpGet("ByUser/{id}")]
-        public ActionResult<IEnumerable<FoundReport>> GetFoundReportsByUserId(int? id)
+        public ActionResult<IEnumerable<FoundReportDto>> GetFoundReportsByUserId(int? id)
         {
             if (id.HasValue && id.Value > 0)
             {

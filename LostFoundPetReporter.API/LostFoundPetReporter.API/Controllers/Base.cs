@@ -9,8 +9,10 @@ namespace LostFoundPetReporter.API.Controllers.Base
     [ApiController]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public abstract class BaseCrudController<TEntity, TController , TResponseDto, TCreateDto> : ControllerBase
+    public abstract class BaseCrudController<TEntity, TController , TResponseDto, TCreateOrUpdateDto> : ControllerBase
         where TEntity : BaseModel, new()
+        where TResponseDto : BaseResponseDto, new()
+        where TCreateOrUpdateDto : BaseCreateOrUpdateDto, new()
         where TController : class
     {
         protected readonly IBaseRepo<TEntity> MainRepo;
@@ -22,7 +24,9 @@ namespace LostFoundPetReporter.API.Controllers.Base
         }
 
         protected abstract TResponseDto MapToResponseDto(TEntity entity);
-        protected abstract TEntity MapToEntity(TCreateDto createDto);
+       
+        protected abstract TEntity MapToEntity(TCreateOrUpdateDto createDto);
+
 
         /// <summary>
         /// GETS ALL RECORDS.
@@ -74,25 +78,30 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> Single Record</returns>
         [ApiVersion("1.0")]
         [HttpPut("{id}")]
-        public ActionResult<IEnumerable<TEntity>> UpdateOne(int id,TEntity entity)
+        public ActionResult<string> UpdateOne(int id, TCreateOrUpdateDto updateDto)
         {
-            if(id != entity.Id)
-            {
-                return BadRequest();
-            }
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
+            if (id != updateDto.Id) { return BadRequest();  }
+
+            if (!ModelState.IsValid) { return ValidationProblem(ModelState);  }
+
             try
             {
+                var existingEntity =  MainRepo.FindAsNoTracking(id);
+                if (existingEntity == null)
+                {
+                    return NotFound();
+                }
+                var entity = MapToEntity(updateDto);
+               
                 MainRepo.Update(entity);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                // Return ex.Message or ex.ToString() temporarily to see the actual error
+                return BadRequest(ex.Message);
             }
-            return Ok(entity);
+
+            return Ok();
         }
 
 
@@ -112,14 +121,21 @@ namespace LostFoundPetReporter.API.Controllers.Base
         /// <returns> Added Record</returns>
         [ApiVersion("1.0")]
         [HttpPost()]
-        public ActionResult<IEnumerable<TEntity>> AddOne(TCreateDto createDto)
+        public ActionResult<IEnumerable<TEntity>> AddOne(TCreateOrUpdateDto createDto)
         {
-            var entity = MapToEntity(createDto);
+            
 
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
+
+            if (createDto.Id.HasValue && createDto.Id.Value > 0)
+            {
+                return BadRequest("POST requests cannot specify an existing Id.");
+            }
+
+            var entity = MapToEntity(createDto);
             try
             {
                 

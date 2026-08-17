@@ -21,7 +21,7 @@ namespace LostFoundPetReporter.API.DTO
     /// Returned to client for GET requests.
     /// Includes primitive/flat data or nested Response DTOs.
     /// </summary>
-    public class FoundReportDto : IDto
+    public class FoundReportDto : BaseResponseDto
     {
         public int Id { get; set; }
         public string Coordinates { get; set; } = string.Empty;
@@ -39,7 +39,7 @@ namespace LostFoundPetReporter.API.DTO
     /// Received from client for POST requests.
     /// Contains ONLY the fields required to create a record.
     /// </summary>
-    public class CreateFoundReportDto : IDto
+    public class CreateFoundReportDto : BaseCreateOrUpdateDto
     {
         public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }

@@ -11,8 +11,6 @@ namespace LostFoundPetReporter.CoreDb.Models
     public abstract class BaseModel
     {
         public int Id { get; set; }
-        [Timestamp]
-        public Byte[]? TimeStamp { get; set; }
     }
 
     /// <summary>

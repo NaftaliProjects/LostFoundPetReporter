@@ -27,9 +27,12 @@ namespace LostFoundPetReporter.API.Controllers
 
         protected override User MapToEntity(CreateUserDto createDto)
         {
+            string HashedPassword = createDto.Password; 
             return new User
             {
+                Id = createDto.Id??0,
                 Name = createDto.Name,
+                HashedPassword = HashedPassword,
                 Email = createDto.Email,
                 Phone = createDto.Phone
             };

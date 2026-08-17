@@ -46,6 +46,7 @@ namespace LostFoundPetReporter.API.Controllers
         {
             return new FoundReport
             {
+                Id = createDto.Id ?? 0,
                 Coordinates = createDto.Coordinates,
                 dateTime = createDto.dateTime,
                 UserId = createDto.UserId

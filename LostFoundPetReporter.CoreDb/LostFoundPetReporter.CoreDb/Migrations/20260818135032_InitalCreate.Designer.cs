@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     [DbContext(typeof(PetReporterContext))]
-    [Migration("20260817170130_initalCreate")]
-    partial class initalCreate
+    [Migration("20260818135032_InitalCreate")]
+    partial class InitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

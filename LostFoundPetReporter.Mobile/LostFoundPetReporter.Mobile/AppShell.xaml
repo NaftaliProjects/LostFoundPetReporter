@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Shell
+    x:Class="LostFoundPetReporter.Mobile.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:LostFoundPetReporter.Mobile.Views">
+
+    <!-- Authentication -->
+
+    <ShellContent
+        Route="login"
+        ContentTemplate="{DataTemplate views:LoginPage}" />
+
+    <ShellContent
+        Route="register"
+        ContentTemplate="{DataTemplate views:RegisterPage}" />
+
+    <!-- Main Application -->
+
+
+    <ShellContent
+        Title="Profile"
+        Route="profile"
+        ContentTemplate="{DataTemplate views:ProfilePage}" />
+
+    <ShellContent
+        Title="Camera"
+        Route="camera"
+        ContentTemplate="{DataTemplate views:CameraPage}" />
+
+    <ShellContent
+        Title="Home"
+        Route="home"
+        ContentTemplate="{DataTemplate views:HomePage}" />
+
+    <ShellContent
+        Title="Map"
+        Route="map"
+        ContentTemplate="{DataTemplate views:MapPage}" />
+
+    <ShellContent
+        Title="My Reports"
+        Route="myreports"
+        ContentTemplate="{DataTemplate views:MyReportsPage}" />
+
+  
+
+</Shell>

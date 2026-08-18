@@ -1,19 +1,61 @@
-## Visual Studio User Options and Cache
+# ==========================================
+# Visual Studio
+# ==========================================
 .vs/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+
+# ==========================================
+# .NET / Build output
+# ==========================================
 [Bb]in/
 [Oo]bj/
 
+# ==========================================
+# Visual Studio / Rider / VS Code
+# ==========================================
+.idea/
+.vscode/
 
-## OS generated files
+# ==========================================
+# MAUI
+# ==========================================
+*.apk
+*.aab
+*.ipa
+
+# ==========================================
+# OS generated files
+# ==========================================
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+.DS_Store
 
+# ==========================================
+# Logs
+# ==========================================
+*.log
 
-# Exclude sensitive settings files
-appsettings.json
-appsettings.*.json
+# ==========================================
+# NuGet
+# ==========================================
+packages/
+*.nupkg
+*.snupkg
+
+# ==========================================
+# Temporary files
+# ==========================================
+*.tmp
+*.temp
+*.swp
+*.bak
+
+# ==========================================
+# Sensitive local configuration
+# ==========================================
+appsettings.Local.json
+appsettings.Development.json

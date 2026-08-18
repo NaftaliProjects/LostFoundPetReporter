@@ -145,8 +145,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
             {
                 return BadRequest(ex);
             }
-            return CreatedAtAction(nameof(GetOne),new { id = entity.Id},entity);
-        }
+            return CreatedAtAction(nameof(GetOne),new { id = entity.Id },MapToResponseDto(entity));}
 
 
 

@@ -109,7 +109,7 @@ namespace LostFoundPetReporter.CoreDb
         {
             var optionBuilder = new DbContextOptionsBuilder<PetReporterContext>();
             //var connectionString = @"Server=localhost\SQLEXPRESS01;Database=LFPR;Trusted_Connection=True;TrustServerCertificate=True;";
-            var connectionString = @"Server=localhost;Database=LFPR;Trusted_Connection=True;TrustServerCertificate=True;";
+            var connectionString = @"Server=DES-SERV-3\NaftulENV;Database=LFPR;Trusted_Connection=True;TrustServerCertificate=True;";
             optionBuilder.UseSqlServer(connectionString);
             return new PetReporterContext(optionBuilder.Options);
         }

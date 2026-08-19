@@ -203,7 +203,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
         }
 
         internal IOrderedQueryable<LostReport> BuildBaseQuery()
-            => Table.Include(x => x.LostReportExtFilesNevigation).OrderBy(o => o.dateTime);
+            => Table.Include(x => x.LostReportExtFilesNevigation).Include(u => u.User).OrderBy(o => o.dateTime);
 
         public override IEnumerable<LostReport> GetAll()
             => BuildBaseQuery();

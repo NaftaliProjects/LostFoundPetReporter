@@ -52,29 +52,50 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:LostReport">
 
-                    <Border
-                        Margin="5"
-                        Padding="15"
+                    <Border Margin="5,8"
+                        Padding="12"
                         StrokeShape="RoundRectangle 10">
 
-                        <VerticalStackLayout Spacing="8">
+                        <!-- 2-Column Grid: Left for Image, Right for Details -->
+                        <Grid ColumnDefinitions="90, *"
+                              ColumnSpacing="15">
 
-                            <Label
-                                Text="{Binding Coordinates}"
-                                FontSize="20"
-                                FontAttributes="Bold" />
+                            <!-- Left: Default Pet Image -->
+                            <Border 
+                                
+                                Grid.Column="0" 
+                                HeightRequest="90"
+                                WidthRequest="90"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                VerticalOptions="Center">
+                                <Image Source="dotnet_bot.png" Aspect="AspectFill" />
+                                   
+                            </Border>
 
-                            <Label
-                                Text="{Binding DateTime}"
-                                FontSize="14" />
+                            <!-- Right: Pet & Reporter Info -->
+                            <VerticalStackLayout Grid.Column="1"
+                                     VerticalOptions="Center"
+                                     Spacing="4">
 
-                            <!-- Optional nested User -->
-                            <Label
-                                Text="{Binding User.Name}"
-                                FontSize="14" />
+                                <!-- Pet Name -->
+                                <Label Text="{Binding PetDescription.Name}"
+                                   FontSize="18"
+                                   FontAttributes="Bold" /> 
 
+                                <!-- Reporter Name -->
+                                <Label Text="{Binding User.Name, StringFormat='Reporter: {0}'}"
+                                   FontSize="14"
+                                   TextColor="White" />      
 
-                        </VerticalStackLayout>
+                                <!-- Location / Country-City -->
+                                <Label Text="{Binding Coordinates, StringFormat='Location: {0}'}"
+                                   FontSize="12"
+                                   TextColor="White" />
+
+                            </VerticalStackLayout>
+
+                        </Grid>
 
                     </Border>
 

@@ -12,6 +12,7 @@ namespace LostFoundPetReporter.Mobile.Models
         public DateTime dateTime { get; set; }
 
         public User? User { get; set; }
+        public AnimalDescription PetDescription { get; set; }
 
 
 

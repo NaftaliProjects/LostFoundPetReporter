@@ -3,50 +3,95 @@
 namespace LostFoundPetReporter.API.DTO
 {
     public class LostReportExtFileDto
+    : IResponseDto<LostReportExtFile, LostReportExtFileDto>
     {
-        //properties
-        public String FilePath { get; set; }
+        public string FilePath { get; set; } = string.Empty;
 
-        public String FileName { get; set; }
-        public String Description { get; set; } = "";
+        public string FileName { get; set; } = string.Empty;
 
-        //Foreign keys 
+        public string Description { get; set; } = string.Empty;
+
+        // Foreign key
         public int LostReportId { get; set; }
+
+
+        public static LostReportExtFileDto FromEntity(LostReportExtFile entity)
+        {
+            return new LostReportExtFileDto
+            {
+                FilePath = entity.FilePath,
+                FileName = entity.FileName,
+                Description = entity.Description,
+                LostReportId = entity.LostReportId
+            };
+        }
     }
 
-    /// <summary>
-    /// Returned to client for GET requests.
-    /// Includes primitive/flat data or nested Response DTOs.
-    /// </summary>
-    public class LostReportDto : BaseResponseDto
+
+    public class LostReportDto : IResponseDto<LostReport, LostReportDto> , IHasId
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
-        // Foreign keys / References
         public int UserId { get; set; }
 
-        // If you need nested details on GET, reference DTOs (not DB entities)
+        public UserDto? User { get; set; }
+
         public AnimalDescriptionDto PetDescription { get; set; } = new();
+
         public List<LostReportExtFileDto> LostReportExtFiles { get; set; } = new();
+
+
+
+
+        public static LostReportDto FromEntity(LostReport entity)
+        {
+            return new LostReportDto
+            {
+                Id = entity.Id,
+                Coordinates = entity.Coordinates,
+                dateTime = entity.dateTime,
+                UserId = entity.UserId,
+
+                User = entity.User == null
+                    ? null
+                    : UserDto.FromEntity(entity.User),
+
+                PetDescription = entity.PetDescription == null
+                    ? new AnimalDescriptionDto()
+                    : AnimalDescriptionDto.FromEntity(entity.PetDescription),
+
+
+                LostReportExtFiles = entity.LostReportExtFilesNevigation?
+                    .Select(LostReportExtFileDto.FromEntity)
+                    .ToList()
+                    ?? new()
+            };
+        }
     }
 
-    /// <summary>
-    /// Received from client for POST requests.
-    /// Contains ONLY the fields required to create a record.
-    /// </summary>
-    public class CreateLostReportDto : BaseCreateOrUpdateDto
+    public class CreateLostReportDto : IEntityDto<LostReport>, IHasId
     {
-        // NOTE: No Id property here (database generates it)
-
+        public int? Id { get; set; }
         public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
-        // Foreign keys required to link relationships
         public int UserId { get; set; }
 
-        // Embedded data required on creation
         public AnimalDescriptionDto PetDescription { get; set; } = new();
+
+        public LostReport ToEntity()
+        {
+            return new LostReport
+            {
+                Id = Id ?? 0,
+                Coordinates = Coordinates,
+                dateTime = dateTime,
+                UserId = UserId,
+
+                PetDescription = PetDescription.ToEntity()
+            };
+        }
     }
 }

@@ -8,49 +8,40 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class FoundReportController : BaseCrudController<FoundReport, FoundReportController, FoundReportDto, CreateFoundReportDto>
+    public class FoundReportController
+        : BaseCrudController<
+            FoundReport,
+            FoundReportController,
+            FoundReportDto,
+            CreateFoundReportDto>
     {
-        public FoundReportController(IFoundReportRepo repo) : base(repo)
+        public FoundReportController(IFoundReportRepo repo)
+            : base(repo)
         {
-
         }
 
+
         /// <summary>
-        /// Gets all FoundReport records.
-        /// <summary>
-        /// <param name="id"> Primary key of the User</param>
-        /// <returns> All FoundReport for a user</returns>
+        /// Gets all FoundReport records for a user.
+        /// </summary>
+        /// <param name="id">Primary key of the User</param>
+        /// <returns>All FoundReports for a user</returns>
         [ApiVersion("1.0")]
         [HttpGet("ByUser/{id}")]
         public ActionResult<IEnumerable<FoundReportDto>> GetFoundReportsByUserId(int? id)
         {
             if (id.HasValue && id.Value > 0)
             {
-                return Ok(((IFoundReportRepo)MainRepo).GetAllByUserId(id.Value));
+                var entities = ((IFoundReportRepo)MainRepo).GetAllByUserId(id.Value);
+                var dtos = entities.Select(FoundReportDto.FromEntity);
+                return Ok(dtos);
             }
-            return Ok(MainRepo.GetAllIgnoreQueryFillters());
-        }
 
-        protected override FoundReportDto MapToResponseDto(FoundReport entity)
-        {
-            return new FoundReportDto
-            {
-                Id = entity.Id,
-                Coordinates = entity.Coordinates,
-                dateTime = entity.dateTime,
-                UserId = entity.UserId
-            };
-        }
+            var allEntities = MainRepo.GetAllIgnoreQueryFillters();
 
-        protected override FoundReport MapToEntity(CreateFoundReportDto createDto)
-        {
-            return new FoundReport
-            {
-                Id = createDto.Id ?? 0,
-                Coordinates = createDto.Coordinates,
-                dateTime = createDto.dateTime,
-                UserId = createDto.UserId
-            };
+            var allDtos = allEntities.Select(FoundReportDto.FromEntity);
+
+            return Ok(allDtos);
         }
     }
 }

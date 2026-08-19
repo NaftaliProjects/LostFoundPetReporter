@@ -38,6 +38,7 @@ public static class MauiProgram
         // =========================
 
         builder.Services.AddTransient<IUserApiService, UserApiService>();
+        builder.Services.AddTransient<ILostReportApiService, LostReportApiService>();
 
         // =========================
         // ViewModels

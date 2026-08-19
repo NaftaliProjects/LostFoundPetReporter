@@ -6,7 +6,9 @@ namespace LostFoundPetReporter.API.DTO
     
 
     public class FoundReportExtFileDto
+        : IResponseDto<FoundReportExtFile, FoundReportExtFileDto> , IHasId
     {
+        public int? Id { get; set; }
         //properties
         public String FilePath { get; set; }
 
@@ -15,32 +17,64 @@ namespace LostFoundPetReporter.API.DTO
 
         //Foreign keys 
         public int FoundReportId { get; set; }
+
+
+        public static FoundReportExtFileDto FromEntity(FoundReportExtFile entity)
+        {
+            return new FoundReportExtFileDto
+            {
+                FilePath = entity.FilePath,
+                FileName = entity.FileName,
+                Description = entity.Description,
+                FoundReportId = entity.FoundReportId
+            };
+        }
     }
 
-    /// <summary>
-    /// Returned to client for GET requests.
-    /// Includes primitive/flat data or nested Response DTOs.
-    /// </summary>
-    public class FoundReportDto : BaseResponseDto
+    public class FoundReportDto : IResponseDto<FoundReport, FoundReportDto> , IHasId
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
-
-        // Foreign keys / References
         public int UserId { get; set; }
 
-        // If you need nested details on GET, reference DTOs (not DB entities)
+        
+        public UserDto? User { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
         public List<FoundReportExtFileDto> FoundReportExtFiles { get; set; } = new();
+
+
+        public static FoundReportDto FromEntity(FoundReport entity)
+        {
+            return new FoundReportDto
+            {
+                Id = entity.Id,
+                Coordinates = entity.Coordinates,
+                dateTime = entity.dateTime,
+                UserId = entity.UserId,
+
+                User = entity.UserNevigation == null
+                    ? null
+                    : UserDto.FromEntity(entity.UserNevigation),
+
+                PetDescription = entity.PetDescription == null
+                    ? new AnimalDescriptionDto()
+                    : AnimalDescriptionDto.FromEntity(entity.PetDescription),
+
+
+                FoundReportExtFiles = entity.FoundReportExtFilesNevigation?
+                    .Select(FoundReportExtFileDto.FromEntity)
+                    .ToList()
+                    ?? new()
+            };
+        }
+
     }
 
-    /// <summary>
-    /// Received from client for POST requests.
-    /// Contains ONLY the fields required to create a record.
-    /// </summary>
-    public class CreateFoundReportDto : BaseCreateOrUpdateDto
+
+    public class CreateFoundReportDto : IEntityDto<FoundReport> , IHasId
     {
+        public int? Id { get; set; }
         public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
@@ -49,5 +83,19 @@ namespace LostFoundPetReporter.API.DTO
 
         // Embedded data required on creation
         public AnimalDescriptionDto PetDescription { get; set; } = new();
+
+
+        public FoundReport ToEntity()
+        {
+            return new FoundReport
+            {
+                Id = Id ?? 0,
+                Coordinates = Coordinates,
+                dateTime = dateTime,
+                UserId = UserId,
+
+                PetDescription = PetDescription.ToEntity()
+            };
+        }
     }
 }

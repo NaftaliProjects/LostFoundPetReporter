@@ -26,32 +26,15 @@ namespace LostFoundPetReporter.API.Controllers
             if (id.HasValue && id.Value > 0)
             {
                 var entities = ((ILostReportRepo)MainRepo).GetAllByUserId(id.Value);
-                var dtos = entities.Select(MapToResponseDto);
-                return Ok(((ILostReportRepo)MainRepo).GetAllByUserId(id.Value));
+                var dtos = entities.Select(LostReportDto.FromEntity);
+                return Ok(dtos);
             }
-            return Ok(MainRepo.GetAllIgnoreQueryFillters());
+
+            var allEntities = MainRepo.GetAllIgnoreQueryFillters();
+            var allDtos = allEntities.Select(LostReportDto.FromEntity);
+            return Ok(allDtos);
         }
 
-        protected override LostReportDto MapToResponseDto(LostReport entity)
-        {
-            return new LostReportDto
-            {
-                Id = entity.Id,
-                Coordinates = entity.Coordinates,
-                dateTime = entity.dateTime,
-                UserId = entity.UserId
-            };
-        }
-
-        protected override LostReport MapToEntity(CreateLostReportDto createDto)
-        {
-            return new LostReport
-            {
-                Id = createDto.Id ?? 0,
-                Coordinates = createDto.Coordinates,
-                dateTime = createDto.dateTime,
-                UserId = createDto.UserId
-            };
-        }
+        
     }
 }

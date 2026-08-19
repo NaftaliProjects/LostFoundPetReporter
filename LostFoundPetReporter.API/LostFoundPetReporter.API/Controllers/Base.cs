@@ -1,103 +1,107 @@
-﻿
-
-using LostFoundPetReporter.CoreDb.Repos;
+﻿using LostFoundPetReporter.API.DTO.Interfaces;
+using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
-using LostFoundPetReporter.API.DTO;
 
 namespace LostFoundPetReporter.API.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public abstract class BaseCrudController<TEntity, TController , TResponseDto, TCreateOrUpdateDto> : ControllerBase
+    public abstract class BaseCrudController<
+        TEntity,
+        TController,
+        TResponseDto,
+        TCreateOrUpdateDto> : ControllerBase
+
         where TEntity : BaseModel, new()
-        where TResponseDto : BaseResponseDto, new()
-        where TCreateOrUpdateDto : BaseCreateOrUpdateDto, new()
+
+        where TResponseDto :
+            IResponseDto<TEntity, TResponseDto>
+
+        where TCreateOrUpdateDto :
+            IEntityDto<TEntity>,
+            IHasId
+
         where TController : class
     {
         protected readonly IBaseRepo<TEntity> MainRepo;
-        //protected readonly IAppLogging
 
         protected BaseCrudController(IBaseRepo<TEntity> repo)
         {
             MainRepo = repo;
         }
 
-        protected abstract TResponseDto MapToResponseDto(TEntity entity);
-       
-        protected abstract TEntity MapToEntity(TCreateOrUpdateDto createDto);
 
+        // =========================
+        // GET ALL
+        // =========================
 
-        /// <summary>
-        /// GETS ALL RECORDS.
-        /// <summary>
-        /// <returns> ALL records</returns>>
         [ApiVersion("1.0")]
         [HttpGet]
         public ActionResult<IEnumerable<TResponseDto>> GetAll()
         {
             var entities = MainRepo.GetAllIgnoreQueryFillters();
-            var dtos = entities.Select(MapToResponseDto);
+
+            var dtos = entities.Select(TResponseDto.FromEntity);
+
             return Ok(dtos);
         }
 
-        /// <summary>
-        /// Gets a single record.
-        /// <summary>
-        /// <param name="id"> Primary key of the record</param>
-        /// <returns> Single Record</returns>
+
+        // =========================
+        // GET ONE
+        // =========================
+
         [ApiVersion("1.0")]
         [HttpGet("{id}")]
-        public ActionResult<IEnumerable<TResponseDto>> GetOne(int id)
+        public ActionResult<TResponseDto> GetOne(int id)
         {
             var entity = MainRepo.Find(id);
-          
+
             if (entity == null)
             {
                 return NoContent();
             }
 
-            return Ok(MapToResponseDto(entity));
+            return Ok(TResponseDto.FromEntity(entity));
+
         }
 
 
-        /// <summary>
-        /// Updates a single record.
-        /// <summary>
-        /// <remarks>
-        /// Sample Body:
-        /// <pre>
-        /// {
-        ///     "Id": 1,
-        ///     "TimeStamp": "AAAAAAAB+E="  
-        /// }
-        /// </pre>
-        /// </remarks>
-        /// <param name="id"> Primary key of the record to update</param>
-        /// <param name="entity"> Entity to update</param>
-        /// <returns> Single Record</returns>
+        // =========================
+        // PUT
+        // =========================
+
         [ApiVersion("1.0")]
         [HttpPut("{id}")]
-        public ActionResult<string> UpdateOne(int id, TCreateOrUpdateDto updateDto)
+        public ActionResult UpdateOne(int id, TCreateOrUpdateDto updateDto)
         {
-            if (id != updateDto.Id) { return BadRequest();  }
+            if (id != updateDto.Id)
+            {
+                return BadRequest();
+            }
 
-            if (!ModelState.IsValid) { return ValidationProblem(ModelState);  }
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
 
             try
             {
-                var existingEntity =  MainRepo.FindAsNoTracking(id);
+                var existingEntity =
+                    MainRepo.FindAsNoTracking(id);
+
                 if (existingEntity == null)
                 {
                     return NotFound();
                 }
-                var entity = MapToEntity(updateDto);
-               
+
+                var entity = updateDto.ToEntity();
+
                 MainRepo.Update(entity);
             }
             catch (Exception ex)
             {
-                // Return ex.Message or ex.ToString() temporarily to see the actual error
                 return BadRequest(ex.Message);
             }
 
@@ -105,63 +109,49 @@ namespace LostFoundPetReporter.API.Controllers.Base
         }
 
 
+        // =========================
+        // POST
+        // =========================
 
-        /// <summary>
-        /// Adds a single record.
-        /// <summary>
-        /// <remarks>
-        /// Sample Body:
-        /// <pre>
-        /// {
-        ///     "Id": 1,
-        ///     "TimeStamp": "AAAAAAAB+E="  
-        /// }
-        /// </pre>
-        /// </remarks>
-        /// <returns> Added Record</returns>
         [ApiVersion("1.0")]
-        [HttpPost()]
-        public ActionResult<IEnumerable<TEntity>> AddOne(TCreateOrUpdateDto createDto)
+        [HttpPost]
+        public ActionResult<TResponseDto> AddOne(
+            TCreateOrUpdateDto createDto)
         {
-            
-
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
 
-            if (createDto.Id.HasValue && createDto.Id.Value > 0)
+            if (createDto.Id.HasValue &&
+                createDto.Id.Value > 0)
             {
-                return BadRequest("POST requests cannot specify an existing Id.");
+                return BadRequest(
+                    "POST requests cannot specify an existing Id.");
             }
 
-            var entity = MapToEntity(createDto);
+            var entity = createDto.ToEntity();
+
             try
             {
-                
                 MainRepo.Add(entity);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            return CreatedAtAction(nameof(GetOne),new { id = entity.Id },MapToResponseDto(entity));}
+
+            return CreatedAtAction(
+                nameof(GetOne),
+                new { id = entity.Id },
+                TResponseDto.FromEntity(entity));
+        }
 
 
+        // =========================
+        // DELETE
+        // =========================
 
-        /// <summary>
-        /// Deletes a single record.
-        /// <summary>
-        /// <remarks>
-        /// Sample Body:
-        /// <pre>
-        /// {
-        ///     "Id": 1,
-        ///     "TimeStamp": "AAAAAAAB+E="  
-        /// }
-        /// </pre>
-        /// </remarks>
-        /// <returns> Nothing</returns>
         [ApiVersion("1.0")]
         [HttpDelete("{id}")]
         public ActionResult DeleteOne(int id)
@@ -179,7 +169,8 @@ namespace LostFoundPetReporter.API.Controllers.Base
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.GetBaseException()?.Message);
+                return BadRequest(
+                    ex.GetBaseException()?.Message);
             }
 
             return NoContent();

@@ -1,7 +1,8 @@
-﻿using System;
+﻿using LostFoundPetReporter.Mobile.Models;
+using LostFoundPetReporter.Mobile.Services.Session;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using LostFoundPetReporter.Mobile.Models;
 
 namespace LostFoundPetReporter.Mobile.Services.Api
 {
@@ -26,8 +27,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 $"api/v1/User/{id}");
         }
 
-        public async Task<User?> CreateUserAsync(
-            CreateUserRequest request)
+        public async Task<User?> CreateUserAsync(CreateUserRequest request)
         {
             return await _apiClient.PostAsync<CreateUserRequest, User>(
                 "api/v1/User",
@@ -47,6 +47,14 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         {
             await _apiClient.DeleteAsync(
                 $"api/v1/User/{id}");
+        }
+
+
+        async Task<UserSession> LoginAsync(LoginUser user)
+        {
+            UserSession userSession = await _apiClient.PostAsync<LoginUser, UserSession>($"api/v1/User/Login", user);
+            if (userSession == null) { return <What to do ?>}
+            return userSession;
         }
     }
 }

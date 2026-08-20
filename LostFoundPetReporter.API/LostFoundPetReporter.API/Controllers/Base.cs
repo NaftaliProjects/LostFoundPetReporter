@@ -115,36 +115,17 @@ namespace LostFoundPetReporter.API.Controllers.Base
 
         [ApiVersion("1.0")]
         [HttpPost]
-        public ActionResult<TResponseDto> AddOne(
-            TCreateOrUpdateDto createDto)
+        public ActionResult<TResponseDto> AddOne(TCreateOrUpdateDto createDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
-
-            if (createDto.Id.HasValue &&
-                createDto.Id.Value > 0)
-            {
-                return BadRequest(
-                    "POST requests cannot specify an existing Id.");
-            }
+            if (!ModelState.IsValid) { return ValidationProblem(ModelState);  }
+            if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
 
             var entity = createDto.ToEntity();
 
-            try
-            {
-                MainRepo.Add(entity);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            try { MainRepo.Add(entity); }
+            catch (Exception ex) { return BadRequest(ex); }
 
-            return CreatedAtAction(
-                nameof(GetOne),
-                new { id = entity.Id },
-                TResponseDto.FromEntity(entity));
+            return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, TResponseDto.FromEntity(entity));
         }
 
 

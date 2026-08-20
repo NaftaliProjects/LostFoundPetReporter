@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using LostFoundPetReporter.Mobile.Models;
+using LostFoundPetReporter.Mobile.Services.Session;
 
 
 namespace LostFoundPetReporter.Mobile.Services.Api
@@ -13,6 +14,8 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         Task<User?> GetUserAsync(int id);
 
         Task<User?> CreateUserAsync(CreateUserRequest request);
+
+        Task<UserSession> LoginAsync(LoginUser user);
 
         Task UpdateUserAsync(int id, CreateUserRequest request);
 

@@ -15,17 +15,13 @@ public partial class RegisterPage : ContentPage
         BindingContext = _viewModel;
     }
 
-    private async void OnRegisterClicked(
-        object? sender,
-        EventArgs e)
+    private async void OnRegisterClicked(object? sender, EventArgs e)
     {
         try
         {
             _viewModel.ErrorMessage = string.Empty;
 
-            var createdUser =
-                await _viewModel.RegisterAsync(
-                    _viewModel.User);
+            var createdUser = await _viewModel.RegisterAsync(_viewModel.User);
 
             // Registration succeeded
             await Shell.Current.GoToAsync("//login");

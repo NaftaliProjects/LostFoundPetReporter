@@ -37,6 +37,8 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
     public interface IUserRepo : IBaseRepo<User>
     {
         IEnumerable<User> GetAllByUserId(int id);
+
+        public User? GetByEmail(string email);
     }
 
     public interface IFoundReportRepo : IBaseRepo<FoundReport>

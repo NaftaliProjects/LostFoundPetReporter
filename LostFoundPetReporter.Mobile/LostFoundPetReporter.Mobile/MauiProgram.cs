@@ -1,4 +1,5 @@
 ﻿using LostFoundPetReporter.Mobile.Services.Api;
+using LostFoundPetReporter.Mobile.Services.Session;
 using LostFoundPetReporter.Mobile.ViewModels;
 using LostFoundPetReporter.Mobile.Views;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<IUserApiService, UserApiService>();
         builder.Services.AddTransient<ILostReportApiService, LostReportApiService>();
+        builder.Services.AddSingleton<IUserSession, UserSession>();
 
         // =========================
         // ViewModels

@@ -1,37 +1,38 @@
-﻿using System.ComponentModel;
+﻿using LostFoundPetReporter.Mobile.Models;
+using LostFoundPetReporter.Mobile.Services.Api;
+using LostFoundPetReporter.Mobile.Services.Session;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace LostFoundPetReporter.Mobile.ViewModels;
 
 public class LoginViewModel : INotifyPropertyChanged
 {
-    private string _username = string.Empty;
-    private string _password = string.Empty;
+    private readonly IUserApiService _userApiService;
+    private readonly IUserSession _userSession;
 
-    public string Username
+    public LoginUser loginUser { get; set; } = new LoginUser();
+
+
+
+
+    public LoginViewModel(
+        IUserApiService userApiService,
+        IUserSession userSession)
     {
-        get => _username;
-        set
-        {
-            if (_username == value)
-                return;
-
-            _username = value;
-            OnPropertyChanged();
-        }
+        _userApiService = userApiService;
+        _userSession = userSession;
     }
 
-    public string Password
+    public async Task LoginAsync()
     {
-        get => _password;
-        set
-        {
-            if (_password == value)
-                return;
+        
+        var user = await _userApiService.LoginAsync(loginUser);
 
-            _password = value;
-            OnPropertyChanged();
-        }
+        if (user == null) { <what to do  ?>}
+
+        _userSession.SetUser(user);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -44,4 +45,3 @@ public class LoginViewModel : INotifyPropertyChanged
             new PropertyChangedEventArgs(propertyName));
     }
 }
-

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace LostFoundPetReporter.Mobile.Services.Api
 {
@@ -24,17 +25,19 @@ namespace LostFoundPetReporter.Mobile.Services.Api
             return await response.Content.ReadFromJsonAsync<TModel>();
         }
 
-        public async Task<TResponse?> PostAsync<TRequest, TResponse>(
-            string endpoint,
-            TRequest request)
+        public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request)
         {
-            var response = await _httpClient.PostAsJsonAsync(
-                endpoint,
-                request);
+            var response = await _httpClient.PostAsJsonAsync(endpoint, request);
 
-            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
 
-            return await response.Content.ReadFromJsonAsync<TResponse>();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(
+                    $"HTTP {(int)response.StatusCode}: {content}");
+            }
+
+            return JsonSerializer.Deserialize<TResponse>(content);
         }
 
         public async Task PutAsync<TRequest>(

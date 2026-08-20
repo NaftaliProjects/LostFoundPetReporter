@@ -153,7 +153,10 @@ namespace LostFoundPetReporter.CoreDb.Repos
                 .IgnoreQueryFilters()
                 .Where(x => x.Id == id)
                 .FirstOrDefault();
-                
+
+        public User GetByEmail(string email)
+            => Table.FirstOrDefault(u => u.Email == email);
+
 
     }
 

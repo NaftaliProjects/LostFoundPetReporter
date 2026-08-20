@@ -4,18 +4,65 @@
     x:Class="LostFoundPetReporter.Mobile.Views.RegisterPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
     Title="Register">
 
-    <Grid RowDefinitions="*,Auto">
+    <ScrollView>
 
-        <ContentView Grid.Row="0">
-            <!-- Profile content -->
-        </ContentView>
+        <VerticalStackLayout
+            Padding="30"
+            Spacing="15">
 
-        <controls:BottomNavigationBar
-            Grid.Row="1" />
+            <!-- Title -->
+            <Label
+                Text="Create Account"
+                FontSize="30"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                Margin="0,20,0,20" />
 
-    </Grid>
+
+            <!-- Name -->
+            <Entry
+                Placeholder="Name"
+                Text="{Binding User.Name}" />
+
+
+            <!-- Email -->
+            <Entry
+                Placeholder="Email"
+                Keyboard="Email"
+                Text="{Binding User.Email}" />
+
+
+            <!-- Phone -->
+            <Entry
+                Placeholder="Phone"
+                Keyboard="Telephone"
+                Text="{Binding User.Phone}" />
+
+
+            <!-- Password -->
+            <Entry
+                Placeholder="Password"
+                IsPassword="True"
+                Text="{Binding User.Password}" />
+
+
+            <!-- Error -->
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="Red"
+                FontSize="14" />
+
+
+            <!-- Register -->
+            <Button
+                Text="Register"
+                Clicked="OnRegisterClicked"
+                Margin="0,10,0,0" />
+
+        </VerticalStackLayout>
+
+    </ScrollView>
 
 </ContentPage>

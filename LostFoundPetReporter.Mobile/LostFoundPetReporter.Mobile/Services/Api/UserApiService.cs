@@ -27,16 +27,14 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         }
 
         public async Task<User?> CreateUserAsync(
-            CreateLostReportRequest request)
+            CreateUserRequest request)
         {
-            return await _apiClient.PostAsync<CreateLostReportRequest, User>(
+            return await _apiClient.PostAsync<CreateUserRequest, User>(
                 "api/v1/User",
                 request);
         }
 
-        public async Task UpdateUserAsync(
-            int id,
-            CreateLostReportRequest request)
+        public async Task UpdateUserAsync(int id , CreateUserRequest request)
         {
             request.Id = id;
 

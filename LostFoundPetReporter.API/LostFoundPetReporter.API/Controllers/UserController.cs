@@ -28,7 +28,7 @@ namespace LostFoundPetReporter.API.Controllers
 
             if (user == null)
             {
-                return Unauthorized("Invalid email or password.");
+                return Unauthorized("Invalid Email or password.");
             }
 
             if (user.HashedPassword != loginDto.Password)

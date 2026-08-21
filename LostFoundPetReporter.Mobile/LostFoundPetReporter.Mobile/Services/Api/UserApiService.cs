@@ -50,10 +50,9 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         }
 
 
-        async Task<UserSession> LoginAsync(LoginUser user)
+        public async Task<User> LoginAsync(LoginUser user)
         {
-            UserSession userSession = await _apiClient.PostAsync<LoginUser, UserSession>($"api/v1/User/Login", user);
-            if (userSession == null) { return <What to do ?>}
+            User userSession = await _apiClient.PostAsync<LoginUser, User>($"api/v1/User/Login", user);
             return userSession;
         }
     }

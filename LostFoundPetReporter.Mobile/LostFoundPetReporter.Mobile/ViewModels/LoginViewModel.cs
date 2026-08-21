@@ -2,7 +2,6 @@
 using LostFoundPetReporter.Mobile.Services.Api;
 using LostFoundPetReporter.Mobile.Services.Session;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace LostFoundPetReporter.Mobile.ViewModels;
@@ -12,7 +11,22 @@ public class LoginViewModel : INotifyPropertyChanged
     private readonly IUserApiService _userApiService;
     private readonly IUserSession _userSession;
 
-    public LoginUser loginUser { get; set; } = new LoginUser();
+    public LoginUser LoginUser { get; } = new();
+
+    private string _errorMessage = string.Empty;
+
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set
+        {
+            if (_errorMessage == value)
+                return;
+
+            _errorMessage = value;
+            OnPropertyChanged();
+        }
+    }
 
 
 
@@ -25,14 +39,29 @@ public class LoginViewModel : INotifyPropertyChanged
         _userSession = userSession;
     }
 
-    public async Task LoginAsync()
+    public async Task<bool> LoginAsync(LoginUser loginUser)
     {
-        
-        var user = await _userApiService.LoginAsync(loginUser);
+        try
+        {
+            ErrorMessage = string.Empty;
 
-        if (user == null) { <what to do  ?>}
+            var user = await _userApiService.LoginAsync(loginUser);
 
-        _userSession.SetUser(user);
+            if (user == null)
+            {
+                ErrorMessage = "Invalid email or password.";
+                return false;
+            }
+
+            _userSession.SetUser(user);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            return false;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

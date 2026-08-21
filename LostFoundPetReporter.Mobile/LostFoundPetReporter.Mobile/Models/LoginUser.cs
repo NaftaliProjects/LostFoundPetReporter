@@ -8,34 +8,11 @@ namespace LostFoundPetReporter.Mobile.Models
 {
     public class LoginUser
     {
-        private string _email = string.Empty;
-        private string _password = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
-        public string Email
-        {
-            get => _email;
-            set
-            {
-                if (_email == value)
-                    return;
+        public string Password { get; set; } = string.Empty;
 
-                _email = value;
-                OnPropertyChanged();
-            }
-        }
 
-        public string Password
-        {
-            get => _password;
-            set
-            {
-                if (_password == value)
-                    return;
-
-                _password = value;
-                OnPropertyChanged();
-            }
-        }
 
     }
 }

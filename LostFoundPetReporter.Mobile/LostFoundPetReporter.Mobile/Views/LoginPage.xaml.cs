@@ -1,15 +1,27 @@
 ﻿
+
+using LostFoundPetReporter.Mobile.ViewModels;
+
 namespace LostFoundPetReporter.Mobile.Views;
 
 public partial class LoginPage : ContentPage
 {
-    public LoginPage()
+    private readonly LoginViewModel _viewModel;
+
+    public LoginPage(LoginViewModel viewModel)
     {
         InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
     }
 
     private async void OnLoginClicked(object? sender, EventArgs e)
     {
+        var success = await _viewModel.LoginAsync(_viewModel.LoginUser);
+
+        if (!success)
+            return;
+
         await Shell.Current.GoToAsync("//home");
     }
 

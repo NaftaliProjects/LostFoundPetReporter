@@ -10,5 +10,6 @@ namespace LostFoundPetReporter.Mobile.Models
         public string Colors { get; set; } = "";
         public string Type { get; set; } = "";
         public string Breed { get; set; } = "";
+
     }
 }

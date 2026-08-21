@@ -1,10 +1,15 @@
-﻿namespace LostFoundPetReporter.Mobile
+﻿using LostFoundPetReporter.Mobile.Views;
+
+namespace LostFoundPetReporter.Mobile;
+
+public partial class AppShell : Shell
 {
-    public partial class AppShell : Shell
+    public AppShell()
     {
-        public AppShell()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+
+        Routing.RegisterRoute(
+            nameof(CreateLostReportPage),
+            typeof(CreateLostReportPage));
     }
 }

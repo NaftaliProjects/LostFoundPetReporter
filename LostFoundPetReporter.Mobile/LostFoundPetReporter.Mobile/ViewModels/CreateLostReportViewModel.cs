@@ -1,20 +1,24 @@
 ﻿using LostFoundPetReporter.Mobile.Models;
 using LostFoundPetReporter.Mobile.Services.Api;
 using LostFoundPetReporter.Mobile.Services.Session;
-using LostFoundPetReporter.Mobile.Views;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 namespace LostFoundPetReporter.Mobile.ViewModels;
 
-public class MyReportsViewModel : INotifyPropertyChanged
+public class CreateLostReportViewModel : INotifyPropertyChanged
 {
     private readonly ILostReportApiService _lostReportApiService;
     private readonly IUserSession _userSession;
 
-    public ObservableCollection<LostReport> Reports { get; } = new();
+    public CreateLostReportRequest Report { get; } = new();
+
+    public AnimalDescription PetDescription => Report.PetDescription;
+
+    public DateTime LostDate { get; set; } = DateTime.Today;
+
+    public TimeSpan LostTime { get; set; } = DateTime.Now.TimeOfDay;
 
     private bool _isBusy;
     public bool IsBusy
@@ -30,21 +34,20 @@ public class MyReportsViewModel : INotifyPropertyChanged
         }
     }
 
-    public ICommand LoadReportsCommand { get; }
-    public ICommand NewReportCommand { get; }
+    public ICommand CreateReportCommand { get; }
 
-    public MyReportsViewModel(
+    public CreateLostReportViewModel(
         ILostReportApiService lostReportApiService,
         IUserSession userSession)
     {
         _lostReportApiService = lostReportApiService;
         _userSession = userSession;
 
-        LoadReportsCommand = new Command(async () => await LoadReportsAsync());
-        NewReportCommand = new Command(async () => await GoToCreateReportAsync());
+        CreateReportCommand = new Command(
+            async () => await CreateReportAsync());
     }
 
-    public async Task LoadReportsAsync()
+    private async Task CreateReportAsync()
     {
         if (IsBusy)
             return;
@@ -52,42 +55,49 @@ public class MyReportsViewModel : INotifyPropertyChanged
         var user = _userSession.CurrentUser;
 
         if (user is null)
+        {
+            await Shell.Current.DisplayAlert(
+                "Error",
+                "You must be logged in to create a report.",
+                "OK");
+
             return;
+        }
 
         try
         {
             IsBusy = true;
 
-            var reports = await _lostReportApiService.GetLostReportByUserIdAsync(user.Id);
+            Report.UserId = user.Id;
 
+            Report.dateTime = LostDate.Date + LostTime;
 
-            Reports.Clear();
+            var result =
+                await _lostReportApiService
+                    .CreateLostReportAsync(Report);
 
-            if (reports is null)
+            if (result is null)
+            {
+                await Shell.Current.DisplayAlert(
+                    "Error",
+                    "The report could not be created.",
+                    "OK");
+
                 return;
+            }
 
-            foreach (var report in reports)
-                Reports.Add(report);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task GoToCreateReportAsync()
-    {
-        try
-        {
-            await Shell.Current.GoToAsync(
-                nameof(CreateLostReportPage));
+            await Shell.Current.GoToAsync("..");
         }
         catch (Exception ex)
         {
             await Shell.Current.DisplayAlert(
-                "Navigation Error",
-                ex.ToString(),
+                "Error",
+                ex.Message,
                 "OK");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 

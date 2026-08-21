@@ -5,14 +5,98 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
-    Title="MyReports">
+    Title="My Reports">
 
     <Grid RowDefinitions="*,Auto">
 
-        <ContentView Grid.Row="0">
-            <!-- Profile content -->
-        </ContentView>
+        <Grid Grid.Row="0"
+              RowDefinitions="Auto,*"
+              Padding="20">
 
+            <!-- Header -->
+            <Grid
+                Grid.Row="0"
+                ColumnDefinitions="*,Auto"
+                Margin="0,0,0,20">
+
+                <Label
+                    Text="My Reports"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="+ New Report"
+                    Command="{Binding NewReportCommand}" />
+
+            </Grid>
+
+
+            <!-- Reports -->
+            <CollectionView
+                Grid.Row="1"
+                ItemsSource="{Binding Reports}">
+
+                <CollectionView.EmptyView>
+
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        Spacing="15">
+
+                        <Label
+                            Text="You don't have any lost reports yet."
+                            FontSize="18"
+                            HorizontalTextAlignment="Center" />
+
+                        <Button
+                            Text="Create your first report"
+                            Command="{Binding NewReportCommand}" />
+
+                    </VerticalStackLayout>
+
+                </CollectionView.EmptyView>
+
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate>
+
+                        <Border
+                            Padding="15"
+                            Margin="0,0,0,12">
+
+                            <VerticalStackLayout Spacing="8">
+
+                                <!-- Report ID -->
+                                <Label
+                                    Text="{Binding Id, StringFormat='Report #{0}'}"
+                                    FontSize="18"
+                                    FontAttributes="Bold" />
+
+                                <!-- Date -->
+                                <Label
+                                    Text="{Binding dateTime, StringFormat='Date: {0:dd/MM/yyyy HH:mm}'}" />
+
+                                <!-- Location -->
+                                <Label
+                                    Text="{Binding Coordinates, StringFormat='Location: {0}'}" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </Grid>
+
+
+        <!-- Bottom navigation -->
         <controls:BottomNavigationBar
             Grid.Row="1" />
 

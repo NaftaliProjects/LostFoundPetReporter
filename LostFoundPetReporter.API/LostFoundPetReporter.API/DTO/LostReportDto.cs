@@ -41,6 +41,7 @@ namespace LostFoundPetReporter.API.DTO
         public AnimalDescriptionDto PetDescription { get; set; } = new();
 
         public List<LostReportExtFileDto> LostReportExtFiles { get; set; } = new();
+        public List<FoundReportDto> FoundReports { get; set; } = new();
 
 
 
@@ -66,7 +67,13 @@ namespace LostFoundPetReporter.API.DTO
                 LostReportExtFiles = entity.LostReportExtFilesNevigation?
                     .Select(LostReportExtFileDto.FromEntity)
                     .ToList()
-                    ?? new()
+                    ?? new(),
+
+                FoundReports = entity.LostFoundMatchNevigation?
+                .Where(m => m.FoundReportNevigation != null)
+                .Select(m => FoundReportDto.FromEntity(m.FoundReportNevigation))
+                .ToList()
+                ?? new()
             };
         }
     }

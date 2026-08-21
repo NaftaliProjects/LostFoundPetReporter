@@ -115,7 +115,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
 
         [ApiVersion("1.0")]
         [HttpPost]
-        public ActionResult<TResponseDto> AddOne(TCreateOrUpdateDto createDto)
+        public virtual ActionResult<TResponseDto> AddOne(TCreateOrUpdateDto createDto)
         {
             if (!ModelState.IsValid) { return ValidationProblem(ModelState);  }
             if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }

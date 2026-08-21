@@ -1,4 +1,5 @@
 ﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.API.DTO.Interfaces;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
@@ -13,6 +14,9 @@ namespace LostFoundPetReporter.API.Controllers
         {
 
         }
+
+        
+        
 
         /// <summary>
         /// Gets all LostReport records.

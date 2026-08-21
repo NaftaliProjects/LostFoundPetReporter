@@ -1,4 +1,5 @@
 ﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
@@ -8,16 +9,40 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class FoundReportController
-        : BaseCrudController<
-            FoundReport,
-            FoundReportController,
-            FoundReportDto,
-            CreateFoundReportDto>
+    public class FoundReportController : BaseCrudController<
+        FoundReport,
+        FoundReportController,
+        FoundReportDto,
+        CreateFoundReportDto>
     {
-        public FoundReportController(IFoundReportRepo repo)
+        private readonly IMatchingQueue _matchingQueue;
+
+        // Inject IMatchingQueue alongside your repository
+        public FoundReportController(
+            IFoundReportRepo repo,
+            IMatchingQueue matchingQueue)
             : base(repo)
         {
+            _matchingQueue = matchingQueue;
+        }
+
+        [ApiVersion("1.0")]
+        [HttpPost]
+        public override ActionResult<FoundReportDto> AddOne(CreateFoundReportDto createDto)
+        {
+            // 1. Call base method to save to DB and get the ActionResult
+            var actionResult = base.AddOne(createDto);
+
+            // 2. Safely extract the generated DTO from CreatedAtActionResult
+            if (actionResult.Result is CreatedAtActionResult createdResult &&
+                createdResult.Value is FoundReportDto createdDto)
+            {
+                // 3. Push the ID to the background queue (non-blocking)
+                _matchingQueue.QueueReportForMatchingAsync(createdDto.Id.Value);
+            }
+
+            // 4. Return the 201 Created response immediately to the client
+            return actionResult;
         }
 
 

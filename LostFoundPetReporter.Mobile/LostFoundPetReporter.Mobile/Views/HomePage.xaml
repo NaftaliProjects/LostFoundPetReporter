@@ -34,7 +34,10 @@
         <CollectionView
             Grid.Row="1"
             ItemsSource="{Binding LostReports}"
-            Margin="10">
+            Margin="10"
+            SelectionMode="Single"
+            SelectionChanged="OnLostReportSelected">
+           
 
             <CollectionView.EmptyView>
                 <VerticalStackLayout

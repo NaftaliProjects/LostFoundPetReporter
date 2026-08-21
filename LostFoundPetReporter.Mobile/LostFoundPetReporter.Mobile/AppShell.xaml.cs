@@ -11,5 +11,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(
             nameof(CreateLostReportPage),
             typeof(CreateLostReportPage));
+
+        Routing.RegisterRoute("specificlostreport", typeof(SpecificLostReportPage));
     }
 }

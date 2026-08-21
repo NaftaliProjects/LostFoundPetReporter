@@ -55,6 +55,7 @@ public static class MauiProgram
         builder.Services.AddTransient<MyReportsViewModel>();
         builder.Services.AddTransient<UsersViewModel>();
         builder.Services.AddTransient<CreateLostReportViewModel>();
+        builder.Services.AddTransient<SpecificLostReportViewModel>();
 
         // =========================
         // Views
@@ -69,6 +70,8 @@ public static class MauiProgram
         builder.Services.AddTransient<MyReportsPage>();
         builder.Services.AddTransient<UsersPage>();
         builder.Services.AddTransient<CreateLostReportPage>();
+        builder.Services.AddTransient<SpecificLostReportPage>();
+
 
         return builder.Build();
     }

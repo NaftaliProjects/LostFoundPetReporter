@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    x:Class="LostFoundPetReporter.Mobile.Views.SpecificLostReportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:LostFoundPetReporter.Mobile.Models"
+    xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
+    Title="Lost Report">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <VerticalStackLayout
+            Grid.Row="0"
+            Padding="20"
+            Spacing="5">
+
+            <Label
+                Text="{Binding LostReport.PetDescription.Name}"
+                FontSize="26"
+                FontAttributes="Bold" />
+
+            <Label
+                Text="{Binding LostReport.Coordinates, StringFormat='Location: {0}'}"
+                FontSize="14" />
+
+            <Label
+                Text="{Binding LostReport.User.Name, StringFormat='Reported by: {0}'}"
+                FontSize="14" />
+
+        </VerticalStackLayout>
+
+
+        <!-- Found Reports -->
+        <CollectionView
+            Grid.Row="1"
+            ItemsSource="{Binding LostReport.FoundReports}"
+            Margin="10">
+
+            <CollectionView.EmptyView>
+
+                <VerticalStackLayout
+                    Padding="20"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="No found reports."
+                        FontSize="18"
+                        HorizontalTextAlignment="Center" />
+
+                </VerticalStackLayout>
+
+            </CollectionView.EmptyView>
+
+
+            <CollectionView.ItemTemplate>
+
+                <DataTemplate x:DataType="model:FoundReport">
+
+                    <Border
+                        Margin="5,8"
+                        Padding="12"
+                        StrokeShape="RoundRectangle 10">
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label
+                                Text="{Binding Coordinates}"
+                                FontSize="18"
+                                FontAttributes="Bold" />
+
+                            <Label
+                                Text="{Binding dateTime}"
+                                FontSize="14" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+                </DataTemplate>
+
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+
+        <!-- Bottom navigation -->
+        <controls:BottomNavigationBar
+            Grid.Row="2" />
+
+    </Grid>
+
+</ContentPage>

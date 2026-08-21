@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LostFoundPetReporter.Mobile.Models
 {
-    public class LostReport
+    public class FoundReport
     {
         public int Id { get; set; }
         public int? UserId { get; set; }
@@ -12,10 +12,6 @@ namespace LostFoundPetReporter.Mobile.Models
         public DateTime dateTime { get; set; }
 
         public User? User { get; set; }
-        public List<FoundReport> FoundReports { get; set; } = new();
         public AnimalDescription PetDescription { get; set; } = new();
-
-
-
     }
 }

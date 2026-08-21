@@ -205,8 +205,19 @@ namespace LostFoundPetReporter.CoreDb.Repos
         {
         }
 
-        internal IOrderedQueryable<LostReport> BuildBaseQuery()
-            => Table.Include(x => x.LostReportExtFilesNevigation).Include(u => u.User).OrderBy(o => o.dateTime);
+        
+         internal IOrderedQueryable<LostReport> BuildBaseQuery()
+            => Table
+                .Include(x => x.LostReportExtFilesNevigation)
+                .Include(x => x.User)
+                .OrderBy(x => x.dateTime);
+
+        internal IQueryable<LostReport> BuildDetailsQuery()
+        => Table
+            .Include(x => x.User)
+            .Include(x => x.LostReportExtFilesNevigation)
+            .Include(x => x.LostFoundMatchNevigation)
+                .ThenInclude(x => x.FoundReportNevigation);
 
         public override IEnumerable<LostReport> GetAll()
             => BuildBaseQuery();
@@ -216,7 +227,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
             => Table.Where(u => u.Id == id);
 
         public override LostReport Find(int? id)
-            => Table
+            => BuildDetailsQuery()
                 .IgnoreQueryFilters()
                 .Where(x => x.Id == id)
                 .FirstOrDefault();

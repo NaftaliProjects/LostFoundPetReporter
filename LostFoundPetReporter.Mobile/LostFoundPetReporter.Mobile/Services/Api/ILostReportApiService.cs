@@ -18,5 +18,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         Task UpdateLostReportAsync(int id, CreateLostReportRequest request);
 
         Task DeleteLostReportAsync(int id);
+
+
     }
 }

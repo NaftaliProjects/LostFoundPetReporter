@@ -1,4 +1,5 @@
-﻿using LostFoundPetReporter.Mobile.ViewModels;
+﻿using LostFoundPetReporter.Mobile.Models;
+using LostFoundPetReporter.Mobile.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,5 +33,21 @@ namespace LostFoundPetReporter.Mobile.Views
             await _viewModel.LoadLostReportsAsync();
         }
 
+        private async void OnLostReportSelected(object? sender, SelectionChangedEventArgs e)
+        {
+            var report = e.CurrentSelection.FirstOrDefault() as LostReport;
+
+            if (report == null)
+                return;
+
+           
+            if (sender is CollectionView collectionView)
+            {
+                collectionView.SelectedItem = null;
+            }
+
+            await Shell.Current.GoToAsync($"specificlostreport?id={report.Id}");
+
+        }
     }
 }

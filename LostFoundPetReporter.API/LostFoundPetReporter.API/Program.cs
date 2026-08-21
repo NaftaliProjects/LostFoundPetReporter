@@ -1,24 +1,16 @@
+global using LostFoundPetReporter.API.ApiVersionSupport;
+global using LostFoundPetReporter.API.Controllers.Base;
 global using LostFoundPetReporter.CoreDb;
 global using LostFoundPetReporter.CoreDb.Models;
-
-
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.AspNetCore.Mvc.ApiExplorer;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ApiExplorer;
 global using Microsoft.AspNetCore.Mvc.Versioning;
-
+global using Microsoft.EntityFrameworkCore;
 global using System.Text.Json.Serialization;
-
-global using LostFoundPetReporter.API.ApiVersionSupport;
-
-global using LostFoundPetReporter.API.Controllers.Base;
-
-
+using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
-using LostFoundPetReporter.Services.DataServices.Dal;
-using LostFoundPetReporter.Services.DataServices.Interfaces;
 
 
 
@@ -60,13 +52,11 @@ builder.Services.AddDbContext<PetReporterContext>(options =>
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ILostReportRepo, LostReportRepo>();
 builder.Services.AddScoped<IFoundReportRepo, FoundReportRepo>();
+builder.Services.AddScoped<ILostFoundMatchRepo, LostFoundMatchRepo>();
 
-/*
-builder.Services.AddScoped<IUserDataService, UserDalDataService>();
-builder.Services.AddScoped<ILostReportDataService, LostReportDalDataService>();
-builder.Services.AddScoped<IFoundReportDataService, FoundReportDalDataService>();
-*/
-
+builder.Services.AddSingleton<IMatchingQueue, MatchingQueue>();
+builder.Services.AddHostedService<MatchingBackgroundService>();
+builder.Services.AddScoped<IMatchingService, MatchingService>();
 
 
 

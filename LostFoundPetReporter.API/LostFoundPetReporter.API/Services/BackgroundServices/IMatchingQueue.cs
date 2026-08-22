@@ -2,9 +2,18 @@
 {
     using System.Threading.Channels;
 
+    public enum ReportType
+    {
+        Found,
+        Lost
+    }
+
+    public record ReportMatchingTask(int ReportId, ReportType Type);
+
+
     public interface IMatchingQueue
     {
-        ValueTask QueueReportForMatchingAsync(int foundReportId);
-        ValueTask<int> DequeueAsync(CancellationToken cancellationToken);
+        ValueTask QueueForMatchingAsync(int reportId, ReportType type);
+        ValueTask<ReportMatchingTask> DequeueAsync(CancellationToken cancellationToken = default);
     }
 }

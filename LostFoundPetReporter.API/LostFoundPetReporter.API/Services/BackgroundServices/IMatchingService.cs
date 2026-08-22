@@ -2,6 +2,7 @@
 {
     public interface IMatchingService
     {
-        Task TryMatchLostReportAsync(int foundReportId, CancellationToken cancellationToken = default);
+        Task TryMatchFoundReportAsync(int foundReportId, CancellationToken cancellationToken = default);
+        Task TryMatchLostReportAsync(int lostReportId, CancellationToken cancellationToken = default);
     }
 }

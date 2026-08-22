@@ -15,18 +15,25 @@
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var foundReportId = await _queue.DequeueAsync(stoppingToken);
+                var task = await _queue.DequeueAsync(stoppingToken);
 
                 try
                 {
                     using var scope = _scopeFactory.CreateScope();
                     var matchingService = scope.ServiceProvider.GetRequiredService<IMatchingService>();
 
-                    await matchingService.TryMatchLostReportAsync(foundReportId);
+                    if (task.Type == ReportType.Found)
+                    {
+                        await matchingService.TryMatchFoundReportAsync(task.ReportId, stoppingToken);
+                    }
+                    else
+                    {
+                        await matchingService.TryMatchLostReportAsync(task.ReportId, stoppingToken);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    // Log exception (e.g., ILogger)
+                    // Log exception
                 }
             }
         }

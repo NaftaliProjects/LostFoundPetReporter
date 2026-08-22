@@ -19,52 +19,111 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             _matchRepo = matchRepo;
         }
 
-        public async Task TryMatchLostReportAsync(int foundReportId, CancellationToken cancellationToken = default)
+        // Direction 1: One FoundReport against many LostReports
+        public async Task TryMatchLostReportAsync(int lostReportId, CancellationToken cancellationToken = default)
         {
-            // 1. Fetch the target found report
-            var foundReport = _foundRepo.Find(foundReportId);
-            if (foundReport == null) return;
+            var lostReport = _lostRepo.Find(lostReportId);
+            if (lostReport == null) return;
 
-            // 2. Query potential lost reports (e.g., same species, active status)
-            var candidateLostReports = _lostRepo.GetAll();
+            var candidateLostReports = _foundRepo.GetAll();
+            if (!candidateLostReports.Any()) return;
 
-            foreach (var lostReport in candidateLostReports)
+            // 1. Fetch all existing match LostReportIds for this found report in ONE query
+            var newMatches = new List<LostFoundMatch>();
+
+            // 2. Filter and score in-memory
+            foreach (var foundReport in candidateLostReports)
             {
-                // Skip if a match entry already exists between these two reports
-                if (_matchRepo.MatchExists(lostReport.Id, foundReport.Id))
-                {
-                    continue;
-                }
-                else
-                {
-                    var match = new LostFoundMatch
-                    {
-                        FoundReportId = foundReport.Id,
-                        LostReportId = lostReport.Id
-                    };
+                if (_matchRepo.MatchExists(foundReport.Id, lostReportId)) continue;
 
-                    _matchRepo.Add(match);
-                }
-
-                /*
-                // 3. Run scoring algorithm
                 double score = CalculateMatchScore(foundReport, lostReport);
 
-                // 4. If confidence threshold is met (e.g. 70%), save a match entity
+                score = 1;
+
                 if (score >= 0.70)
                 {
-                    var match = new LostFoundMatch
+                    newMatches.Add(new LostFoundMatch
                     {
                         FoundReportId = foundReport.Id,
                         LostReportId = lostReport.Id,
-                        ConfidenceScore = score,
-                        CreatedAt = DateTime.UtcNow,
-                        Status = MatchStatus.PendingReview
-                    };
-
-                    await _matchRepo.AddAsync(match);
-                */
+                    });
+                }
             }
+
+            // 3. Batch insert all matches at once
+            if (newMatches.Count > 0)
+            {
+                _matchRepo.AddRange(newMatches);
+            }
+        }
+
+        // Direction 2: One LostReport against many FoundReports
+        public async Task TryMatchFoundReportAsync(int foundReportId, CancellationToken cancellationToken = default)
+        {
+            var foundReport =  _foundRepo.Find(foundReportId);
+            if (foundReport == null) return;
+
+            var candidateLostReports =  _lostRepo.GetAll();
+            if (!candidateLostReports.Any()) return;
+
+            // 1. Fetch all existing match LostReportIds for this found report in ONE query
+            var newMatches = new List<LostFoundMatch>();
+
+            // 2. Filter and score in-memory
+            foreach (var lostReport in candidateLostReports)
+            {
+                if (_matchRepo.MatchExists(lostReport.Id, foundReportId)) continue;
+
+                double score = CalculateMatchScore(foundReport, lostReport);
+
+                score = 1;
+
+                if (score >= 0.70)
+                {
+                    newMatches.Add(new LostFoundMatch
+                    {
+                        FoundReportId = foundReport.Id,
+                        LostReportId = lostReport.Id,
+                    });
+                }
+            }
+
+            // 3. Batch insert all matches at once
+            if (newMatches.Count > 0)
+            {
+                _matchRepo.AddRange(newMatches);       
+            }
+        }
+
+        // Shared symmetric logic
+        private async Task EvaluateAndSaveMatchAsync(FoundReport found, LostReport lost)
+        {
+            if ( _matchRepo.MatchExists(lost.Id, found.Id)) return;
+
+            double score = CalculateMatchScore(found, lost);
+
+            //secretly for now everyone gett a 100% score 
+            score = 1;
+
+            if (score >= 0.70)
+            {
+                var match = new LostFoundMatch
+                {
+                    FoundReportId = found.Id,
+                    LostReportId = lost.Id,
+                };
+
+                _matchRepo.Add(match);
+            }
+        }
+
+        private double CalculateMatchScore(FoundReport found, LostReport lost)
+        {
+            double score = 0.0;
+            if (found.PetDescription?.Type == lost.PetDescription?.Type) score += 0.4;
+            if (found.PetDescription?.Breed == lost.PetDescription?.Breed) score += 0.3;
+            if (found.PetDescription?.Colors == lost.PetDescription?.Colors) score += 0.3;
+            return score;
         }
     }
 }

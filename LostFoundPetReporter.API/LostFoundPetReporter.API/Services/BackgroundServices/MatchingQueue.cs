@@ -4,12 +4,12 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 {
     public class MatchingQueue : IMatchingQueue
     {
-        private readonly Channel<int> _queue = Channel.CreateUnbounded<int>();
+        private readonly Channel<ReportMatchingTask> _queue = Channel.CreateUnbounded<ReportMatchingTask>();
 
-        public ValueTask QueueReportForMatchingAsync(int foundReportId)
-            => _queue.Writer.WriteAsync(foundReportId);
+        public ValueTask QueueForMatchingAsync(int reportId, ReportType type)
+            => _queue.Writer.WriteAsync(new ReportMatchingTask(reportId, type));
 
-        public ValueTask<int> DequeueAsync(CancellationToken cancellationToken)
+        public ValueTask<ReportMatchingTask> DequeueAsync(CancellationToken cancellationToken)
             => _queue.Reader.ReadAsync(cancellationToken);
     }
 }

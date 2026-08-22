@@ -27,7 +27,7 @@
     <ShellContent
         Title="Camera"
         Route="camera"
-        ContentTemplate="{DataTemplate views:CameraPage}" />
+        ContentTemplate="{DataTemplate views:CreateFoundReportPage}" />
 
     <ShellContent
         Title="Home"

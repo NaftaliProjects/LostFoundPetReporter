@@ -98,6 +98,9 @@
 
                             </VerticalStackLayout>
 
+                            <controls:BottomNavigationBar
+                                Grid.Row="1" />
+
                         </Grid>
 
                     </Border>

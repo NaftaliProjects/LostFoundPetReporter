@@ -40,6 +40,7 @@ public static class MauiProgram
 
         builder.Services.AddTransient<IUserApiService, UserApiService>();
         builder.Services.AddTransient<ILostReportApiService, LostReportApiService>();
+        builder.Services.AddTransient<IFoundReportApiService, FoundReportApiService>();
         builder.Services.AddSingleton<IUserSession, UserSession>();
 
         // =========================
@@ -55,7 +56,9 @@ public static class MauiProgram
         builder.Services.AddTransient<MyReportsViewModel>();
         builder.Services.AddTransient<UsersViewModel>();
         builder.Services.AddTransient<CreateLostReportViewModel>();
+        builder.Services.AddTransient<CreateFoundReportViewModel>();
         builder.Services.AddTransient<SpecificLostReportViewModel>();
+        
 
         // =========================
         // Views
@@ -70,6 +73,7 @@ public static class MauiProgram
         builder.Services.AddTransient<MyReportsPage>();
         builder.Services.AddTransient<UsersPage>();
         builder.Services.AddTransient<CreateLostReportPage>();
+        builder.Services.AddTransient<CreateFoundReportPage>();
         builder.Services.AddTransient<SpecificLostReportPage>();
 
 

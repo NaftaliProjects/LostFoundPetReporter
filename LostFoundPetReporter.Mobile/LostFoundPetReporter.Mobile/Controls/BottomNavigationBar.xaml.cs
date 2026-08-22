@@ -12,9 +12,9 @@ public partial class BottomNavigationBar : ContentView
         await Shell.Current.GoToAsync("//profile");
     }
 
-    private async void OnCameraClicked(object? sender, EventArgs e)
+    private async void OnPostFoundReport(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//camera");
+        await Shell.Current.GoToAsync("//CreateFoundReport");
     }
 
     private async void OnHomeClicked(object? sender, EventArgs e)

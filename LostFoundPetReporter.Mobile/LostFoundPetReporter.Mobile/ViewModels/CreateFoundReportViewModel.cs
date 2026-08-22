@@ -70,7 +70,7 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
             Report.UserId = user.Id;
 
-            Report.dateTime = FoundDate.Date + FoundTime;
+            Report.dateTime = Report.dateTime + FoundTime;
 
             var result =
                 await _foundReportApiService

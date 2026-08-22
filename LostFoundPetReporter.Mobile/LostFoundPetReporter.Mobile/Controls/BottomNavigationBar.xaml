@@ -17,8 +17,8 @@
 
         <Button
             Grid.Column="1"
-            Text="Camera"
-            Clicked="OnCameraClicked" />
+            Text="PostFoundReport"
+            Clicked="OnPostFoundReport" />
 
         <Button
             Grid.Column="2"

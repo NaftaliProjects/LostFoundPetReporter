@@ -70,7 +70,7 @@ public class CreateLostReportViewModel : INotifyPropertyChanged
 
             Report.UserId = user.Id;
 
-            Report.dateTime = LostDate.Date + LostTime;
+            Report.dateTime = Report.dateTime + LostTime;
 
             var result =
                 await _lostReportApiService

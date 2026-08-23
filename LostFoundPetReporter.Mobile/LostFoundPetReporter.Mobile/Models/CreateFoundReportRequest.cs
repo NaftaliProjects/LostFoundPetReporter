@@ -13,5 +13,7 @@ namespace LostFoundPetReporter.Mobile.Models
 
         public AnimalDescription PetDescription { get; set; } = new();
 
+        public string? PictureBase64 { get; set; }
+
     }
 }

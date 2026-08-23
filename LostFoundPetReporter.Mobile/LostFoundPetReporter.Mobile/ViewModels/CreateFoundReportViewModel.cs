@@ -34,18 +34,79 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
         }
     }
 
+    private string? _picturePath;
+
+    public string? PicturePath
+    {
+        get => _picturePath;
+        set
+        {
+            if (_picturePath == value)
+                return;
+
+            _picturePath = value;
+
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasPicture));
+        }
+    }
+
+    public bool HasPicture => !string.IsNullOrEmpty(PicturePath);
+
+
+    public ICommand TakePictureCommand { get; }
     public ICommand CreateReportCommand { get; }
 
-    public CreateFoundReportViewModel(
-        IFoundReportApiService foundReportApiService,
-        IUserSession userSession)
+    public CreateFoundReportViewModel(IFoundReportApiService foundReportApiService, IUserSession userSession)
     {
         _foundReportApiService = foundReportApiService;
         _userSession = userSession;
 
-        CreateReportCommand = new Command(
-            async () => await CreateReportAsync());
+        TakePictureCommand = new Command(async () => await TakePictureAsync());
+
+
+        CreateReportCommand = new Command(async () => await CreateReportAsync());
+
     }
+
+    private async Task TakePictureAsync()
+    {
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                await Shell.Current.DisplayAlert(
+                    "Camera",
+                    "Camera is not available on this device.",
+                    "OK");
+
+                return;
+            }
+
+            var photo = await MediaPicker.Default.CapturePhotoAsync();
+
+            if (photo is null)
+                return;
+
+            PicturePath = photo.FullPath;
+
+            using var stream = await photo.OpenReadAsync();
+            using var memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+
+            Report.PictureBase64 = Convert.ToBase64String(memoryStream.ToArray());
+
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert(
+                "Camera Error",
+                ex.Message,
+                "OK");
+        }
+    }
+
 
     private async Task CreateReportAsync()
     {
@@ -72,9 +133,7 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
             Report.dateTime = Report.dateTime + FoundTime;
 
-            var result =
-                await _foundReportApiService
-                    .CreateFoundReportAsync(Report);
+            var result = await _foundReportApiService.CreateFoundReportAsync(Report);
 
             if (result is null)
             {

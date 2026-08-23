@@ -59,3 +59,11 @@ packages/
 # ==========================================
 appsettings.Local.json
 appsettings.Development.json
+
+# User-specific files
+*.user
+*.suo
+
+# Android
+*.keystore
+*.jks

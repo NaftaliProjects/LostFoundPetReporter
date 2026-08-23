@@ -63,6 +63,25 @@
                     <Entry Placeholder="Brown, black, white..." Text="{Binding PetDescription.Colors}" />
                 </VerticalStackLayout>
 
+                <!-- Picture -->
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        Text="Picture"
+                        FontAttributes="Bold" />
+
+                                    <Button
+                        Text="📷 Add Picture"
+                        Command="{Binding TakePictureCommand}" />
+
+                                    <Image
+                        Source="{Binding PicturePath}"
+                        HeightRequest="250"
+                        Aspect="AspectFit"
+                        IsVisible="{Binding HasPicture}" />
+
+                 </VerticalStackLayout>
+
                 <!-- Create -->
                 <Button
                     Text="Create Report"

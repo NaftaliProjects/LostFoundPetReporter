@@ -10,4 +10,9 @@ public partial class CreateLostReportPage : ContentPage
 
         BindingContext = viewModel;
     }
+
+    private async void OnReturnClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 }

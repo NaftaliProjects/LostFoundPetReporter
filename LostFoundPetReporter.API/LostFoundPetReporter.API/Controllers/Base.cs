@@ -96,9 +96,10 @@ namespace LostFoundPetReporter.API.Controllers.Base
                     return NotFound();
                 }
 
-                var entity = updateDto.ToEntity();
 
-                MainRepo.Update(entity);
+                var updatedEntity = updateDto.ToEntity();
+                
+                MainRepo.Update(existingEntity,updatedEntity);
             }
             catch (Exception ex)
             {

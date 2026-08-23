@@ -34,7 +34,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 request);
         }
 
-        public async Task UpdateUserAsync(int id , CreateUserRequest request)
+        public async Task UpdateUserAsync(int id , UpdateUserRequest request)
         {
             request.Id = id;
 

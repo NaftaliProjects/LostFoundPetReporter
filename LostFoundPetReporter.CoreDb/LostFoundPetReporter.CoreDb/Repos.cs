@@ -102,9 +102,26 @@ namespace LostFoundPetReporter.CoreDb.Repos
             Table.AddRange(entities);
             return persist ? SaveChanges() : 0;
         }
-        public virtual int Update(T entity, bool persist = true)
+        public virtual int Update(T entity,T updatedEntity, bool persist = true)
         {
+            var properties = typeof(T).GetProperties();
+
+            foreach (var property in properties)
+            {
+                var updatedValue = property.GetValue(updatedEntity);
+
+                if (updatedValue == null)
+                    continue;
+
+                if (updatedValue is string stringValue &&
+                    string.IsNullOrWhiteSpace(stringValue))
+                    continue;
+
+                property.SetValue(entity, updatedValue);
+            }
+
             Table.Update(entity);
+
             return persist ? SaveChanges() : 0;
         }
         public virtual int UpdateRange(IEnumerable<T> entities, bool persist = true)

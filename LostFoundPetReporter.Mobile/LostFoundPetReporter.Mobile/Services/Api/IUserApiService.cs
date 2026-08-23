@@ -17,7 +17,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
 
         Task<User> LoginAsync(LoginUser user);
 
-        Task UpdateUserAsync(int id, CreateUserRequest request);
+        Task UpdateUserAsync(int id, UpdateUserRequest request);
 
         Task DeleteUserAsync(int id);
     }

@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LostFoundPetReporter.Mobile.ViewModels;
 
-namespace LostFoundPetReporter.Mobile.Views
+namespace LostFoundPetReporter.Mobile.Views;
+
+public partial class ProfilePage : ContentPage
 {
-    partial class ProfilePage : ContentPage
+    public ProfilePage(ProfileViewModel viewModel)
     {
-        public ProfilePage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
 
+        BindingContext = viewModel;
+    }
+
+    private async void OnReturnClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
     }
 }

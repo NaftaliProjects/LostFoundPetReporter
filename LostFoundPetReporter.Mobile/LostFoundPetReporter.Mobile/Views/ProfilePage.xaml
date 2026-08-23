@@ -9,9 +9,68 @@
 
     <Grid RowDefinitions="*,Auto">
 
-        <ContentView Grid.Row="0">
-            <!-- Profile content -->
-        </ContentView>
+        <!-- ========================= -->
+        <!-- Profile Content            -->
+        <!-- ========================= -->
+
+        <ScrollView Grid.Row="0">
+
+            <VerticalStackLayout
+                Padding="30"
+                Spacing="15">
+
+                <Label
+                    Text="Profile"
+                    FontSize="28"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center" />
+
+                <!-- Name -->
+
+                <Label
+                    Text="Name"
+                    FontAttributes="Bold" />
+
+                <Entry
+                    Text="{Binding CurrentUser.Name}"
+                    Placeholder="Enter your name" />
+
+                <!-- Email -->
+
+                <Label
+                    Text="Email"
+                    FontAttributes="Bold" />
+
+                <Entry
+                    Text="{Binding CurrentUser.Email}"
+                    Placeholder="Enter your email"
+                    Keyboard="Email" />
+
+                <!-- Phone -->
+
+                <Label
+                    Text="Phone"
+                    FontAttributes="Bold" />
+
+                <Entry
+                    Text="{Binding CurrentUser.Phone}"
+                    Placeholder="Enter your phone"
+                    Keyboard="Telephone" />
+
+                <!-- Update -->
+
+                <Button
+                    Text="Update Profile"
+                    Command="{Binding UpdateCommand}"
+                    Margin="0,20,0,0" />
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+        <!-- ========================= -->
+        <!-- Bottom Navigation          -->
+        <!-- ========================= -->
 
         <controls:BottomNavigationBar
             Grid.Row="1" />

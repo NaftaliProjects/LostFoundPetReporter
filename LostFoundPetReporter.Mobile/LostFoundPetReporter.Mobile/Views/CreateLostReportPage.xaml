@@ -7,12 +7,19 @@
     Title="Create Lost Report">
 
     <ScrollView>
+ 
 
         <VerticalStackLayout
             Padding="20"
             Spacing="18">
 
-            <Label
+                <!-- Return -->
+            <Button
+                Text="← Return"
+                HorizontalOptions="Start"
+                Clicked="OnReturnClicked" />
+
+                <Label
                 Text="Create Lost Report"
                 FontSize="28"
                 FontAttributes="Bold" />

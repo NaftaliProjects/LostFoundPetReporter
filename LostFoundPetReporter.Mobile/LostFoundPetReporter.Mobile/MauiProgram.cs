@@ -3,6 +3,7 @@ using LostFoundPetReporter.Mobile.Services.Session;
 using LostFoundPetReporter.Mobile.ViewModels;
 using LostFoundPetReporter.Mobile.Views;
 using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace LostFoundPetReporter.Mobile;
 
@@ -14,7 +15,7 @@ public static class MauiProgram
 
         builder
             .UseMauiApp<App>()
-            .UseMauiMaps()
+            .UseSkiaSharp()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

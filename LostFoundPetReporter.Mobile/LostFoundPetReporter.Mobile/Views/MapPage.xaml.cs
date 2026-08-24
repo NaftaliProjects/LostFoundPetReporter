@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls.Maps;
+﻿using Android.Graphics;
+using Mapsui.Tiling;
 
 namespace LostFoundPetReporter.Mobile.Views;
 
@@ -8,17 +9,14 @@ public partial class MapPage : ContentPage
     {
         InitializeComponent();
 
+        PetMap.Map?.Layers.Add(
+            OpenStreetMap.CreateTileLayer());
+
         AddTestPin();
     }
 
     private void AddTestPin()
     {
-        var pin = new Pin
-        {
-            Label = "Lost Dog",
-            Location = new Location(32.0853, 34.7818)
-        };
-
-        PetMap.Pins.Add(pin);
+        // We'll add the marker in the next step.
     }
 }

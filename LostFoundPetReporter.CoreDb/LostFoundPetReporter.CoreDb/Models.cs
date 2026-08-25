@@ -65,7 +65,31 @@ namespace LostFoundPetReporter.CoreDb.Models
         public int FoundReportId { get; set; }
     }
 
- 
+
+    public class LostCoordinate 
+    {
+        public int LostReportId { get; set; }
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
+
+        //Nevigation properties 
+        public LostReport LostReportNavigation { get; set; }
+
+    }
+
+
+    public class FoundCoordinate 
+    {
+        public int FoundReportId { get; set; }
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
+
+        //Nevigation properties 
+        public FoundReport FoundReportNavigation { get; set; }
+    }
+
 
     /// <summary>
     /// A found report from any user will be save in the appropriate LostReport
@@ -73,7 +97,6 @@ namespace LostFoundPetReporter.CoreDb.Models
     public class FoundReport : BaseModel
     {
         //properties
-        public String Coordinates { get; set; } = "";
         public DateTime dateTime { get; set; }
 
         //Foreign keys 
@@ -82,6 +105,7 @@ namespace LostFoundPetReporter.CoreDb.Models
 
         //Nevigation properties 
         public User? UserNevigation { get; set; }
+        public FoundCoordinate? FoundCoordinateNavigation { get; set; }
         public List<FoundReportExtFile>? FoundReportExtFilesNevigation { get; set; } = new();
         public AnimalDescription PetDescription { get; set; } = new();
         public List<LostFoundMatch>? LostFoundMatchNevigation { get; set; } = new();
@@ -95,7 +119,6 @@ namespace LostFoundPetReporter.CoreDb.Models
     public class LostReport : BaseModel
     {
         //properties
-        public String Coordinates { get; set; } = "";
         public DateTime dateTime { get; set; }
 
 
@@ -104,6 +127,7 @@ namespace LostFoundPetReporter.CoreDb.Models
 
         //Nevigation properties
         public User? User { get; set; }
+        public LostCoordinate? LostCoordinateNavigation { get; set; }
         public List<LostReportExtFile>? LostReportExtFilesNevigation { get; set; } = new();
         public List<LostFoundMatch>? LostFoundMatchNevigation { get; set; } = new();
 

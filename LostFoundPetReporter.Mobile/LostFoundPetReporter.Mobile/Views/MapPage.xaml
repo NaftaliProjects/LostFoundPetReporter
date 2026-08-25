@@ -5,15 +5,13 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
-    xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.Maui"
     Title="Map">
 
     <Grid RowDefinitions="*,Auto">
 
-        <mapsui:MapControl
-            x:Name="PetMap"
-            Grid.Row="0"
-
+        <ContentView
+            x:Name="MapContainer"
+            Grid.Row="0" />
 
         <controls:BottomNavigationBar
             Grid.Row="1" />

@@ -8,9 +8,8 @@ namespace LostFoundPetReporter.Mobile.Models
     {
         public int Id { get; set; }
         public int? UserId { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
-        public DateTime FoundDate { get; set; } = DateTime.Today;
-
+        public DateTime DateTime { get; set; } = DateTime.Today;
+        public FoundCoordinate? FoundCoordinate { get; set; }
         public User? User { get; set; }
         public AnimalDescription PetDescription { get; set; } = new();
     }

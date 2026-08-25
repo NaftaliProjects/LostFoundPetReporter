@@ -3,6 +3,23 @@
 namespace LostFoundPetReporter.API.DTO
 {
 
+
+
+    public class FoundCoordinateDto : IResponseDto<FoundCoordinate, FoundCoordinateDto>
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+        public static FoundCoordinateDto FromEntity(FoundCoordinate entity)
+        {
+            return new FoundCoordinateDto
+            {
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+            };
+        }
+    }
+
     
 
     public class FoundReportExtFileDto
@@ -34,12 +51,12 @@ namespace LostFoundPetReporter.API.DTO
     public class FoundReportDto : IResponseDto<FoundReport, FoundReportDto> , IHasId
     {
         public int? Id { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
         public int UserId { get; set; }
 
         
         public UserDto? User { get; set; }
+        public FoundCoordinateDto? FoundCoordinate { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
         public List<FoundReportExtFileDto> FoundReportExtFiles { get; set; } = new();
 
@@ -49,7 +66,6 @@ namespace LostFoundPetReporter.API.DTO
             return new FoundReportDto
             {
                 Id = entity.Id,
-                Coordinates = entity.Coordinates,
                 dateTime = entity.dateTime,
                 UserId = entity.UserId,
 
@@ -61,6 +77,9 @@ namespace LostFoundPetReporter.API.DTO
                     ? new AnimalDescriptionDto()
                     : AnimalDescriptionDto.FromEntity(entity.PetDescription),
 
+                FoundCoordinate = entity.FoundCoordinateNavigation == null 
+                    ? null
+                    : FoundCoordinateDto.FromEntity(entity.FoundCoordinateNavigation),
 
                 FoundReportExtFiles = entity.FoundReportExtFilesNevigation?
                     .Select(FoundReportExtFileDto.FromEntity)
@@ -75,7 +94,6 @@ namespace LostFoundPetReporter.API.DTO
     public class CreateFoundReportDto : IEntityDto<FoundReport> , IHasId
     {
         public int? Id { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
         // Foreign keys required to link relationships
@@ -83,6 +101,7 @@ namespace LostFoundPetReporter.API.DTO
 
         // Embedded data required on creation
         public AnimalDescriptionDto PetDescription { get; set; } = new();
+        public FoundCoordinateDto? FoundCoordinate { get; set; } = new();
 
 
         public FoundReport ToEntity()
@@ -90,12 +109,17 @@ namespace LostFoundPetReporter.API.DTO
             return new FoundReport
             {
                 Id = Id ?? 0,
-                Coordinates = Coordinates,
                 dateTime = dateTime,
                 UserId = UserId,
-
-                PetDescription = PetDescription.ToEntity()
+                PetDescription = PetDescription.ToEntity(),
+                FoundCoordinateNavigation = new FoundCoordinate
+                {
+                    Latitude = FoundCoordinate.Latitude,
+                    Longitude = FoundCoordinate.Longitude
+                }
             };
+
+
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LostFoundPetReporter.Mobile.Models.Map;
 
-namespace LostFoundPetReporter.Mobile.Services.Maps
+namespace LostFoundPetReporter.Mobile.Services.Map;
+
+public interface IMapService
 {
-    internal interface IMapService
-    {
-    }
+    Task<MapPoint?> GetCurrentLocationAsync();
 }

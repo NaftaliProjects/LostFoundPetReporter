@@ -2,6 +2,23 @@
 
 namespace LostFoundPetReporter.API.DTO
 {
+
+    public class LostCoordinateDto : IResponseDto<LostCoordinate, LostCoordinateDto>
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+        public static LostCoordinateDto FromEntity(LostCoordinate entity)
+        {
+            return new LostCoordinateDto
+            {
+                Latitude = entity.Latitude,
+                Longitude = entity.Longitude,
+            };
+        }
+    }
+
+
     public class LostReportExtFileDto
     : IResponseDto<LostReportExtFile, LostReportExtFileDto>
     {
@@ -31,13 +48,13 @@ namespace LostFoundPetReporter.API.DTO
     public class LostReportDto : IResponseDto<LostReport, LostReportDto> , IHasId
     {
         public int? Id { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
         public int UserId { get; set; }
 
         public UserDto? User { get; set; }
 
+        public LostCoordinateDto? LostCoordinate { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
 
         public List<LostReportExtFileDto> LostReportExtFiles { get; set; } = new();
@@ -51,7 +68,6 @@ namespace LostFoundPetReporter.API.DTO
             return new LostReportDto
             {
                 Id = entity.Id,
-                Coordinates = entity.Coordinates,
                 dateTime = entity.dateTime,
                 UserId = entity.UserId,
 
@@ -62,6 +78,10 @@ namespace LostFoundPetReporter.API.DTO
                 PetDescription = entity.PetDescription == null
                     ? new AnimalDescriptionDto()
                     : AnimalDescriptionDto.FromEntity(entity.PetDescription),
+
+                LostCoordinate = entity.LostCoordinateNavigation == null
+                    ? null
+                    : LostCoordinateDto.FromEntity(entity.LostCoordinateNavigation),
 
 
                 LostReportExtFiles = entity.LostReportExtFilesNevigation?
@@ -81,23 +101,26 @@ namespace LostFoundPetReporter.API.DTO
     public class CreateLostReportDto : IEntityDto<LostReport>, IHasId
     {
         public int? Id { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
         public DateTime dateTime { get; set; }
 
         public int UserId { get; set; }
 
         public AnimalDescriptionDto PetDescription { get; set; } = new();
+        public LostCoordinateDto? LostCoordinate { get; set; } = new();
 
         public LostReport ToEntity()
         {
             return new LostReport
             {
                 Id = Id ?? 0,
-                Coordinates = Coordinates,
                 dateTime = dateTime,
                 UserId = UserId,
-
-                PetDescription = PetDescription.ToEntity()
+                PetDescription = PetDescription.ToEntity(),
+                LostCoordinateNavigation = new LostCoordinate
+                {
+                    Latitude = LostCoordinate.Latitude,
+                    Longitude = LostCoordinate.Longitude
+                }
             };
         }
     }

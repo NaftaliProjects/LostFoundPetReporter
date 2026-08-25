@@ -1,14 +1,21 @@
 ﻿using LostFoundPetReporter.Mobile.Models.Map;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+using LostFoundPetReporter.Mobile.Services.Map;
 
-namespace LostFoundPetReporter.Mobile.ViewModels
+namespace LostFoundPetReporter.Mobile.ViewModels;
+
+public class MapViewModel
 {
-    public class MapViewModel
-    {
-        public ObservableCollection<MapPoint> Points { get; } = new();
+    private readonly IMapService _mapService;
 
+    public MapPoint? CurrentLocation { get; private set; }
+
+    public MapViewModel(IMapService mapService)
+    {
+        _mapService = mapService;
+    }
+
+    public async Task LoadLocationAsync()
+    {
+        CurrentLocation = await _mapService.GetCurrentLocationAsync();
     }
 }

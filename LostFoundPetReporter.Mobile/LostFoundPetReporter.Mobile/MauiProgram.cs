@@ -1,9 +1,16 @@
-﻿using LostFoundPetReporter.Mobile.Services.Api;
+﻿
+using LostFoundPetReporter.Mobile.Services.Api;
+using LostFoundPetReporter.Mobile.Services.Map;
+
 using LostFoundPetReporter.Mobile.Services.Session;
 using LostFoundPetReporter.Mobile.ViewModels;
 using LostFoundPetReporter.Mobile.Views;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+
+
+
+
 
 namespace LostFoundPetReporter.Mobile;
 
@@ -37,7 +44,7 @@ public static class MauiProgram
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
             client.BaseAddress = new Uri(
-                "https://10.100.102.27:7074/");
+                "https://localhost:7074/");
         }).ConfigurePrimaryHttpMessageHandler(() => handler);
 
 
@@ -49,6 +56,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ILostReportApiService, LostReportApiService>();
         builder.Services.AddTransient<IFoundReportApiService, FoundReportApiService>();
         builder.Services.AddSingleton<IUserSession, UserSession>();
+        builder.Services.AddTransient<IMapService, MapService>();
 
         // =========================
         // ViewModels

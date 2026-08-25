@@ -27,10 +27,22 @@
                 </VerticalStackLayout>
 
                 <!-- Location -->
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Location" FontAttributes="Bold" />
-                    <Entry Placeholder="Enter coordinates" Text="{Binding Report.Coordinates}" />
-                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        Text="Location"
+                        FontAttributes="Bold" />
+
+                                    <Button
+                        Text="📍 Use My Current Location"
+                        Command="{Binding UseCurrentLocationCommand}" />
+
+                                    <Label
+                        Text="{Binding LocationText}"
+                        FontSize="14"
+                        HorizontalOptions="Center" />
+
+                                </VerticalStackLayout>
 
                 <!-- Animal -->
                 <Label

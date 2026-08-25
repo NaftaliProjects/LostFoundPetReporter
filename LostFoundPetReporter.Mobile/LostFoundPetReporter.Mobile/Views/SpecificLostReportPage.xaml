@@ -17,12 +17,21 @@
             Spacing="5">
 
             <Label
-                Text="{Binding LostReport.PetDescription.Name}"
+                Text="Lost Report"
                 FontSize="26"
                 FontAttributes="Bold" />
 
             <Label
-                Text="{Binding LostReport.Coordinates, StringFormat='Location: {0}'}"
+                Text="{Binding LostReport.PetDescription.Name}"
+                FontSize="22"
+                FontAttributes="Bold" />
+
+            <Label
+                Text="{Binding LostReport.LostCoordinate.Latitude, StringFormat='Latitude: {0:F6}'}"
+                FontSize="14" />
+
+            <Label
+                Text="{Binding LostReport.LostCoordinate.Longitude, StringFormat='Longitude: {0:F6}'}"
                 FontSize="14" />
 
             <Label
@@ -63,16 +72,33 @@
                         Padding="12"
                         StrokeShape="RoundRectangle 10">
 
-                        <VerticalStackLayout Spacing="5">
+                        <VerticalStackLayout
+                            Spacing="5">
 
+                            <!-- Found pet -->
                             <Label
-                                Text="{Binding Coordinates}"
+                                Text="{Binding PetDescription.Name}"
                                 FontSize="18"
                                 FontAttributes="Bold" />
 
+                            <!-- Reporter -->
                             <Label
-                                Text="{Binding dateTime}"
+                                Text="{Binding User.Name, StringFormat='Found by: {0}'}"
                                 FontSize="14" />
+
+                            <!-- Date -->
+                            <Label
+                                Text="{Binding dateTime, StringFormat='Found: {0:dd/MM/yyyy HH:mm}'}"
+                                FontSize="14" />
+
+                            <!-- Location -->
+                            <Label
+                                Text="{Binding FoundCoordinate.Latitude, StringFormat='Latitude: {0:F6}'}"
+                                FontSize="12" />
+
+                            <Label
+                                Text="{Binding FoundCoordinate.Longitude, StringFormat='Longitude: {0:F6}'}"
+                                FontSize="12" />
 
                         </VerticalStackLayout>
 

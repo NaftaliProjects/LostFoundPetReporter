@@ -17,18 +17,19 @@
             Spacing="15"
             VerticalOptions="Center">
 
-                    <Label
+            <Label
                 Text="Lost Pets"
                 FontSize="28"
                 FontAttributes="Bold"
                 VerticalOptions="Center" />
 
-                    <Button
+            <Button
                 Text="Refresh"
                 Clicked="OnRefreshClicked"
                 VerticalOptions="Center" />
 
         </HorizontalStackLayout>
+
 
         <!-- Lost reports -->
         <CollectionView
@@ -37,9 +38,9 @@
             Margin="10"
             SelectionMode="Single"
             SelectionChanged="OnLostReportSelected">
-           
 
             <CollectionView.EmptyView>
+
                 <VerticalStackLayout
                     Padding="20"
                     VerticalOptions="Center">
@@ -50,67 +51,84 @@
                         HorizontalTextAlignment="Center" />
 
                 </VerticalStackLayout>
+
             </CollectionView.EmptyView>
 
+
             <CollectionView.ItemTemplate>
+
                 <DataTemplate x:DataType="model:LostReport">
 
-                    <Border Margin="5,8"
+                    <Border
+                        Margin="5,8"
                         Padding="12"
                         StrokeShape="RoundRectangle 10">
 
-                        <!-- 2-Column Grid: Left for Image, Right for Details -->
-                        <Grid ColumnDefinitions="90, *"
-                              ColumnSpacing="15">
+                        <Grid
+                            ColumnDefinitions="90,*"
+                            ColumnSpacing="15">
 
-                            <!-- Left: Default Pet Image -->
-                            <Border 
-                                
-                                Grid.Column="0" 
+                            <!-- Pet image -->
+                            <Border
+                                Grid.Column="0"
                                 HeightRequest="90"
                                 WidthRequest="90"
                                 StrokeShape="RoundRectangle 8"
                                 StrokeThickness="0"
                                 VerticalOptions="Center">
-                                <Image Source="dotnet_bot.png" Aspect="AspectFill" />
-                                   
+
+                                <Image
+                                    Source="dotnet_bot.png"
+                                    Aspect="AspectFill" />
+
                             </Border>
 
-                            <!-- Right: Pet & Reporter Info -->
-                            <VerticalStackLayout Grid.Column="1"
-                                     VerticalOptions="Center"
-                                     Spacing="4">
 
-                                <!-- Pet Name -->
-                                <Label Text="{Binding PetDescription.Name}"
-                                   FontSize="18"
-                                   FontAttributes="Bold" /> 
+                            <!-- Pet information -->
+                            <VerticalStackLayout
+                                Grid.Column="1"
+                                VerticalOptions="Center"
+                                Spacing="4">
 
-                                <!-- Reporter Name -->
-                                <Label Text="{Binding User.Name, StringFormat='Reporter: {0}'}"
-                                   FontSize="14"
-                                   TextColor="White" />      
+                                <!-- Pet name -->
+                                <Label
+                                    Text="{Binding PetDescription.Name}"
+                                    FontSize="18"
+                                    FontAttributes="Bold" />
 
-                                <!-- Location / Country-City -->
-                                <Label Text="{Binding Coordinates, StringFormat='Location: {0}'}"
-                                   FontSize="12"
-                                   TextColor="White" />
+
+                                <!-- Reporter -->
+                                <Label
+                                    Text="{Binding User.Name, StringFormat='Reporter: {0}'}"
+                                    FontSize="14"
+                                    TextColor="White" />
+
+
+                                <!-- Latitude -->
+                                <Label
+                                    Text="{Binding LostCoordinate.Latitude, StringFormat='Lat: {0:F6}'}"
+                                    FontSize="12"
+                                    TextColor="White" />
+
+
+                                <!-- Longitude -->
+                                <Label
+                                    Text="{Binding LostCoordinate.Longitude, StringFormat='Lng: {0:F6}'}"
+                                    FontSize="12"
+                                    TextColor="White" />
 
                             </VerticalStackLayout>
-
-                            <controls:BottomNavigationBar
-                                Grid.Row="1" />
 
                         </Grid>
 
                     </Border>
 
                 </DataTemplate>
+
             </CollectionView.ItemTemplate>
 
         </CollectionView>
 
-        
 
         <!-- Bottom navigation -->
         <controls:BottomNavigationBar

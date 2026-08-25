@@ -26,19 +26,39 @@ namespace LostFoundPetReporter.CoreDb
 
             });
 
+            modelBuilder.Entity<LostCoordinate>()
+             .HasKey(x => x.LostReportId);
 
             modelBuilder.Entity<LostReport>(entity =>
             {
                 entity.ToTable("LostReports");
-                entity.OwnsOne(lr => lr.PetDescription);
-                
+                entity.OwnsOne(lr => lr.PetDescription);    
             });
+
+            modelBuilder.Entity<LostReport>()
+            .HasOne(x => x.LostCoordinateNavigation)
+            .WithOne(x => x.LostReportNavigation)
+            .HasForeignKey<LostCoordinate>(
+                x => x.LostReportId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<FoundCoordinate>()
+               .HasKey(x => x.FoundReportId);
+
 
             modelBuilder.Entity<FoundReport>(entity =>
             {
                 entity.ToTable("FoundReports");
                 entity.OwnsOne(fr => fr.PetDescription);
             });
+
+            modelBuilder.Entity<FoundReport>()
+            .HasOne(x => x.FoundCoordinateNavigation)
+            .WithOne(x => x.FoundReportNavigation)
+            .HasForeignKey<FoundCoordinate>(
+                x => x.FoundReportId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FoundReportExtFile>(entity =>
             {

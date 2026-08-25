@@ -1,22 +1,66 @@
-﻿using Android.Graphics;
+﻿using LostFoundPetReporter.Mobile.ViewModels;
+using Mapsui;
+using Mapsui.Layers;
+using Mapsui.Projections;
 using Mapsui.Tiling;
+using Mapsui.UI.Maui;
 
 namespace LostFoundPetReporter.Mobile.Views;
 
 public partial class MapPage : ContentPage
 {
-    public MapPage()
+    private readonly MapViewModel _viewModel;
+
+    private readonly MapControl _mapControl;
+    private readonly MyLocationLayer _myLocationLayer;
+
+    public MapPage(MapViewModel viewModel)
     {
         InitializeComponent();
 
-        PetMap.Map?.Layers.Add(
+        _viewModel = viewModel;
+
+        BindingContext = _viewModel;
+
+        _mapControl = new MapControl();
+
+        _mapControl.Map?.Layers.Add(
             OpenStreetMap.CreateTileLayer());
 
-        AddTestPin();
+        _myLocationLayer = new MyLocationLayer(
+            _mapControl.Map!);
+
+        _mapControl.Map?.Layers.Add(
+            _myLocationLayer);
+
+        MapContainer.Content = _mapControl;
     }
 
-    private void AddTestPin()
+    protected override async void OnAppearing()
     {
-        // We'll add the marker in the next step.
+        base.OnAppearing();
+
+        await _viewModel.LoadLocationAsync();
+
+        ShowCurrentLocation();
+    }
+
+    private void ShowCurrentLocation()
+    {
+        var location = _viewModel.CurrentLocation;
+
+        if (location == null)
+            return;
+
+        var point = SphericalMercator.FromLonLat(
+            new MPoint(
+                location.Longitude,
+                location.Latitude));
+
+        _myLocationLayer.UpdateMyLocation(point);
+
+        _mapControl.Map?.Navigator.CenterOnAndZoomTo(
+            point,
+            _mapControl.Map.Navigator.Resolutions[16]);
     }
 }

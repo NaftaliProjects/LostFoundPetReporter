@@ -22,6 +22,22 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundCoordinate", b =>
+                {
+                    b.Property<int>("FoundReportId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.HasKey("FoundReportId");
+
+                    b.ToTable("FoundCoordinate");
+                });
+
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReport", b =>
                 {
                     b.Property<int>("Id")
@@ -29,10 +45,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Coordinates")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -80,6 +92,22 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     b.ToTable("FoundReportExtFiles", (string)null);
                 });
 
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostCoordinate", b =>
+                {
+                    b.Property<int>("LostReportId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.HasKey("LostReportId");
+
+                    b.ToTable("LostCoordinate");
+                });
+
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostFoundMatch", b =>
                 {
                     b.Property<int>("Id")
@@ -111,10 +139,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Coordinates")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -195,6 +219,17 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundCoordinate", b =>
+                {
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.FoundReport", "FoundReportNavigation")
+                        .WithOne("FoundCoordinateNavigation")
+                        .HasForeignKey("LostFoundPetReporter.CoreDb.Models.FoundCoordinate", "FoundReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FoundReportNavigation");
+                });
+
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReport", b =>
                 {
                     b.HasOne("LostFoundPetReporter.CoreDb.Models.User", "UserNevigation")
@@ -245,6 +280,17 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         .HasForeignKey("FoundReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostCoordinate", b =>
+                {
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.LostReport", "LostReportNavigation")
+                        .WithOne("LostCoordinateNavigation")
+                        .HasForeignKey("LostFoundPetReporter.CoreDb.Models.LostCoordinate", "LostReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LostReportNavigation");
                 });
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostFoundMatch", b =>
@@ -320,6 +366,8 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundReport", b =>
                 {
+                    b.Navigation("FoundCoordinateNavigation");
+
                     b.Navigation("FoundReportExtFilesNevigation");
 
                     b.Navigation("LostFoundMatchNevigation");
@@ -327,6 +375,8 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.LostReport", b =>
                 {
+                    b.Navigation("LostCoordinateNavigation");
+
                     b.Navigation("LostFoundMatchNevigation");
 
                     b.Navigation("LostReportExtFilesNevigation");

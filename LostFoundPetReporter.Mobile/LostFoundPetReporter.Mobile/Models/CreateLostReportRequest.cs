@@ -11,6 +11,7 @@ namespace LostFoundPetReporter.Mobile.Models
         public string Coordinates { get; set; }
         public DateTime dateTime { get; set; }
 
+        public LostCoordinate LostCoordinate { get; set; } = new();
         public AnimalDescription PetDescription { get; set; } = new();
 
     }

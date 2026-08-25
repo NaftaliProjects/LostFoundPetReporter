@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Coordinates = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     dateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PetDescription_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -58,7 +57,6 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Coordinates = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     dateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PetDescription_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -73,6 +71,25 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         name: "FK_LostReports_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FoundCoordinate",
+                columns: table => new
+                {
+                    FoundReportId = table.Column<int>(type: "int", nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoundCoordinate", x => x.FoundReportId);
+                    table.ForeignKey(
+                        name: "FK_FoundCoordinate_FoundReports_FoundReportId",
+                        column: x => x.FoundReportId,
+                        principalTable: "FoundReports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -95,6 +112,25 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                         name: "FK_FoundReportExtFiles_FoundReports_FoundReportId",
                         column: x => x.FoundReportId,
                         principalTable: "FoundReports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LostCoordinate",
+                columns: table => new
+                {
+                    LostReportId = table.Column<int>(type: "int", nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LostCoordinate", x => x.LostReportId);
+                    table.ForeignKey(
+                        name: "FK_LostCoordinate_LostReports_LostReportId",
+                        column: x => x.LostReportId,
+                        principalTable: "LostReports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -182,7 +218,13 @@ namespace LostFoundPetReporter.CoreDb.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "FoundCoordinate");
+
+            migrationBuilder.DropTable(
                 name: "FoundReportExtFiles");
+
+            migrationBuilder.DropTable(
+                name: "LostCoordinate");
 
             migrationBuilder.DropTable(
                 name: "LostFoundMatches");

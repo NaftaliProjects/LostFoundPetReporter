@@ -252,7 +252,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
                 .FirstOrDefault();
 
         public IEnumerable<LostReport> GetAllByUserId(int userId)
-            => BuildBaseQuery().Where(u => u.UserId == userId);
+            => BuildDetailsQuery().Where(u => u.UserId == userId);
     }
 
 

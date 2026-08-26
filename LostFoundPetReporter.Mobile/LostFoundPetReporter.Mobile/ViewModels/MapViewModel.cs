@@ -2,6 +2,7 @@
 using LostFoundPetReporter.Mobile.Models.Map;
 using LostFoundPetReporter.Mobile.Services.Api;
 using LostFoundPetReporter.Mobile.Services.Map;
+using LostFoundPetReporter.Mobile.Services.Session;
 
 namespace LostFoundPetReporter.Mobile.ViewModels;
 
@@ -9,6 +10,7 @@ public class MapViewModel
 {
     private readonly IMapService _mapService;
     private readonly ILostReportApiService _lostReportApiService;
+    private readonly IUserSession _userSession;
 
     public MapPoint? CurrentLocation { get; private set; }
 
@@ -16,24 +18,40 @@ public class MapViewModel
 
     public MapViewModel(
         IMapService mapService,
-        ILostReportApiService lostReportApiService)
+        ILostReportApiService lostReportApiService,
+        IUserSession userSession)
     {
         _mapService = mapService;
         _lostReportApiService = lostReportApiService;
+        _userSession = userSession;
     }
 
     public async Task LoadAsync()
     {
+        // Get current device location
         CurrentLocation = await _mapService.GetCurrentLocationAsync();
 
+        // Get reports belonging to the current user
         await LoadReportsAsync();
     }
 
     private async Task LoadReportsAsync()
     {
-        var reports = await _lostReportApiService.GetLostReportsAsync();
+        var user = _userSession.CurrentUser;
+
+        if (user is null)
+        {
+            ReportGroups.Clear();
+            return;
+        }
+
+        var reports = await _lostReportApiService
+            .GetLostReportByUserIdAsync(user.Id);
 
         ReportGroups.Clear();
+
+        if (reports is null)
+            return;
 
         var colors = new[]
         {
@@ -57,25 +75,24 @@ public class MapViewModel
                 Color = colors[colorIndex % colors.Length]
             };
 
+            // Lost report location
             if (lostReport.LostCoordinate != null)
             {
-                group.LostPoint = new MapPoint
-                {
-                    Latitude = lostReport.LostCoordinate.Latitude,
-                    Longitude = lostReport.LostCoordinate.Longitude
-                };
+                group.LostPoint = new MapPoint(
+                    lostReport.LostCoordinate.Latitude,
+                    lostReport.LostCoordinate.Longitude);
             }
 
+            // Found report locations
             foreach (var foundReport in lostReport.FoundReports)
             {
                 if (foundReport.FoundCoordinate == null)
                     continue;
 
-                group.FoundPoints.Add(new MapPoint
-                {
-                    Latitude = foundReport.FoundCoordinate.Latitude,
-                    Longitude = foundReport.FoundCoordinate.Longitude
-                });
+                group.FoundPoints.Add(
+                    new MapPoint(
+                        foundReport.FoundCoordinate.Latitude,
+                        foundReport.FoundCoordinate.Longitude));
             }
 
             ReportGroups.Add(group);

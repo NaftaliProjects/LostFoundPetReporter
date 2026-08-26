@@ -235,7 +235,8 @@ namespace LostFoundPetReporter.CoreDb.Repos
             .Include(x => x.LostReportExtFilesNevigation)
             .Include(c => c.LostCoordinateNavigation)
             .Include(x => x.LostFoundMatchNevigation)
-                .ThenInclude(x => x.FoundReportNevigation);
+                .ThenInclude(x => x.FoundReportNevigation)
+                .ThenInclude(x => x.FoundCoordinateNavigation);
 
         public override IEnumerable<LostReport> GetAll()
             => BuildBaseQuery();

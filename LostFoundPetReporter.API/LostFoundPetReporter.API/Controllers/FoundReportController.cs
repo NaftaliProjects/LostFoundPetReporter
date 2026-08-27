@@ -16,6 +16,7 @@ namespace LostFoundPetReporter.API.Controllers
         CreateFoundReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
+        private readonly IExtFileQueue _extFileQueue;
 
         // Inject IMatchingQueue alongside your repository
         public FoundReportController(
@@ -37,6 +38,9 @@ namespace LostFoundPetReporter.API.Controllers
 
             {
                 _matchingQueue.QueueForMatchingAsync(createdDto.Id.Value, ReportType.Found);
+
+                _extFileQueue.QueueForExtFileAsync(createdDto.Id.Value, ReportType.Found, createDto.PictureBase64List ?? new List<string>());
+
             }
 
             return actionResult;

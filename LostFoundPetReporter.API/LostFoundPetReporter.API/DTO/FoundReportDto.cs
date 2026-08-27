@@ -58,8 +58,7 @@ namespace LostFoundPetReporter.API.DTO
         public UserDto? User { get; set; }
         public FoundCoordinateDto? FoundCoordinate { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
-        public List<FoundReportExtFileDto> FoundReportExtFiles { get; set; } = new();
-
+     
 
         public static FoundReportDto FromEntity(FoundReport entity)
         {
@@ -81,10 +80,9 @@ namespace LostFoundPetReporter.API.DTO
                     ? null
                     : FoundCoordinateDto.FromEntity(entity.FoundCoordinateNavigation),
 
-                FoundReportExtFiles = entity.FoundReportExtFilesNevigation?
-                    .Select(FoundReportExtFileDto.FromEntity)
-                    .ToList()
-                    ?? new()
+                
+
+
             };
         }
 
@@ -103,6 +101,7 @@ namespace LostFoundPetReporter.API.DTO
         public AnimalDescriptionDto PetDescription { get; set; } = new();
         public FoundCoordinateDto? FoundCoordinate { get; set; } = new();
 
+        public List<string>? PictureBase64List { get; set; }
 
         public FoundReport ToEntity()
         {
@@ -116,9 +115,10 @@ namespace LostFoundPetReporter.API.DTO
                 {
                     Latitude = FoundCoordinate.Latitude,
                     Longitude = FoundCoordinate.Longitude
-                }
-            };
+                },
 
+                FoundReportExtFilesNevigation = new List<FoundReportExtFile>()
+            };
 
         }
     }

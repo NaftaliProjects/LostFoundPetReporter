@@ -20,6 +20,8 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
     public AnimalDescription PetDescription => Report.PetDescription;
 
+
+
     public DateTime FoundDate { get; set; } = DateTime.Today;
 
     public TimeSpan FoundTime { get; set; } = DateTime.Now.TimeOfDay;
@@ -152,7 +154,9 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
             await stream.CopyToAsync(memoryStream);
 
-            Report.PictureBase64 = Convert.ToBase64String(memoryStream.ToArray());
+            var base64 = Convert.ToBase64String(memoryStream.ToArray());
+
+            Report.PictureBase64List.Add(base64);
 
         }
         catch (Exception ex)

@@ -113,6 +113,8 @@ public partial class MapPage : ContentPage
                         foundPoint.Longitude,
                         foundPoint.Latitude));
 
+                
+
                 features.Add(
                     CreateMarker(
                         point,

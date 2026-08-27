@@ -124,6 +124,14 @@ namespace LostFoundPetReporter.CoreDb.Repos
 
             return persist ? SaveChanges() : 0;
         }
+
+
+        public virtual int Update(T entity, bool persist = true)
+        {
+            Table.Update(entity);
+
+            return persist ? SaveChanges() : 0;
+        }
         public virtual int UpdateRange(IEnumerable<T> entities, bool persist = true)
         {
             Table.UpdateRange(entities);

@@ -11,5 +11,7 @@
         Task<StoredFileInfo> SaveBase64Async(
             string base64,
             CancellationToken cancellationToken = default);
+
+        string ConvertToBase64(string filePath);
     }
 }

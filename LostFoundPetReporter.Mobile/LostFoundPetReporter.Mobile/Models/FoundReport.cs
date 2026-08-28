@@ -12,5 +12,6 @@ namespace LostFoundPetReporter.Mobile.Models
         public FoundCoordinate? FoundCoordinate { get; set; }
         public User? User { get; set; }
         public AnimalDescription PetDescription { get; set; } = new();
+        public List<string> PictureBase64List { get; set; } = new();
     }
 }

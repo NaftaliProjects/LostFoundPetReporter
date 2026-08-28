@@ -44,7 +44,7 @@ public static class MauiProgram
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
             client.BaseAddress = new Uri(
-                "https://localhost:7074/");
+                "https://10.100.102.27:7074/");
         }).ConfigurePrimaryHttpMessageHandler(() => handler);
 
 

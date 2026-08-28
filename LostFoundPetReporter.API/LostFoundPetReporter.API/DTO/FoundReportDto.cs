@@ -1,4 +1,5 @@
 ﻿using LostFoundPetReporter.API.DTO.Interfaces;
+using LostFoundPetReporter.API.Services.BackgroundServices;
 
 namespace LostFoundPetReporter.API.DTO
 {
@@ -20,36 +21,28 @@ namespace LostFoundPetReporter.API.DTO
         }
     }
 
-    
+
 
     public class FoundReportExtFileDto
-        : IResponseDto<FoundReportExtFile, FoundReportExtFileDto> , IHasId
+     : IResponseDto<FoundReportExtFile, FoundReportExtFileDto>
     {
-        public int? Id { get; set; }
-        //properties
-        public String FilePath { get; set; }
+        public string PictureBase64 { get; set; } = "";
 
-        public String FileName { get; set; }
-        public String Description { get; set; } = "";
-
-        //Foreign keys 
-        public int FoundReportId { get; set; }
-
-
-        public static FoundReportExtFileDto FromEntity(FoundReportExtFile entity)
+        public static FoundReportExtFileDto FromEntity(
+            FoundReportExtFile entity)
         {
             return new FoundReportExtFileDto
             {
-                FilePath = entity.FilePath,
-                FileName = entity.FileName,
-                Description = entity.Description,
-                FoundReportId = entity.FoundReportId
+                
             };
         }
     }
 
+
     public class FoundReportDto : IResponseDto<FoundReport, FoundReportDto> , IHasId
     {
+
+        private IFileStorageService _fileStorageService;
         public int? Id { get; set; }
         public DateTime dateTime { get; set; }
         public int UserId { get; set; }
@@ -58,7 +51,9 @@ namespace LostFoundPetReporter.API.DTO
         public UserDto? User { get; set; }
         public FoundCoordinateDto? FoundCoordinate { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
-     
+
+        public List<string>? PictureBase64List { get; set; }
+
 
         public static FoundReportDto FromEntity(FoundReport entity)
         {
@@ -80,7 +75,11 @@ namespace LostFoundPetReporter.API.DTO
                     ? null
                     : FoundCoordinateDto.FromEntity(entity.FoundCoordinateNavigation),
 
-                
+                PictureBase64List = entity.FoundReportExtFilesNevigation?
+                .Where(x => File.Exists(x.FilePath))
+                .Select(x => Convert.ToBase64String(
+                    File.ReadAllBytes(x.FilePath)))
+                .ToList()
 
 
             };

@@ -2,7 +2,7 @@
 
 namespace LostFoundPetReporter.API.Services.BackgroundServices
 {
-    public class FileStorageService
+    public class FileStorageService : IFileStorageService
     {
 
         public async Task<StoredFileInfo> SaveBase64Async(string base64, CancellationToken cancellationToken = default)
@@ -29,6 +29,18 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
                 filePath,
                 fileName,
                 "image/jpeg");
+        }
+
+        public string ConvertToBase64(string filePath)
+        {
+            if (!File.Exists(filePath))
+                return string.Empty;
+
+            byte[] bytes = File.ReadAllBytes(filePath);
+
+            return Convert.ToBase64String(bytes);
+
+            
         }
     }
 }

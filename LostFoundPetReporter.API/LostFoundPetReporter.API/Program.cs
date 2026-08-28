@@ -58,6 +58,12 @@ builder.Services.AddSingleton<IMatchingQueue, MatchingQueue>();
 builder.Services.AddHostedService<MatchingBackgroundService>();
 builder.Services.AddScoped<IMatchingService, MatchingService>();
 
+builder.Services.AddSingleton<IExtFileQueue, ExtFileQueue>();
+builder.Services.AddHostedService<ExtFileBackgroundService>();
+builder.Services.AddScoped<IExtFileService, ExtFileService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+
 
 
 builder.Services.AddCors(options =>

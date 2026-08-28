@@ -19,11 +19,10 @@ namespace LostFoundPetReporter.API.Controllers
         private readonly IExtFileQueue _extFileQueue;
 
         // Inject IMatchingQueue alongside your repository
-        public FoundReportController(
-            IFoundReportRepo repo,
-            IMatchingQueue matchingQueue)
-            : base(repo)
+        public FoundReportController(IFoundReportRepo repo, IMatchingQueue matchingQueue, IExtFileQueue extFileQueue) : base(repo)
+
         {
+            _extFileQueue = extFileQueue;
             _matchingQueue = matchingQueue;
         }
 

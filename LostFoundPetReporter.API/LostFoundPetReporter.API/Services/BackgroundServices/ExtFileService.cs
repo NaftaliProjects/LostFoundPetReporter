@@ -22,11 +22,17 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             if (entity == null)
                 return;
 
-            foreach (var base64 in pictureBase64List)
+            for (int i = 0; i < pictureBase64List.Count; i++)
             {
+                string fileName = $"foundReport{DateTime.Now:ddMMyyHHmmss}_{i}.jpg";
+
+
+                var base64 = pictureBase64List[i];
+
                 var storedFile =
                     await _fileStorage.SaveBase64Async(
                         base64,
+                        fileName,
                         cancellationToken);
 
                 var extFile = new FoundReportExtFile
@@ -41,7 +47,7 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             }
 
             // Save the report + newly added files
-            _repo.Update(entity);
+            _repo.SaveChanges();
         }
     }
 }

@@ -200,6 +200,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
         internal IOrderedQueryable<FoundReport> BuildBaseQuery()
             => Table.Include(x => x.FoundReportExtFilesNevigation).Include(c => c.FoundCoordinateNavigation).OrderBy(o=>o.dateTime);
 
+       
         public override IEnumerable<FoundReport> GetAll()
             => BuildBaseQuery();
         public override IEnumerable<FoundReport> GetAllIgnoreQueryFillters()
@@ -244,7 +245,14 @@ namespace LostFoundPetReporter.CoreDb.Repos
             .Include(c => c.LostCoordinateNavigation)
             .Include(x => x.LostFoundMatchNevigation)
                 .ThenInclude(x => x.FoundReportNevigation)
-                .ThenInclude(x => x.FoundCoordinateNavigation);
+                .ThenInclude(x => x.FoundCoordinateNavigation)
+            .Include(x => x.LostFoundMatchNevigation)
+                .ThenInclude(x => x.FoundReportNevigation)
+                .ThenInclude(x => x.FoundReportExtFilesNevigation);
+
+
+
+
 
         public override IEnumerable<LostReport> GetAll()
             => BuildBaseQuery();

@@ -6,114 +6,466 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:model="clr-namespace:LostFoundPetReporter.Mobile.Models"
     xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
-    Title="Lost Report">
+    xmlns:converters="clr-namespace:LostFoundPetReporter.Mobile.Converters"
+    Title="Lost Report"
+    BackgroundColor="{AppThemeBinding Light=#F5F6F8, Dark=#121212}">
+
+    <ContentPage.Resources>
+
+        <ResourceDictionary>
+
+            <converters:Base64ToImageSourceConverter
+                x:Key="Base64ToImageSourceConverter" />
+
+            <converters:StringNotEmptyConverter
+              x:Key="StringNotEmptyConverter" />
+            
+            <converters:ListNotEmptyConverter x:Key="ListNotEmptyConverter" />
+
+        </ResourceDictionary>
+
+    </ContentPage.Resources>
+
 
     <Grid RowDefinitions="Auto,*,Auto">
 
-        <!-- Header -->
-        <VerticalStackLayout
+
+        <!-- ===================================================== -->
+        <!-- TOP - LOST REPORT INFORMATION -->
+        <!-- ===================================================== -->
+
+        <ScrollView
             Grid.Row="0"
-            Padding="20"
-            Spacing="5">
+            MaximumHeightRequest="250">
 
-            <Label
-                Text="Lost Report"
-                FontSize="26"
-                FontAttributes="Bold" />
+            <Border
+                Margin="15,15,15,8"
+                Padding="18"
+                BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 18">
 
-            <Label
-                Text="{Binding LostReport.PetDescription.Name}"
-                FontSize="22"
-                FontAttributes="Bold" />
+                <VerticalStackLayout Spacing="10">
 
-            <Label
-                Text="{Binding LostReport.LostCoordinate.Latitude, StringFormat='Latitude: {0:F6}'}"
-                FontSize="14" />
+                    <!-- Title -->
 
-            <Label
-                Text="{Binding LostReport.LostCoordinate.Longitude, StringFormat='Longitude: {0:F6}'}"
-                FontSize="14" />
+                    <HorizontalStackLayout
+                        Spacing="10">
 
-            <Label
-                Text="{Binding LostReport.User.Name, StringFormat='Reported by: {0}'}"
-                FontSize="14" />
-
-        </VerticalStackLayout>
-
-
-        <!-- Found Reports -->
-        <CollectionView
-            Grid.Row="1"
-            ItemsSource="{Binding LostReport.FoundReports}"
-            Margin="10">
-
-            <CollectionView.EmptyView>
-
-                <VerticalStackLayout
-                    Padding="20"
-                    VerticalOptions="Center">
-
-                    <Label
-                        Text="No found reports."
-                        FontSize="18"
-                        HorizontalTextAlignment="Center" />
-
-                </VerticalStackLayout>
-
-            </CollectionView.EmptyView>
-
-
-            <CollectionView.ItemTemplate>
-
-                <DataTemplate x:DataType="model:FoundReport">
-
-                    <Border
-                        Margin="5,8"
-                        Padding="12"
-                        StrokeShape="RoundRectangle 10">
+                        <Label
+                            Text="🐾"
+                            FontSize="28"
+                            VerticalOptions="Center" />
 
                         <VerticalStackLayout
-                            Spacing="5">
+                            Spacing="0">
 
-                            <!-- Found pet -->
                             <Label
-                                Text="{Binding PetDescription.Name}"
-                                FontSize="18"
+                                Text="Lost Report"
+                                FontSize="14"
+                                TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}" />
+
+                            <Label
+                                Text="{Binding LostReport.PetDescription.Name}"
+                                FontSize="24"
                                 FontAttributes="Bold" />
-
-                            <!-- Reporter -->
-                            <Label
-                                Text="{Binding User.Name, StringFormat='Found by: {0}'}"
-                                FontSize="14" />
-
-                            <!-- Date -->
-                            <Label
-                                Text="{Binding dateTime, StringFormat='Found: {0:dd/MM/yyyy HH:mm}'}"
-                                FontSize="14" />
-
-                            <!-- Location -->
-                            <Label
-                                Text="{Binding FoundCoordinate.Latitude, StringFormat='Latitude: {0:F6}'}"
-                                FontSize="12" />
-
-                            <Label
-                                Text="{Binding FoundCoordinate.Longitude, StringFormat='Longitude: {0:F6}'}"
-                                FontSize="12" />
 
                         </VerticalStackLayout>
 
-                    </Border>
-
-                </DataTemplate>
-
-            </CollectionView.ItemTemplate>
-
-        </CollectionView>
+                    </HorizontalStackLayout>
 
 
-        <!-- Bottom navigation -->
+                    <BoxView
+                        HeightRequest="1"
+                        Color="{AppThemeBinding Light=#E5E5E5, Dark=#333333}" />
+
+
+                    <!-- Reporter -->
+
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="12">
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Reporter"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+
+                        <Label
+                            Grid.Column="1"
+                            Text="{Binding LostReport.User.Name}"
+                            HorizontalTextAlignment="End" />
+
+                    </Grid>
+
+
+                    <!-- Posted -->
+
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="12">
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Posted"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+
+                        <Label
+                            Grid.Column="1"
+                            Text="{Binding LostReport.DateTime, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                            HorizontalTextAlignment="End" />
+
+                    </Grid>
+
+
+                    <!-- Location -->
+
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="12">
+
+                        <Label
+                            Grid.Column="0"
+                            Text="Location"
+                            FontAttributes="Bold"
+                            TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+
+                        <VerticalStackLayout
+                            Grid.Column="1"
+                            Spacing="0">
+
+                            <Label
+                                Text="{Binding LostReport.LostCoordinate.Latitude, StringFormat='{0:F6}'}"
+                                HorizontalTextAlignment="End" />
+
+                            <Label
+                                Text="{Binding LostReport.LostCoordinate.Longitude, StringFormat='{0:F6}'}"
+                                HorizontalTextAlignment="End"
+                                FontSize="12"
+                                TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}" />
+
+                        </VerticalStackLayout>
+
+                    </Grid>
+
+                </VerticalStackLayout>
+
+            </Border>
+
+        </ScrollView>
+
+
+        <!-- ===================================================== -->
+        <!-- MIDDLE - FOUND REPORTS -->
+        <!-- ===================================================== -->
+
+        <Grid Grid.Row="1">
+
+            <CollectionView
+                ItemsSource="{Binding FoundReports}"
+                Margin="10,5,10,5"
+                SelectionMode="None">
+
+                <CollectionView.EmptyView>
+
+                    <VerticalStackLayout
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        Spacing="8">
+
+                        <Label
+                            Text="🔍"
+                            FontSize="42"
+                            HorizontalTextAlignment="Center" />
+
+                        <Label
+                            Text="No found reports"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            HorizontalTextAlignment="Center" />
+
+                        <Label
+                            Text="Nobody has reported finding this pet yet."
+                            FontSize="14"
+                            TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}"
+                            HorizontalTextAlignment="Center" />
+
+                    </VerticalStackLayout>
+
+                </CollectionView.EmptyView>
+
+
+                <CollectionView.ItemTemplate>
+
+                    <DataTemplate
+                        x:DataType="model:FoundReport">
+
+                        <Border
+                            Margin="5,7"
+                            Padding="15"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#1E1E1E}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 16">
+
+                            <VerticalStackLayout
+                                Spacing="12">
+
+
+                                <!-- Found report header -->
+
+                                <Grid
+                                    ColumnDefinitions="*,Auto">
+
+                                    <VerticalStackLayout
+                                        Grid.Column="0"
+                                        Spacing="2">
+
+                                        <Label
+                                            Text="Found Report"
+                                            FontSize="13"
+                                            TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}" />
+
+                                        <Label
+                                            Text="{Binding User.Name, StringFormat='Found by {0}'}"
+                                            FontSize="18"
+                                            FontAttributes="Bold" />
+
+                                    </VerticalStackLayout>
+
+
+                                    <Label
+                                        Grid.Column="1"
+                                        Text="{Binding DateTime, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                        FontSize="12"
+                                        TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}"
+                                        VerticalOptions="Center" />
+
+                                </Grid>
+
+
+                                <BoxView
+                                    HeightRequest="1"
+                                    Color="{AppThemeBinding Light=#EEEEEE, Dark=#333333}" />
+
+
+                                <!-- Pet information -->
+
+                                <Grid
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+
+                                    <Label
+                                        Text="Pet"
+                                        FontAttributes="Bold"
+                                        TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+
+                                    <Label
+                                        Grid.Column="1"
+                                        Text="{Binding PetDescription.Name}"
+                                        HorizontalTextAlignment="End" />
+
+                                </Grid>
+
+
+                                <!-- Location -->
+
+                                <Grid
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="10">
+
+                                    <Label
+                                        Text="Location"
+                                        FontAttributes="Bold"
+                                        TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+
+                                    <VerticalStackLayout
+                                        Grid.Column="1"
+                                        Spacing="0">
+
+                                        <Label
+                                            Text="{Binding FoundCoordinate.Latitude, StringFormat='{0:F6}'}"
+                                            HorizontalTextAlignment="End" />
+
+                                        <Label
+                                            Text="{Binding FoundCoordinate.Longitude, StringFormat='{0:F6}'}"
+                                            HorizontalTextAlignment="End"
+                                            FontSize="12"
+                                            TextColor="{AppThemeBinding Light=#777777, Dark=#AAAAAA}" />
+
+                                    </VerticalStackLayout>
+
+                                </Grid>
+
+
+                                <!-- ================================================= -->
+                                <!-- IMAGE COLLAGE -->
+                                <!-- Only visible when images exist -->
+                                <!-- ================================================= -->
+
+                                <VerticalStackLayout
+                                    Spacing="6"
+                                    IsVisible="{Binding PictureBase64List, Converter={StaticResource ListNotEmptyConverter}}">
+
+                                    <Label Text="Photos" FontAttributes="Bold" FontSize="14" />
+
+                                    <Border
+        HeightRequest="90"
+        Padding="3"
+        StrokeThickness="0"
+        StrokeShape="RoundRectangle 12"
+        BackgroundColor="{AppThemeBinding Light=#EEEEEE, Dark=#2A2A2A}">
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                Tapped="OnPhotoCollectionTapped" />
+                                        </Border.GestureRecognizers>
+
+                                        <HorizontalStackLayout
+            BindableLayout.ItemsSource="{Binding PictureBase64List}"
+            Spacing="4">
+
+                                            <BindableLayout.ItemTemplate>
+
+                                                <DataTemplate x:DataType="x:String">
+                                                    <Image Source="{Binding ., Converter={StaticResource Base64ToImageSourceConverter}}"
+                                                           WidthRequest="84" HeightRequest="84" Aspect="AspectFill" />
+                                                </DataTemplate>
+
+                                            </BindableLayout.ItemTemplate>
+
+                                        </HorizontalStackLayout>
+
+                                    </Border>
+
+                                    <Label
+        Text="Tap to view photos"
+        FontSize="11"
+        TextColor="Gray" />
+
+                                </VerticalStackLayout>
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+
+            <!-- Loading -->
+
+            <Grid
+                BackgroundColor="#80000000"
+                IsVisible="{Binding IsLoading}">
+
+                <ActivityIndicator
+                    IsRunning="{Binding IsLoading}"
+                    Color="White"
+                    WidthRequest="50"
+                    HeightRequest="50"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center" />
+
+            </Grid>
+
+
+            <!-- Error -->
+
+            <Border
+                IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}"
+                Margin="20"
+                Padding="15"
+                BackgroundColor="#FFE5E5"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 12"
+                VerticalOptions="Center">
+
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    TextColor="#B00020"
+                    HorizontalTextAlignment="Center" />
+
+            </Border>
+
+        </Grid>
+
+
+        <!-- ===================================================== -->
+        <!-- BOTTOM NAVIGATION -->
+        <!-- ===================================================== -->
+
         <controls:BottomNavigationBar
             Grid.Row="2" />
+
+
+        <!-- ===================================================== -->
+        <!-- FULL SCREEN IMAGE VIEWER -->
+        <!-- ===================================================== -->
+
+        <Grid
+            Grid.RowSpan="3"
+            BackgroundColor="#F0000000"
+            IsVisible="{Binding IsImageViewerVisible}"
+            ZIndex="100">
+
+            <Grid
+                RowDefinitions="Auto,*"
+                Padding="15">
+
+                <!-- Close button -->
+
+                <Button
+                    Grid.Row="0"
+                    Text="✕"
+                    FontSize="24"
+                    TextColor="White"
+                    BackgroundColor="Transparent"
+                    HorizontalOptions="End"
+                    Clicked="OnCloseImageViewerClicked" />
+
+
+                <!-- Full resolution image viewer -->
+
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding SelectedImages}"
+                    ItemsLayout="HorizontalList"
+                    HorizontalScrollBarVisibility="Never"
+                    VerticalScrollBarVisibility="Never"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    SelectionMode="None">
+
+                    <CollectionView.ItemTemplate>
+
+                        <DataTemplate>
+
+                            <Grid
+                                WidthRequest="360"
+                                HorizontalOptions="Center">
+
+                                <Image
+                                    Source="{Binding Converter={StaticResource Base64ToImageSourceConverter}}"
+                                    Aspect="AspectFit"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+
+                            </Grid>
+
+                        </DataTemplate>
+
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
+
+            </Grid>
+
+        </Grid>
 
     </Grid>
 

@@ -7,9 +7,11 @@ global using Microsoft.AspNetCore.Mvc.ApiExplorer;
 global using Microsoft.AspNetCore.Mvc.Versioning;
 global using Microsoft.EntityFrameworkCore;
 global using System.Text.Json.Serialization;
+using LostFoundPetReporter.API.Services.API;
 using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using LostFoundPetReporter.Services.API;
 
 
 
@@ -62,6 +64,8 @@ builder.Services.AddSingleton<IExtFileQueue, ExtFileQueue>();
 builder.Services.AddHostedService<ExtFileBackgroundService>();
 builder.Services.AddScoped<IExtFileService, ExtFileService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+builder.Services.AddHttpClient<IAnimalDescriptionService, AnimalDescriptionService>();
 
 
 

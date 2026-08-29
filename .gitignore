@@ -67,3 +67,6 @@ appsettings.Development.json
 # Android
 *.keystore
 *.jks
+
+**/appsettings.json
+**/appsettings.*.json

@@ -22,8 +22,8 @@
                 <!-- Date / Time -->
                 <VerticalStackLayout Spacing="6">
                     <Label Text="Date and Time" FontAttributes="Bold" />
-                    <DatePicker Date="{Binding Report.dateTime}" />
-                    <TimePicker Time="{Binding Report.dateTime}" />
+                    <DatePicker Date="{Binding FoundDate}" />
+                    <TimePicker Time="{Binding FoundTime}" />
                 </VerticalStackLayout>
 
                 <!-- Location -->
@@ -82,17 +82,33 @@
                         Text="Picture"
                         FontAttributes="Bold" />
 
-                                    <Button
-                        Text="📷 Add Picture"
-                        Command="{Binding TakePictureCommand}" />
+                    <HorizontalStackLayout
+                        Spacing="10">
 
-                                    <Image
+                        <Button
+                            Text="📷 Take Picture"
+                            Command="{Binding TakePictureCommand}"
+                            HorizontalOptions="FillAndExpand" />
+
+                        <Button
+                            Text="🖼️ Choose Picture"
+                            Command="{Binding PickPictureCommand}"
+                            HorizontalOptions="FillAndExpand" />
+
+                    </HorizontalStackLayout>
+
+                    <Image
                         Source="{Binding PicturePath}"
                         HeightRequest="250"
                         Aspect="AspectFit"
                         IsVisible="{Binding HasPicture}" />
 
-                 </VerticalStackLayout>
+                    <Button
+                        Text="✨ Auto Fill Animal Information"
+                        Command="{Binding AutoFillAnimalDescriptionCommand}"
+                        IsEnabled="{Binding HasPicture}" />
+
+                </VerticalStackLayout>
 
                 <!-- Create -->
                 <Button

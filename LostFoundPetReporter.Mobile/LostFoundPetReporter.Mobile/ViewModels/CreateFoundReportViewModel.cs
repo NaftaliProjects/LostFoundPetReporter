@@ -22,9 +22,44 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
 
 
-    public DateTime FoundDate { get; set; } = DateTime.Today;
+    private DateTime _foundDate = DateTime.Today;
+    public DateTime FoundDate
+    {
+        get => _foundDate;
+        set
+        {
+            if (_foundDate == value)
+                return;
 
-    public TimeSpan FoundTime { get; set; } = DateTime.Now.TimeOfDay;
+            _foundDate = value;
+
+            UpdateReportDateTime();
+
+            OnPropertyChanged();
+        }
+    }
+
+    private void UpdateReportDateTime()
+    {
+        Report.dateTime = _foundDate.Date + _foundTime;
+    }
+
+    private TimeSpan _foundTime = DateTime.Now.TimeOfDay;
+    public TimeSpan FoundTime
+    {
+        get => _foundTime;
+        set
+        {
+            if (_foundTime == value)
+                return;
+
+            _foundTime = value;
+
+            UpdateReportDateTime();
+
+            OnPropertyChanged();
+        }
+    }
 
     private bool _isBusy;
     public bool IsBusy
@@ -62,8 +97,9 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
     public ICommand TakePictureCommand { get; }
     public ICommand CreateReportCommand { get; }
-
     public ICommand UseCurrentLocationCommand { get; }
+    public ICommand AutoFillAnimalDescriptionCommand { get; }
+    public ICommand PickPictureCommand { get; }
 
     public CreateFoundReportViewModel(IFoundReportApiService foundReportApiService, IUserSession userSession, IMapService mapService)
     {
@@ -75,8 +111,16 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
         UseCurrentLocationCommand = new Command(async () => await UseCurrentLocationAsync());
 
+        UpdateReportDateTime();
+
 
         CreateReportCommand = new Command(async () => await CreateReportAsync());
+
+        AutoFillAnimalDescriptionCommand = new Command(async () => await AutoFillAnimalDescriptionAsync());
+
+        PickPictureCommand = new Command(async () => await PickPictureAsync());
+
+
 
     }
 
@@ -202,9 +246,11 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
             Report.UserId = user.Id;
 
-            Report.dateTime = Report.dateTime + FoundTime;
-
             var result = await _foundReportApiService.CreateFoundReportAsync(Report);
+
+
+
+
 
             if (result is null)
             {
@@ -230,6 +276,103 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
             IsBusy = false;
         }
     }
+
+    private async Task AutoFillAnimalDescriptionAsync()
+    {
+        if (IsBusy)
+            return;
+
+        if (Report.PictureBase64List == null ||
+            Report.PictureBase64List.Count == 0)
+        {
+            await Shell.Current.DisplayAlert(
+                "Animal Description",
+                "Please take a picture of the animal first.",
+                "OK");
+
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+
+            var result =
+                await _foundReportApiService.ImageToAnimalDescriptionAsync(
+                    Report.PictureBase64List);
+
+            if (result is null)
+            {
+                await Shell.Current.DisplayAlert(
+                    "Animal Description",
+                    "Could not identify the animal.",
+                    "OK");
+
+                return;
+            }
+
+            Report.PetDescription.Name = result.Name;
+            Report.PetDescription.Colors = result.Colors;
+            Report.PetDescription.Type = result.Type;
+            Report.PetDescription.Breed = result.Breed;
+
+            // Tell the UI that the PetDescription properties changed.
+            OnPropertyChanged(nameof(PetDescription));
+
+            await Shell.Current.DisplayAlert(
+                "Animal Description",
+                "Animal information was filled automatically.",
+                "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert(
+                "AI Error",
+                ex.Message,
+                "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PickPictureAsync()
+    {
+        try
+        {
+            var options = new PickOptions
+            {
+                PickerTitle = "Select an animal picture",
+                FileTypes = FilePickerFileType.Images
+            };
+
+            var result = await FilePicker.Default.PickAsync(options);
+
+            if (result is null)
+                return;
+
+            PicturePath = result.FullPath;
+
+            using var stream = await result.OpenReadAsync();
+            using var memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+
+            var base64 = Convert.ToBase64String(
+                memoryStream.ToArray());
+
+            Report.PictureBase64List.Add(base64);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert(
+                "Picture Error",
+                ex.Message,
+                "OK");
+        }
+    }
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

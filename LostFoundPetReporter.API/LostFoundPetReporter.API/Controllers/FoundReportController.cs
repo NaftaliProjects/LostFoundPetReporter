@@ -1,4 +1,5 @@
 ﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.API.Services.API;
 using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
@@ -18,12 +19,15 @@ namespace LostFoundPetReporter.API.Controllers
         private readonly IMatchingQueue _matchingQueue;
         private readonly IExtFileQueue _extFileQueue;
 
+        private readonly IAnimalDescriptionService _animalDescriptionService;
+
         // Inject IMatchingQueue alongside your repository
-        public FoundReportController(IFoundReportRepo repo, IMatchingQueue matchingQueue, IExtFileQueue extFileQueue) : base(repo)
+        public FoundReportController(IFoundReportRepo repo, IMatchingQueue matchingQueue, IExtFileQueue extFileQueue , IAnimalDescriptionService animalDescriptionService) : base(repo)
 
         {
             _extFileQueue = extFileQueue;
             _matchingQueue = matchingQueue;
+            _animalDescriptionService = animalDescriptionService;
         }
 
 
@@ -67,6 +71,22 @@ namespace LostFoundPetReporter.API.Controllers
             var allDtos = allEntities.Select(FoundReportDto.FromEntity);
 
             return Ok(allDtos);
+        }
+
+
+        [ApiVersion("1.0")]
+        [HttpPost("ImageToAnimalDescription")]
+        public async Task<ActionResult<AnimalDescriptionDto>> ImageToAnimalDescription([FromBody] ImageToAnimalDescriptionDto dto, CancellationToken cancellationToken)
+        {
+            if (dto.PictureBase64List == null || dto.PictureBase64List.Count == 0)
+            {
+                return BadRequest("At least one image is required.");
+            }
+
+            var animalDescription = await _animalDescriptionService.ImageToAnimalDescriptionAsync(dto.PictureBase64List, cancellationToken);
+
+
+            return Ok(animalDescription);
         }
     }
 }

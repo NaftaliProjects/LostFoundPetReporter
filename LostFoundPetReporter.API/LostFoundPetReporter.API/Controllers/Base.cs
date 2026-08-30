@@ -1,12 +1,15 @@
 ﻿using LostFoundPetReporter.API.DTO.Interfaces;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using LostFoundPetReporter.API.Services.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LostFoundPetReporter.API.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize]
     public abstract class BaseCrudController<
         TEntity,
         TController,
@@ -24,11 +27,27 @@ namespace LostFoundPetReporter.API.Controllers.Base
 
         where TController : class
     {
+
         protected readonly IBaseRepo<TEntity> MainRepo;
 
         protected BaseCrudController(IBaseRepo<TEntity> repo)
         {
             MainRepo = repo;
+          
+        }
+
+        //Helper Methods
+        protected int? GetCurrentUserId()
+        {
+            var userId = User.FindFirst(
+                JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (!int.TryParse(userId, out var id))
+            {
+                return null;
+            }
+
+            return id;
         }
 
 

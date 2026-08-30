@@ -2,6 +2,8 @@
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using LostFoundPetReporter.API.Services.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -10,14 +12,17 @@ namespace LostFoundPetReporter.API.Controllers
 {
     public class UserController : BaseCrudController<User, UserController, UserDto, CreateUserDto>
     {
-        public UserController(IUserRepo repo) : base(repo)
-        {
+        private readonly IJwtService _jwtService;
 
+        public UserController(IUserRepo repo, IJwtService jwtService) : base(repo)
+        {
+            _jwtService = jwtService;
         }
 
         [ApiVersion("1.0")]
+        [AllowAnonymous]
         [HttpPost("Login")]
-        public ActionResult<UserDto> Login(LoginUserDto loginDto)
+        public ActionResult<LoginResponseDto> Login(LoginUserDto loginDto)
         {
             if (!ModelState.IsValid)
             {
@@ -36,7 +41,15 @@ namespace LostFoundPetReporter.API.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            return Ok(UserDto.FromEntity(user));
+            var token = _jwtService.CreateToken(user.Id, user.Email, out var expiresAt);
+
+
+            return Ok(new LoginResponseDto
+            {
+                Token = token,
+                ExpiresAt = expiresAt,
+                User = UserDto.FromEntity(user)
+            });
         }
 
 

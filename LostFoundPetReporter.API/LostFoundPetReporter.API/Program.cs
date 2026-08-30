@@ -16,6 +16,7 @@ using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using LostFoundPetReporter.Services.API;
+using LostFoundPetReporter.API.Services.Authentication;
 
 
 
@@ -69,6 +70,8 @@ builder.Services.AddSingleton<IExtFileQueue, ExtFileQueue>();
 builder.Services.AddHostedService<ExtFileBackgroundService>();
 builder.Services.AddScoped<IExtFileService, ExtFileService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 
 builder.Services.AddHttpClient<IAnimalDescriptionService, AnimalDescriptionService>();
 

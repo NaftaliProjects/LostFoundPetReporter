@@ -1,8 +1,9 @@
 ﻿using LostFoundPetReporter.API.DTO;
+using LostFoundPetReporter.API.DTO.Interfaces;
+using LostFoundPetReporter.API.Services.Authentication;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
-using LostFoundPetReporter.API.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 
@@ -50,6 +51,23 @@ namespace LostFoundPetReporter.API.Controllers
                 ExpiresAt = expiresAt,
                 User = UserDto.FromEntity(user)
             });
+        }
+
+
+        [ApiVersion("1.0")]
+        [AllowAnonymous]
+        [HttpPost("Register")]
+        public virtual ActionResult<UserDto> AddOne(CreateUserDto createDto)
+        {
+            if (!ModelState.IsValid) { return ValidationProblem(ModelState); }
+            if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
+
+            var entity = createDto.ToEntity();
+
+            try { MainRepo.Add(entity); }
+            catch (Exception ex) { return BadRequest(ex); }
+
+            return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, UserDto.FromEntity(entity));
         }
 
 

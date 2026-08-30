@@ -9,7 +9,16 @@ namespace LostFoundPetReporter.Mobile.Services.Session
     {
         User? CurrentUser { get; }
 
-        void SetUser(User user);
+        string? Token { get; }
+
+        DateTime? TokenExpiresAt { get; }
+
+        bool IsLoggedIn { get; }
+
+        void SetSession(
+            User user,
+            string token,
+            DateTime expiresAt);
 
         void Clear();
     }

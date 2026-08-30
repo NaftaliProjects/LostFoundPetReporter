@@ -36,16 +36,22 @@ public static class MauiProgram
         // =========================
         // API
         // =========================
+
         var handler = new HttpClientHandler();
 
         handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
 
+        builder.Services.AddSingleton<IUserSession, UserSession>();
+
+        builder.Services.AddTransient<JwtAuthorizationHandler>();
+
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            client.BaseAddress = new Uri(
-                "https://localhost:7074/");
-        }).ConfigurePrimaryHttpMessageHandler(() => handler);
+            client.BaseAddress = new Uri("https://localhost:7074/");
+        })
+        .AddHttpMessageHandler<JwtAuthorizationHandler>()
+        .ConfigurePrimaryHttpMessageHandler(() => handler);
 
 
         // =========================

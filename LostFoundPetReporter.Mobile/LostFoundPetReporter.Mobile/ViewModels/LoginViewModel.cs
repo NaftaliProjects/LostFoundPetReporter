@@ -45,15 +45,16 @@ public class LoginViewModel : INotifyPropertyChanged
         {
             ErrorMessage = string.Empty;
 
-            var user = await _userApiService.LoginAsync(loginUser);
+            var loginResponse = await _userApiService.LoginAsync(loginUser);
 
-            if (user == null)
+            if (loginResponse == null)
             {
                 ErrorMessage = "Invalid email or password.";
                 return false;
             }
 
-            _userSession.SetUser(user);
+            _userSession.SetSession(loginResponse.User, loginResponse.Token, loginResponse.ExpiresAt);
+
 
             return true;
         }

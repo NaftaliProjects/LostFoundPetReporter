@@ -30,7 +30,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         public async Task<User?> CreateUserAsync(CreateUserRequest request)
         {
             return await _apiClient.PostAsync<CreateUserRequest, User>(
-                "api/v1/User",
+                "api/v1/User/Register",
                 request);
         }
 
@@ -50,10 +50,11 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         }
 
 
-        public async Task<User> LoginAsync(LoginUser user)
+        public async Task<LoginResponse?> LoginAsync(LoginUser user)
         {
-            User userSession = await _apiClient.PostAsync<LoginUser, User>($"api/v1/User/Login", user);
-            return userSession;
+            return await _apiClient.PostAsync<LoginUser, LoginResponse>(
+                "api/v1/User/Login",
+                user);
         }
     }
 }

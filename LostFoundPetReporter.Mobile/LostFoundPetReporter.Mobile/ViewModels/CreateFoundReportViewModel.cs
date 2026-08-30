@@ -340,48 +340,49 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
                 return;
             }
-            Report.PetDescription.Name = result.Name;
-            Report.PetDescription.Colors = result.Colors;
-            Report.PetDescription.Type = result.Type;
-            Report.PetDescription.Breed = result.Breed;
+            var pet = Report.PetDescription;
 
-            Report.PetDescription.Sex = result.Sex;
-            Report.PetDescription.Age = result.Age;
-            Report.PetDescription.Size = result.Size;
-            Report.PetDescription.WeightKg = result.WeightKg;
+            pet.Name = result.Name;
+            pet.Colors = result.Colors;
+            pet.Type = result.Type;
+            pet.Breed = result.Breed;
 
-            Report.PetDescription.CoatLength = result.CoatLength;
-            Report.PetDescription.CoatType = result.CoatType;
-            Report.PetDescription.Pattern = result.Pattern;
+            pet.Sex = result.Sex;
+            pet.Age = result.Age;
+            pet.Size = result.Size;
+            pet.WeightKg = result.WeightKg;
 
-            Report.PetDescription.DistinctiveMarkings =
+            pet.CoatLength = result.CoatLength;
+            pet.CoatType = result.CoatType;
+            pet.Pattern = result.Pattern;
+
+            pet.DistinctiveMarkings =
                 result.DistinctiveMarkings;
 
-            Report.PetDescription.EyeColor =
-                result.EyeColor;
+            pet.EyeColor = result.EyeColor;
 
-            Report.PetDescription.EarDescription =
+            pet.EarDescription =
                 result.EarDescription;
 
-            Report.PetDescription.TailDescription =
+            pet.TailDescription =
                 result.TailDescription;
 
-            Report.PetDescription.CollarPresent =
+            pet.CollarPresent =
                 result.CollarPresent;
 
-            Report.PetDescription.CollarColor =
+            pet.CollarColor =
                 result.CollarColor;
 
-            Report.PetDescription.CollarType =
+            pet.CollarType =
                 result.CollarType;
 
-            Report.PetDescription.HarnessPresent =
+            pet.HarnessPresent =
                 result.HarnessPresent;
 
-            Report.PetDescription.HarnessColor =
+            pet.HarnessColor =
                 result.HarnessColor;
 
-            // Tell the UI that the PetDescription properties changed.
+            
             OnPropertyChanged(nameof(PetDescription));
 
             await Shell.Current.DisplayAlert(

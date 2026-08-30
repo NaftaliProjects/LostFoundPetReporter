@@ -441,6 +441,8 @@ public class CreateLostReportViewModel : INotifyPropertyChanged
             pet.HarnessColor =
                 result.HarnessColor;
 
+            OnPropertyChanged(nameof(PetDescription));
+
             await Shell.Current.DisplayAlert(
                 "Animal Description",
                 "Animal information was filled automatically.",

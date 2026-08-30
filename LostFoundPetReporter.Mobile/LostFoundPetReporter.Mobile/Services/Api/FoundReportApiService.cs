@@ -58,7 +58,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 $"api/v1/FoundReport/{id}");
         }
 
-        public async Task<AnimalDescription?> ImageToAnimalDescriptionAsync(List<string> pictureBase64List)
+        public async Task<CreateAnimalDescription?> ImageToAnimalDescriptionAsync(List<string> pictureBase64List)
         {
             var request = new ImageToAnimalDescriptionRequest
             {
@@ -67,7 +67,7 @@ namespace LostFoundPetReporter.Mobile.Services.Api
 
             return await _apiClient.PostAsync<
                 ImageToAnimalDescriptionRequest,
-                AnimalDescription>(
+                CreateAnimalDescription>(
                 "api/v1/FoundReport/ImageToAnimalDescription",
                 request);
         }

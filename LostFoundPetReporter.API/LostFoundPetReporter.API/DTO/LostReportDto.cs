@@ -20,26 +20,16 @@ namespace LostFoundPetReporter.API.DTO
 
 
     public class LostReportExtFileDto
-    : IResponseDto<LostReportExtFile, LostReportExtFileDto>
+     : IResponseDto<LostReportExtFile, LostReportExtFileDto>
     {
-        public string FilePath { get; set; } = string.Empty;
+        public string PictureBase64 { get; set; } = "";
 
-        public string FileName { get; set; } = string.Empty;
-
-        public string Description { get; set; } = string.Empty;
-
-        // Foreign key
-        public int LostReportId { get; set; }
-
-
-        public static LostReportExtFileDto FromEntity(LostReportExtFile entity)
+        public static LostReportExtFileDto FromEntity(
+            LostReportExtFile entity)
         {
             return new LostReportExtFileDto
             {
-                FilePath = entity.FilePath,
-                FileName = entity.FileName,
-                Description = entity.Description,
-                LostReportId = entity.LostReportId
+
             };
         }
     }
@@ -57,7 +47,7 @@ namespace LostFoundPetReporter.API.DTO
         public LostCoordinateDto? LostCoordinate { get; set; }
         public AnimalDescriptionDto PetDescription { get; set; } = new();
 
-        public List<LostReportExtFileDto> LostReportExtFiles { get; set; } = new();
+        public List<string>? PictureBase64List { get; set; }
         public List<FoundReportDto> FoundReports { get; set; } = new();
 
 
@@ -84,16 +74,19 @@ namespace LostFoundPetReporter.API.DTO
                     : LostCoordinateDto.FromEntity(entity.LostCoordinateNavigation),
 
 
-                LostReportExtFiles = entity.LostReportExtFilesNevigation?
-                    .Select(LostReportExtFileDto.FromEntity)
-                    .ToList()
-                    ?? new(),
 
                 FoundReports = entity.LostFoundMatchNevigation?
                 .Where(m => m.FoundReportNevigation != null)
                 .Select(m => FoundReportDto.FromEntity(m.FoundReportNevigation))
                 .ToList()
-                ?? new()
+                ?? new(),
+
+
+                PictureBase64List = entity.LostReportExtFilesNevigation?
+                .Where(x => File.Exists(x.FilePath))
+                .Select(x => Convert.ToBase64String(
+                    File.ReadAllBytes(x.FilePath)))
+                .ToList()
             };
         }
     }
@@ -105,8 +98,10 @@ namespace LostFoundPetReporter.API.DTO
 
         public int UserId { get; set; }
 
-        public AnimalDescriptionDto PetDescription { get; set; } = new();
+        public CreateAnimalDescriptionDto PetDescription { get; set; } = new();
         public LostCoordinateDto? LostCoordinate { get; set; } = new();
+
+        public List<string>? PictureBase64List { get; set; }
 
         public LostReport ToEntity()
         {
@@ -120,8 +115,13 @@ namespace LostFoundPetReporter.API.DTO
                 {
                     Latitude = LostCoordinate.Latitude,
                     Longitude = LostCoordinate.Longitude
-                }
+                },
+
+                LostReportExtFilesNevigation = new List<LostReportExtFile>()
+
             };
+
+
         }
     }
 }

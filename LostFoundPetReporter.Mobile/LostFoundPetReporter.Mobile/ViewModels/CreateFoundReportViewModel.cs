@@ -16,9 +16,11 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
     private readonly IUserSession _userSession;
 
     private readonly IMapService _mapService;
+
+
     public CreateFoundReportRequest Report { get; } = new();
 
-    public AnimalDescription PetDescription => Report.PetDescription;
+    public CreateAnimalDescription PetDescription => Report.PetDescription;
 
 
 
@@ -101,6 +103,33 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
     public ICommand AutoFillAnimalDescriptionCommand { get; }
     public ICommand PickPictureCommand { get; }
 
+    public ICommand ToggleAdditionalDetailsCommand { get; }
+
+
+
+    private bool _isAdditionalDetailsExpanded;
+
+    public bool IsAdditionalDetailsExpanded
+    {
+        get => _isAdditionalDetailsExpanded;
+        set
+        {
+            if (_isAdditionalDetailsExpanded == value)
+                return;
+
+            _isAdditionalDetailsExpanded = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(AdditionalDetailsButtonText));
+        }
+    }
+
+    public string AdditionalDetailsButtonText =>
+        IsAdditionalDetailsExpanded
+            ? "▲ Hide Additional Details"
+            : "▼ Add More Animal Details";
+
+
+
     public CreateFoundReportViewModel(IFoundReportApiService foundReportApiService, IUserSession userSession, IMapService mapService)
     {
         _foundReportApiService = foundReportApiService;
@@ -120,6 +149,7 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
         PickPictureCommand = new Command(async () => await PickPictureAsync());
 
+        ToggleAdditionalDetailsCommand = new Command(() => {IsAdditionalDetailsExpanded = !IsAdditionalDetailsExpanded; });
 
 
     }
@@ -310,11 +340,46 @@ public class CreateFoundReportViewModel : INotifyPropertyChanged
 
                 return;
             }
-
             Report.PetDescription.Name = result.Name;
             Report.PetDescription.Colors = result.Colors;
             Report.PetDescription.Type = result.Type;
             Report.PetDescription.Breed = result.Breed;
+
+            Report.PetDescription.Sex = result.Sex;
+            Report.PetDescription.Age = result.Age;
+            Report.PetDescription.Size = result.Size;
+            Report.PetDescription.WeightKg = result.WeightKg;
+
+            Report.PetDescription.CoatLength = result.CoatLength;
+            Report.PetDescription.CoatType = result.CoatType;
+            Report.PetDescription.Pattern = result.Pattern;
+
+            Report.PetDescription.DistinctiveMarkings =
+                result.DistinctiveMarkings;
+
+            Report.PetDescription.EyeColor =
+                result.EyeColor;
+
+            Report.PetDescription.EarDescription =
+                result.EarDescription;
+
+            Report.PetDescription.TailDescription =
+                result.TailDescription;
+
+            Report.PetDescription.CollarPresent =
+                result.CollarPresent;
+
+            Report.PetDescription.CollarColor =
+                result.CollarColor;
+
+            Report.PetDescription.CollarType =
+                result.CollarType;
+
+            Report.PetDescription.HarnessPresent =
+                result.HarnessPresent;
+
+            Report.PetDescription.HarnessColor =
+                result.HarnessColor;
 
             // Tell the UI that the PetDescription properties changed.
             OnPropertyChanged(nameof(PetDescription));

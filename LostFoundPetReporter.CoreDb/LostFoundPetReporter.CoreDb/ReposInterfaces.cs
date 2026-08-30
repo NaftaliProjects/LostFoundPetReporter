@@ -45,12 +45,14 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
     public interface IFoundReportRepo : IBaseRepo<FoundReport>
     {
         IEnumerable<FoundReport> GetAllByUserId(int userId);
+        IEnumerable<FoundReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
 
     }
 
     public interface ILostReportRepo : IBaseRepo<LostReport>
     {
         IEnumerable<LostReport> GetAllByUserId(int userId);
+        IEnumerable<LostReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
     }
 
     public interface ILostFoundMatchRepo : IBaseRepo<LostFoundMatch>
@@ -58,6 +60,8 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
         IEnumerable<LostFoundMatch> GetByLostReportId(int lostReportId);
         IEnumerable<LostFoundMatch> GetByFoundReportId(int foundReportId);
         bool MatchExists(int lostReportId, int foundReportId);
+        IEnumerable<int> GetFoundReportIdsForLostReport(int lostReportId);
+        IEnumerable<int> GetLostReportIdsForFoundReport(int foundReportId);
     }
 
 

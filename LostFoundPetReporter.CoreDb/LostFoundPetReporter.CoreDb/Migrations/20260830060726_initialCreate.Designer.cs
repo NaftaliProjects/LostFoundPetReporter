@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     [DbContext(typeof(PetReporterContext))]
-    [Migration("20260826165059_initialcreate")]
-    partial class initialcreate
+    [Migration("20260830060726_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,13 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
                     b.Property<int>("LostReportId")
                         .HasColumnType("int");
+
+                    b.Property<string>("MatchReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Score")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -246,7 +253,29 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                             b1.Property<int>("FoundReportId")
                                 .HasColumnType("int");
 
+                            b1.Property<double?>("Age")
+                                .HasColumnType("float");
+
                             b1.Property<string>("Breed")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CoatLength")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CoatType")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CollarColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<bool?>("CollarPresent")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("CollarType")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -254,13 +283,51 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<string>("DistinctiveMarkings")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("EarDescription")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("EyeColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("HarnessColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<bool?>("HarnessPresent")
+                                .HasColumnType("bit");
+
                             b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Pattern")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Sex")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Size")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("TailDescription")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Type")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
+
+                            b1.Property<double?>("WeightKg")
+                                .HasColumnType("float");
 
                             b1.HasKey("FoundReportId");
 
@@ -328,7 +395,29 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                             b1.Property<int>("LostReportId")
                                 .HasColumnType("int");
 
+                            b1.Property<double?>("Age")
+                                .HasColumnType("float");
+
                             b1.Property<string>("Breed")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CoatLength")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CoatType")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CollarColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<bool?>("CollarPresent")
+                                .HasColumnType("bit");
+
+                            b1.Property<string>("CollarType")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -336,13 +425,51 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<string>("DistinctiveMarkings")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("EarDescription")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("EyeColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("HarnessColor")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<bool?>("HarnessPresent")
+                                .HasColumnType("bit");
+
                             b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Pattern")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Sex")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Size")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("TailDescription")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Type")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
+
+                            b1.Property<double?>("WeightKg")
+                                .HasColumnType("float");
 
                             b1.HasKey("LostReportId");
 

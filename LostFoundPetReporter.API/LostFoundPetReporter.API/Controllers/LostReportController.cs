@@ -1,7 +1,8 @@
 ﻿using LostFoundPetReporter.API.DTO;
 using LostFoundPetReporter.API.DTO.Interfaces;
-using LostFoundPetReporter.CoreDb.Models;
+using LostFoundPetReporter.API.Services.API;
 using LostFoundPetReporter.API.Services.BackgroundServices;
+using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using System.Reflection.Metadata.Ecma335;
 
@@ -13,10 +14,14 @@ namespace LostFoundPetReporter.API.Controllers
     public class LostReportController : BaseCrudController<LostReport, LostReportController ,LostReportDto, CreateLostReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
+        private readonly IExtFileQueue _extFileQueue;
+        private readonly IAnimalDescriptionService _animalDescriptionService;
 
-        public LostReportController (ILostReportRepo repo, IMatchingQueue matchingQueue) : base(repo)
+        public LostReportController (ILostReportRepo repo, IMatchingQueue matchingQueue, IExtFileQueue extFileQueue, IAnimalDescriptionService animalDescriptionService) : base(repo)
         {
             _matchingQueue = matchingQueue;
+            _extFileQueue = extFileQueue;
+            _animalDescriptionService = animalDescriptionService;
         }
 
 
@@ -30,6 +35,7 @@ namespace LostFoundPetReporter.API.Controllers
 
             {        
                _matchingQueue.QueueForMatchingAsync(createdDto.Id.Value, ReportType.Lost);
+                _extFileQueue.QueueForExtFileAsync(createdDto.Id.Value, ReportType.Found, createDto.PictureBase64List ?? new List<string>());
             }
 
             return actionResult;
@@ -58,6 +64,21 @@ namespace LostFoundPetReporter.API.Controllers
             return Ok(allDtos);
         }
 
-        
+        [ApiVersion("1.0")]
+        [HttpPost("ImageToAnimalDescription")]
+        public async Task<ActionResult<AnimalDescriptionDto>> ImageToAnimalDescription([FromBody] ImageToAnimalDescriptionDto dto, CancellationToken cancellationToken)
+        {
+            if (dto.PictureBase64List == null || dto.PictureBase64List.Count == 0)
+            {
+                return BadRequest("At least one image is required.");
+            }
+
+            var animalDescription = await _animalDescriptionService.ImageToAnimalDescriptionAsync(dto.PictureBase64List, cancellationToken);
+
+
+            return Ok(animalDescription);
+        }
+
+
     }
 }

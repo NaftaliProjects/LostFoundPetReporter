@@ -217,6 +217,17 @@ namespace LostFoundPetReporter.CoreDb.Repos
         public IEnumerable<FoundReport> GetAllByUserId(int userId)
             => BuildBaseQuery().Where(u => u.UserId == userId);
 
+        public IEnumerable<FoundReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate)
+        {
+            return Table
+                .Include(x => x.FoundCoordinateNavigation)
+                .Where(x =>
+                    x.dateTime >= fromDate &&
+                    x.dateTime <= toDate)
+                .OrderBy(x => x.dateTime)
+                .ToList();
+        }
+
 
     }
 
@@ -269,6 +280,17 @@ namespace LostFoundPetReporter.CoreDb.Repos
 
         public IEnumerable<LostReport> GetAllByUserId(int userId)
             => BuildDetailsQuery().Where(u => u.UserId == userId);
+
+        public IEnumerable<LostReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate)
+        {
+            return Table
+                .Include(x => x.LostCoordinateNavigation)
+                .Where(x =>
+                    x.dateTime >= fromDate &&
+                    x.dateTime <= toDate)
+                .OrderBy(x => x.dateTime)
+                .ToList();
+        }
     }
 
 
@@ -327,5 +349,22 @@ namespace LostFoundPetReporter.CoreDb.Repos
 
         public bool MatchExists(int lostReportId, int foundReportId)
             => Table.Any(m => m.LostReportId == lostReportId && m.FoundReportId == foundReportId);
+
+
+        public IEnumerable<int> GetFoundReportIdsForLostReport(int lostReportId)
+        {
+            return Table
+                .Where(m => m.LostReportId == lostReportId)
+                .Select(m => m.FoundReportId)
+                .ToList();
+        }
+
+        public IEnumerable<int> GetLostReportIdsForFoundReport(int foundReportId)
+        {
+            return Table
+                .Where(m => m.FoundReportId == foundReportId)
+                .Select(m => m.LostReportId)
+                .ToList();
+        }
     }
 }

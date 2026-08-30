@@ -97,7 +97,7 @@ namespace LostFoundPetReporter.API.DTO
         public int UserId { get; set; }
 
         // Embedded data required on creation
-        public AnimalDescriptionDto PetDescription { get; set; } = new();
+        public CreateAnimalDescriptionDto PetDescription { get; set; } = new();
         public FoundCoordinateDto? FoundCoordinate { get; set; } = new();
 
         public List<string>? PictureBase64List { get; set; }

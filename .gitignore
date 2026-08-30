@@ -69,4 +69,5 @@ appsettings.Development.json
 *.jks
 
 **/appsettings.json
-**/appsettings.*.json
+**/appsettings.*
+**/appsettings

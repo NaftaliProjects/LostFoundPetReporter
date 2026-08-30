@@ -29,6 +29,13 @@ namespace LostFoundPetReporter.Mobile.ViewModels
 
             foreach (var report in reports)
             {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Report {report.Id}: " +
+                    $"User={report.User?.Name}, " +
+                    $"Type={report.PetDescription?.Type}, " +
+                    $"Breed={report.PetDescription?.Breed}, " +
+                    $"Colors={report.PetDescription?.Colors}");
+
                 LostReports.Add(report);
             }
         }

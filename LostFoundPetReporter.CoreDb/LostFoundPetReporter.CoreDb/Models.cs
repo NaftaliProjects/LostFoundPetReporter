@@ -39,16 +39,66 @@ namespace LostFoundPetReporter.CoreDb.Models
     /// - "White,Black,Grey"
     /// </para>
     /// </summary>
-    public class AnimalDescription 
+    public class AnimalDescription
     {
-        //properties
-        public String Name { get; set; } = "";
-        public String Colors { get; set; } = "";
-        public String Type { get; set; } = "";
-        public String Breed { get; set; } = "";
+        public string Name { get; set; } = "";
+
+        // "Dog", "Cat", etc.
+        public string Type { get; set; } = "";
+
+        // "Labrador", "German Shepherd", "Mixed", etc.
+        public string Breed { get; set; } = "";
+
+        // "white,black", "brown", etc.
+        public string Colors { get; set; } = "";
+
+        // "Male", "Female", "Unknown"
+        public string Sex { get; set; } = "";
+
+        // Approximate age in years
+        public double? Age { get; set; }
+
+        // "Small", "Medium", "Large"
+        public string Size { get; set; } = "";
+
+        // Optional approximate weight
+        public double? WeightKg { get; set; }
+
+        // "Short", "Medium", "Long"
+        public string CoatLength { get; set; } = "";
+
+        // "Straight", "Curly", "Wavy", etc.
+        public string CoatType { get; set; } = "";
+
+        // "Solid", "Spotted", "Striped", "Tabby", etc.
+        public string Pattern { get; set; } = "";
+
+        // Human-readable unique features
+        // Example: "white patch on chest, scar above left eye"
+        public string DistinctiveMarkings { get; set; } = "";
+
+        // "Brown", "Blue", "Green", etc.
+        public string EyeColor { get; set; } = "";
+
+        // Example: "Left ear folded"
+        public string EarDescription { get; set; } = "";
+
+        // Example: "Long tail with white tip"
+        public string TailDescription { get; set; } = "";
+
+        // Collar/accessories
+        public bool? CollarPresent { get; set; }
+
+        public string CollarColor { get; set; } = "";
+
+        public string CollarType { get; set; } = "";
+
+        public bool? HarnessPresent { get; set; }
+
+        public string HarnessColor { get; set; } = "";
     }
 
-  
+
 
     /// <summary>
     /// SubModel for FoundReport to hold images data related to a FoundReport
@@ -141,9 +191,21 @@ namespace LostFoundPetReporter.CoreDb.Models
     public class LostFoundMatch : BaseModel
     {
         public int LostReportId { get; set; }
+
         public int FoundReportId { get; set; }
 
+        /// <summary>
+        /// Overall matching confidence from 0 to 1.
+        /// </summary>
+        public double Score { get; set; }
+
+        /// <summary>
+        /// Optional human-readable explanation.
+        /// </summary>
+        public string MatchReason { get; set; } = "";
+
         public LostReport LostReportNevigation { get; set; }
+
         public FoundReport FoundReportNevigation { get; set; }
     }
 

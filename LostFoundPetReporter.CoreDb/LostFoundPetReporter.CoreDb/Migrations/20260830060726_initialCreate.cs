@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     /// <inheritdoc />
-    public partial class initialcreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,9 +36,25 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     dateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PetDescription_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Sex = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Age = table.Column<double>(type: "float", nullable: true),
+                    PetDescription_Size = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_WeightKg = table.Column<double>(type: "float", nullable: true),
+                    PetDescription_CoatLength = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CoatType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Pattern = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_DistinctiveMarkings = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_EyeColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_EarDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_TailDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CollarPresent = table.Column<bool>(type: "bit", nullable: true),
+                    PetDescription_CollarColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CollarType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_HarnessPresent = table.Column<bool>(type: "bit", nullable: true),
+                    PetDescription_HarnessColor = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,9 +76,25 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     dateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PetDescription_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PetDescription_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PetDescription_Breed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Sex = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Age = table.Column<double>(type: "float", nullable: true),
+                    PetDescription_Size = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_WeightKg = table.Column<double>(type: "float", nullable: true),
+                    PetDescription_CoatLength = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CoatType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_Pattern = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_DistinctiveMarkings = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_EyeColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_EarDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_TailDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CollarPresent = table.Column<bool>(type: "bit", nullable: true),
+                    PetDescription_CollarColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_CollarType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PetDescription_HarnessPresent = table.Column<bool>(type: "bit", nullable: true),
+                    PetDescription_HarnessColor = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,7 +174,9 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LostReportId = table.Column<int>(type: "int", nullable: false),
-                    FoundReportId = table.Column<int>(type: "int", nullable: false)
+                    FoundReportId = table.Column<int>(type: "int", nullable: false),
+                    Score = table.Column<double>(type: "float", nullable: false),
+                    MatchReason = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

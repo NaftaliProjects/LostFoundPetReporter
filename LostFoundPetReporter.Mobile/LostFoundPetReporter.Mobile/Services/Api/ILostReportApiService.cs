@@ -19,6 +19,8 @@ namespace LostFoundPetReporter.Mobile.Services.Api
 
         Task DeleteLostReportAsync(int id);
 
+        Task<CreateAnimalDescription?> ImageToAnimalDescriptionAsync(List<string> pictureBase64List);
+
 
     }
 }

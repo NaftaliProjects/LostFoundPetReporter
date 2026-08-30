@@ -10,63 +10,49 @@ namespace LostFoundPetReporter.Mobile.Models
         private string _type = "";
         private string _breed = "";
 
+        
+
         public string Name
         {
             get => _name;
-            set
-            {
-                if (_name == value)
-                    return;
-
-                _name = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _name, value);
         }
 
         public string Colors
         {
             get => _colors;
-            set
-            {
-                if (_colors == value)
-                    return;
-
-                _colors = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _colors, value);
         }
 
         public string Type
         {
             get => _type;
-            set
-            {
-                if (_type == value)
-                    return;
-
-                _type = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _type, value);
         }
 
         public string Breed
         {
             get => _breed;
-            set
-            {
-                if (_breed == value)
-                    return;
-
-                _breed = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _breed, value);
         }
 
+        
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private void OnPropertyChanged(
+        private void SetProperty<T>(
+            ref T backingField,
+            T value,
             [CallerMemberName] string? propertyName = null)
         {
+            if (EqualityComparer<T>.Default.Equals(
+                    backingField,
+                    value))
+            {
+                return;
+            }
+
+            backingField = value;
+
             PropertyChanged?.Invoke(
                 this,
                 new PropertyChangedEventArgs(propertyName));

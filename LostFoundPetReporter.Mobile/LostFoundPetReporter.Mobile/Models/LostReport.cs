@@ -7,14 +7,20 @@ namespace LostFoundPetReporter.Mobile.Models
     public class LostReport
     {
         public int Id { get; set; }
-        public int? UserId { get; set; }
-        public string Coordinates { get; set; } = string.Empty;
-        public DateTime DateTime { get; set; } = DateTime.Today;
+
+        public DateTime DateTime { get; set; }
+
+        public int UserId { get; set; }
 
         public User? User { get; set; }
-        public LostCoordinate? LostCoordinate { get; set; }   
+
+        public LostCoordinate? LostCoordinate { get; set; }
+
+        public AnimalDescription? PetDescription { get; set; }
+
+        public List<string> PictureBase64List { get; set; } = new();
+
         public List<FoundReport> FoundReports { get; set; } = new();
-        public AnimalDescription PetDescription { get; set; } = new();
 
 
 

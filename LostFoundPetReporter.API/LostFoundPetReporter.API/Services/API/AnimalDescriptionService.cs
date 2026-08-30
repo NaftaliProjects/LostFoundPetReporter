@@ -47,23 +47,66 @@ namespace LostFoundPetReporter.Services.API
                 text = """
                        Analyze the provided image(s) of an animal.
 
-                       Return information about the animal using the following fields:
+                       Return a single JSON object describing the animal visible in the image(s).
 
-                       - name: The animal's name if it can be determined. Otherwise use an empty string.
-                       - colors: Describe the animal's main colors, can be concated with ',' for example : red,blue,green.
-                       - type: The general animal type, such as dog, cat, bird, rabbit, etc.
-                       - breed: The animal's breed if it can reasonably be determined. Otherwise use an empty string.
+                       Use the following fields:
 
-                       Do not invent information that cannot reasonably be determined from the images.
-                       Return ONLY valid JSON in this exact format:
-                       And Return ONLY ONE JSON Assuming each image is about one animal
+                       * name: The animal's name if it can be determined from the image or provided context. Otherwise use an empty string.
+                       * type: The general animal type, such as "dog", "cat", "bird", "rabbit", etc.
+                       * breed: The animal's breed if it can reasonably be identified from its visible characteristics. Otherwise use an empty string.
+                       * colors: The main visible colors of the animal. If there are multiple colors, separate them with commas, for example "white,black,brown".
+                       * sex: "Male" or "Female" only if it can reasonably be determined from the image. Otherwise use an empty string.
+                       * age: Approximate age in years only if it can reasonably be estimated from the image. Otherwise use null.
+                       * size: "Small", "Medium", or "Large" based on the apparent physical size of the animal. If it cannot reasonably be determined, use an empty string.
+                       * weightKg: Approximate weight in kilograms only if it can reasonably be estimated. Otherwise use null.
+                       * coatLength: "Short", "Medium", or "Long" based on the visible fur length. Otherwise use an empty string.
+                       * coatType: Describe the visible coat type, such as "Straight", "Curly", "Wavy", or "Wire". Otherwise use an empty string.
+                       * pattern: Describe the visible coat pattern, such as "Solid", "Spotted", "Striped", "Tabby", "Tuxedo", or "Mixed". Otherwise use an empty string.
+                       * distinctiveMarkings: Describe clearly visible unique markings that could help identify the animal, such as "white patch on chest", "black spot above left eye", or "white paws". Otherwise use an empty string.
+                       * eyeColor: The visible eye color, such as "Brown", "Blue", "Green", or "Amber". Otherwise use an empty string.
+                       * earDescription: Describe clearly visible distinctive ear characteristics, such as "left ear folded", "both ears upright", or "one floppy ear". Otherwise use an empty string.
+                       * tailDescription: Describe clearly visible distinctive tail characteristics, such as "long tail with white tip", "short tail", or "curled tail". Otherwise use an empty string.
+                       * collarPresent: true if a collar is clearly visible, false if no collar is clearly visible, or null if the image does not allow this to be determined.
+                       * collarColor: The visible collar color. Otherwise use an empty string.
+                       * collarType: The visible collar type, such as "standard collar", "reflective collar", or "leather collar". Otherwise use an empty string.
+                       * harnessPresent: true if a harness is clearly visible, false if no harness is clearly visible, or null if it cannot be determined.
+                       * harnessColor: The visible harness color. Otherwise use an empty string.
+
+                       Important rules:
+
+                       1. Do not invent or guess information that cannot reasonably be determined from the image.
+                       2. Prefer an empty string or null over an uncertain answer.
+                       3. Only describe characteristics that are actually visible.
+                       4. If multiple images show the same animal, combine the information from all images into the same JSON object.
+                       5. Assume all provided images represent one animal.
+                       6. Return ONLY one valid JSON object.
+                       7. Do not include Markdown, code fences, explanations, or additional text.
+
+                       Return JSON in exactly this structure:
 
                        {
-                         "name": "",
-                         "colors": "",
-                         "type": "",
-                         "breed": ""
+                       "name": "",
+                       "type": "",
+                       "breed": "",
+                       "colors": "",
+                       "sex": "",
+                       "age": null,
+                       "size": "",
+                       "weightKg": null,
+                       "coatLength": "",
+                       "coatType": "",
+                       "pattern": "",
+                       "distinctiveMarkings": "",
+                       "eyeColor": "",
+                       "earDescription": "",
+                       "tailDescription": "",
+                       "collarPresent": null,
+                       "collarColor": "",
+                       "collarType": "",
+                       "harnessPresent": null,
+                       "harnessColor": ""
                        }
+                       
                        """
             });
 

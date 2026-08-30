@@ -84,38 +84,42 @@
                             </Border>
 
 
-                            <!-- Pet information -->
                             <VerticalStackLayout
                                 Grid.Column="1"
                                 VerticalOptions="Center"
                                 Spacing="4">
 
-                                <!-- Pet name -->
-                                <Label
-                                    Text="{Binding PetDescription.Name}"
+                                                            <!-- Pet -->
+                                                            <Label
+                                    Text="{Binding PetDescription.Type}"
                                     FontSize="18"
                                     FontAttributes="Bold" />
 
+                                                            <Label
+                                    Text="{Binding PetDescription.Breed, StringFormat='Breed: {0}'}"
+                                    FontSize="14" />
 
-                                <!-- Reporter -->
-                                <Label
+                                                            <Label
+                                    Text="{Binding PetDescription.Colors, StringFormat='Colors: {0}'}"
+                                    FontSize="14" />
+
+                                                            <!-- Reporter -->
+                                                            <Label
                                     Text="{Binding User.Name, StringFormat='Reporter: {0}'}"
-                                    FontSize="14"
-                                    TextColor="White" />
+                                    FontSize="14" />
 
+                                                            <Label
+                                    Text="{Binding User.Email, StringFormat='Email: {0}'}"
+                                    FontSize="13" />
 
-                                <!-- Latitude -->
-                                <Label
-                                    Text="{Binding LostCoordinate.Latitude, StringFormat='Lat: {0:F6}'}"
-                                    FontSize="12"
-                                    TextColor="White" />
+                                                            <Label
+                                    Text="{Binding User.Phone, StringFormat='Phone: {0}'}"
+                                    FontSize="13" />
 
-
-                                <!-- Longitude -->
-                                <Label
-                                    Text="{Binding LostCoordinate.Longitude, StringFormat='Lng: {0:F6}'}"
-                                    FontSize="12"
-                                    TextColor="White" />
+                                                            <!-- Report -->
+                                                            <Label
+                                    Text="{Binding DateTime, StringFormat='Reported: {0:dd/MM/yyyy HH:mm}'}"
+                                    FontSize="12" />
 
                             </VerticalStackLayout>
 

@@ -58,6 +58,19 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 $"api/v1/LostReport/{id}");
         }
 
-        
+        public async Task<CreateAnimalDescription?> ImageToAnimalDescriptionAsync(List<string> pictureBase64List)
+        {
+            var request = new ImageToAnimalDescriptionRequest
+            {
+                PictureBase64List = pictureBase64List
+            };
+
+            return await _apiClient.PostAsync<
+                ImageToAnimalDescriptionRequest,
+                CreateAnimalDescription>(
+                "api/v1/LostReport/ImageToAnimalDescription",
+                request);
+        }
+
     }
 }

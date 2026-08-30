@@ -4,147 +4,378 @@
     x:Class="LostFoundPetReporter.Mobile.Views.CreateLostReportPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
     Title="Create Lost Report">
 
-    <ScrollView>
- 
+    <Grid RowDefinitions="*, Auto">
 
-        <VerticalStackLayout
-            Padding="20"
-            Spacing="18">
+        <ScrollView Grid.Row="0">
+
+            <VerticalStackLayout
+                Padding="20"
+                Spacing="18">
 
                 <!-- Return -->
-            <Button
-                Text="← Return"
-                HorizontalOptions="Start"
-                Clicked="OnReturnClicked" />
-
-                <Label
-                Text="Create Lost Report"
-                FontSize="28"
-                FontAttributes="Bold" />
-
-            <!-- Date / Time -->
-
-            <VerticalStackLayout Spacing="6">
-
-                <Label
-                    Text="Date and Time"
-                    FontAttributes="Bold" />
-
-                <DatePicker
-                    Date="{Binding Report.dateTime}" />
-
-                <TimePicker
-                    Time="{Binding Report.dateTime}" />
-
-            </VerticalStackLayout>
-
-
-
-
-            <!-- Location -->
-            <VerticalStackLayout Spacing="10">
-
-                <Label
-        Text="Location"
-        FontAttributes="Bold" />
-
                 <Button
-        Text="📍 Use My Current Location"
-        Command="{Binding UseCurrentLocationCommand}" />
+                    Text="← Return"
+                    HorizontalOptions="Start"
+                    Clicked="OnReturnClicked" />
 
                 <Label
-        Text="{Binding LocationText}"
-        FontSize="14"
-        HorizontalOptions="Center" />
-
-            </VerticalStackLayout>
-
-
-            <!-- Animal -->
-
-            <Label
-                Text="Animal Information"
-                FontSize="22"
-                FontAttributes="Bold"
-                Margin="0,10,0,0" />
-
-
-            <!-- Animal Type -->
-
-            <VerticalStackLayout Spacing="6">
-
-                <Label
-                    Text="Type"
+                    Text="Create Lost Report"
+                    FontSize="28"
                     FontAttributes="Bold" />
 
-                <Entry
-                    Placeholder="Dog, Cat, Bird..."
-                    Text="{Binding PetDescription.Type}" />
+                <!-- Date / Time -->
+                <VerticalStackLayout Spacing="6">
 
-            </VerticalStackLayout>
+                    <Label
+                        Text="Date and Time"
+                        FontAttributes="Bold" />
 
+                    <DatePicker
+                        Date="{Binding LostDate}" />
 
-            <!-- Breed -->
+                    <TimePicker
+                        Time="{Binding LostTime}" />
 
-            <VerticalStackLayout Spacing="6">
+                </VerticalStackLayout>
 
+                <!-- Location -->
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        Text="Location"
+                        FontAttributes="Bold" />
+
+                    <Button
+                        Text="📍 Use My Current Location"
+                        Command="{Binding UseCurrentLocationCommand}" />
+
+                    <Label
+                        Text="{Binding LocationText}"
+                        FontSize="14"
+                        HorizontalOptions="Center" />
+
+                </VerticalStackLayout>
+
+                <!-- Animal -->
                 <Label
-                    Text="Breed"
-                    FontAttributes="Bold" />
+                    Text="Animal Information"
+                    FontSize="22"
+                    FontAttributes="Bold"
+                    Margin="0,10,0,0" />
 
-                <Entry
-                    Placeholder="Breed"
-                    Text="{Binding PetDescription.Breed}" />
+                <!-- Type -->
+                <VerticalStackLayout Spacing="6">
+
+                    <Label
+                        Text="Type"
+                        FontAttributes="Bold" />
+
+                    <Entry
+                        Placeholder="Dog, Cat, Bird..."
+                        Text="{Binding PetDescription.Type}" />
+
+                </VerticalStackLayout>
+
+                <!-- Breed -->
+                <VerticalStackLayout Spacing="6">
+
+                    <Label
+                        Text="Breed"
+                        FontAttributes="Bold" />
+
+                    <Entry
+                        Placeholder="Breed"
+                        Text="{Binding PetDescription.Breed}" />
+
+                </VerticalStackLayout>
+
+                <!-- Name -->
+                <VerticalStackLayout Spacing="6">
+
+                    <Label
+                        Text="Name"
+                        FontAttributes="Bold" />
+
+                    <Entry
+                        Placeholder="Animal's name"
+                        Text="{Binding PetDescription.Name}" />
+
+                </VerticalStackLayout>
+
+                <!-- Colors -->
+                <VerticalStackLayout Spacing="6">
+
+                    <Label
+                        Text="Colors"
+                        FontAttributes="Bold" />
+
+                    <Entry
+                        Placeholder="Brown, black, white..."
+                        Text="{Binding PetDescription.Colors}" />
+
+                </VerticalStackLayout>
+
+                <!-- Additional Details -->
+                <Button
+                    Text="{Binding AdditionalDetailsButtonText}"
+                    Command="{Binding ToggleAdditionalDetailsCommand}"
+                    Margin="0,5,0,0" />
+
+                <VerticalStackLayout
+                    Spacing="14"
+                    IsVisible="{Binding IsAdditionalDetailsExpanded}">
+
+                    <!-- Sex -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Sex"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Male, Female, Unknown"
+                            Text="{Binding PetDescription.Sex}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Age -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Approximate Age"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Age in years"
+                            Keyboard="Numeric"
+                            Text="{Binding PetDescription.Age}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Size -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Size"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Small, Medium, Large"
+                            Text="{Binding PetDescription.Size}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Weight -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Approximate Weight"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Weight in kg"
+                            Keyboard="Numeric"
+                            Text="{Binding PetDescription.WeightKg}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Coat -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Coat"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Coat length: Short, Medium, Long"
+                            Text="{Binding PetDescription.CoatLength}" />
+
+                        <Entry
+                            Placeholder="Coat type: Straight, Curly, Wavy..."
+                            Text="{Binding PetDescription.CoatType}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Pattern -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Pattern"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Solid, Spotted, Striped, Tabby..."
+                            Text="{Binding PetDescription.Pattern}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Eye Color -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Eye Color"
+                            FontAttributes="Bold" />
+
+                        <Entry
+                            Placeholder="Brown, Blue, Green..."
+                            Text="{Binding PetDescription.EyeColor}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Distinctive Markings -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Distinctive Markings"
+                            FontAttributes="Bold" />
+
+                        <Editor
+                            Placeholder="White patch on chest, scar above left eye..."
+                            Text="{Binding PetDescription.DistinctiveMarkings}"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="80" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Ear Description -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Ear Description"
+                            FontAttributes="Bold" />
+
+                        <Editor
+                            Placeholder="Left ear folded, both ears pointed..."
+                            Text="{Binding PetDescription.EarDescription}"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="60" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Tail Description -->
+                    <VerticalStackLayout Spacing="6">
+
+                        <Label
+                            Text="Tail Description"
+                            FontAttributes="Bold" />
+
+                        <Editor
+                            Placeholder="Long tail with white tip..."
+                            Text="{Binding PetDescription.TailDescription}"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="60" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Collar -->
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label
+                            Text="Collar"
+                            FontAttributes="Bold" />
+
+                        <HorizontalStackLayout Spacing="10">
+
+                            <Label
+                                Text="Collar present"
+                                VerticalOptions="Center" />
+
+                            <Switch
+                                IsToggled="{Binding PetDescription.CollarPresent, Mode=TwoWay}" />
+
+                        </HorizontalStackLayout>
+
+                        <Entry
+                            Placeholder="Collar color"
+                            Text="{Binding PetDescription.CollarColor}" />
+
+                        <Entry
+                            Placeholder="Collar type"
+                            Text="{Binding PetDescription.CollarType}" />
+
+                    </VerticalStackLayout>
+
+                    <!-- Harness -->
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label
+                            Text="Harness"
+                            FontAttributes="Bold" />
+
+                        <HorizontalStackLayout Spacing="10">
+
+                            <Label
+                                Text="Harness present"
+                                VerticalOptions="Center" />
+
+                            <Switch
+                                IsToggled="{Binding PetDescription.HarnessPresent, Mode=TwoWay}" />
+
+                        </HorizontalStackLayout>
+
+                        <Entry
+                            Placeholder="Harness color"
+                            Text="{Binding PetDescription.HarnessColor}" />
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+
+                <!-- Picture -->
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        Text="Picture"
+                        FontAttributes="Bold" />
+
+                    <HorizontalStackLayout Spacing="10">
+
+                        <Button
+                            Text="📷 Take Picture"
+                            Command="{Binding TakePictureCommand}"
+                            HorizontalOptions="FillAndExpand" />
+
+                        <Button
+                            Text="🖼️ Choose Picture"
+                            Command="{Binding PickPictureCommand}"
+                            HorizontalOptions="FillAndExpand" />
+
+                    </HorizontalStackLayout>
+
+                    <Image
+                        Source="{Binding PicturePath}"
+                        HeightRequest="250"
+                        Aspect="AspectFit"
+                        IsVisible="{Binding HasPicture}" />
+
+                    <Button
+                        Text="✨ Auto Fill Animal Information"
+                        Command="{Binding AutoFillAnimalDescriptionCommand}"
+                        IsEnabled="{Binding HasPicture}" />
+
+                </VerticalStackLayout>
+
+                <!-- Create -->
+                <Button
+                    Text="Create Report"
+                    Command="{Binding CreateReportCommand}"
+                    Margin="0,10,0,0" />
+
+                <ActivityIndicator
+                    IsRunning="{Binding IsBusy}"
+                    IsVisible="{Binding IsBusy}"
+                    HorizontalOptions="Center" />
 
             </VerticalStackLayout>
 
+        </ScrollView>
 
-            <!-- Name -->
+        <!-- Bottom Navigation -->
+        <controls:BottomNavigationBar Grid.Row="1" />
 
-            <VerticalStackLayout Spacing="6">
-
-                <Label
-                    Text="Name"
-                    FontAttributes="Bold" />
-
-                <Entry
-                    Placeholder="Animal's name"
-                    Text="{Binding PetDescription.Name}" />
-
-            </VerticalStackLayout>
-
-
-            <!-- Colors -->
-
-            <VerticalStackLayout Spacing="6">
-
-                <Label
-                    Text="Colors"
-                    FontAttributes="Bold" />
-
-                <Entry
-                    Placeholder="Brown, black, white..."
-                    Text="{Binding PetDescription.Colors}" />
-
-            </VerticalStackLayout>
-
-
-            <!-- Create -->
-
-            <Button
-                Text="Create Report"
-                Command="{Binding CreateReportCommand}"
-                Margin="0,10,0,0" />
-
-            <ActivityIndicator
-                IsRunning="{Binding IsBusy}"
-                IsVisible="{Binding IsBusy}"
-                HorizontalOptions="Center" />
-
-        </VerticalStackLayout>
-
-    </ScrollView>
+    </Grid>
 
 </ContentPage>

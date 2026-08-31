@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -14,6 +15,18 @@ namespace LostFoundPetReporter.CoreDb.Models
     }
 
     /// <summary>
+    /// Holds the info for Push notification system
+    /// </summary>
+    public class UserDevice : BaseModel
+    {
+        //properties
+        public int UserId { get; set; }
+        public string Token { get; set; } = "";
+        public string Platform { get; set; } = "";
+        public DateTime LastUpdated { get; set; }
+    }
+
+    /// <summary>
     /// Holds the profile and contact information for a system user.
     /// </summary>
     public class User : BaseModel
@@ -24,8 +37,6 @@ namespace LostFoundPetReporter.CoreDb.Models
         public String HashedPassword { get; set; }
         public String Email { get; set; } = "";
         public String Phone { get; set; } = "";
-
-        
 
     }
 

@@ -6,17 +6,20 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.ApiExplorer;
 global using Microsoft.AspNetCore.Mvc.Versioning;
 global using Microsoft.EntityFrameworkCore;
-global using System.Text.Json.Serialization;
 global using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+global using System.Text.Json.Serialization;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using LostFoundPetReporter.API.Services.API;
+using LostFoundPetReporter.API.Services.Authentication;
 using LostFoundPetReporter.API.Services.BackgroundServices;
+using LostFoundPetReporter.API.Services.Notification;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using LostFoundPetReporter.Services.API;
-using LostFoundPetReporter.API.Services.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 
@@ -26,6 +29,13 @@ using LostFoundPetReporter.API.Services.Authentication;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile(
+        "Firebase/firebase-service-account.json")
+});
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
@@ -57,6 +67,7 @@ builder.Services.AddDbContext<PetReporterContext>(options =>
         sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
 );
 
+builder.Services.AddScoped<IUserDeviceRepo, UserDeviceRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ILostReportRepo, LostReportRepo>();
 builder.Services.AddScoped<IFoundReportRepo, FoundReportRepo>();
@@ -71,6 +82,8 @@ builder.Services.AddHostedService<ExtFileBackgroundService>();
 builder.Services.AddScoped<IExtFileService, ExtFileService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
 
 
 builder.Services.AddHttpClient<IAnimalDescriptionService, AnimalDescriptionService>();

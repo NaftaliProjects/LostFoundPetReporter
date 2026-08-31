@@ -1,3 +1,12 @@
+
+# ==========================================
+# Sensitive credentials
+# ==========================================
+**/firebase-service-account.json
+**/*firebase-adminsdk*.json
+
+
+
 # ==========================================
 # Visual Studio
 # ==========================================
@@ -71,3 +80,4 @@ appsettings.Development.json
 **/appsettings.json
 **/appsettings.*
 **/appsettings
+

@@ -226,6 +226,39 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.UserDevice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserDevices", (string)null);
+                });
+
             modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.FoundCoordinate", b =>
                 {
                     b.HasOne("LostFoundPetReporter.CoreDb.Models.FoundReport", "FoundReportNavigation")
@@ -487,6 +520,15 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     b.HasOne("LostFoundPetReporter.CoreDb.Models.LostReport", null)
                         .WithMany("LostReportExtFilesNevigation")
                         .HasForeignKey("LostReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LostFoundPetReporter.CoreDb.Models.UserDevice", b =>
+                {
+                    b.HasOne("LostFoundPetReporter.CoreDb.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("LostFoundPetReporter.CoreDb.Models.UserDevice", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

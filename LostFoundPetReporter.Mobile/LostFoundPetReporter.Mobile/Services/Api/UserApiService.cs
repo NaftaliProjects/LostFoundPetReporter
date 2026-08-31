@@ -56,5 +56,10 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 "api/v1/User/Login",
                 user);
         }
+
+        public async Task RegisterDeviceAsync(RegisterDeviceTokenRequest request)
+        {
+            await _apiClient.PostAsync<RegisterDeviceTokenRequest, RegisterDeviceResponse>("api/v1/User/RegisterDevice", request);
+        }
     }
 }

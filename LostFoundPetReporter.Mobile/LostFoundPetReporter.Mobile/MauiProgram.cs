@@ -6,9 +6,18 @@ using LostFoundPetReporter.Mobile.Services.Session;
 using LostFoundPetReporter.Mobile.ViewModels;
 using LostFoundPetReporter.Mobile.Views;
 using Microsoft.Extensions.Logging;
+
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using Microsoft.Maui.LifecycleEvents;
+using LostFoundPetReporter.Mobile.Services.Notification;
 
 
+
+
+#if ANDROID
+using Plugin.Firebase.CloudMessaging;
+using Plugin.Firebase.Core.Platforms.Android;
+#endif
 
 
 
@@ -33,6 +42,20 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+
+        builder.ConfigureLifecycleEvents(events =>
+        {
+        #if ANDROID
+            events.AddAndroid(android => android.OnCreate((activity, _) => { CrossFirebase.Initialize(activity, () => Platform.CurrentActivity); }));
+        #endif
+        });
+
+
+        #if ANDROID
+                builder.Services.AddSingleton(_ => CrossFirebaseCloudMessaging.Current);
+        #endif
+
+
         // =========================
         // API
         // =========================
@@ -48,10 +71,15 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            client.BaseAddress = new Uri("https://localhost:7074/");
+            client.BaseAddress = new Uri("https://192.168.0.52:7074/");
         })
         .AddHttpMessageHandler<JwtAuthorizationHandler>()
         .ConfigurePrimaryHttpMessageHandler(() => handler);
+
+        // =========================
+        // Notification Services
+        // =========================
+        builder.Services.AddSingleton<PushNotificationService>();
 
 
         // =========================

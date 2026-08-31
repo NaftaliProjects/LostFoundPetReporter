@@ -1,4 +1,5 @@
 ﻿
+using LostFoundPetReporter.API.Services.Notification;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 
@@ -9,17 +10,20 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
         private readonly IFoundReportRepo _foundRepo;
         private readonly ILostReportRepo _lostRepo;
         private readonly ILostFoundMatchRepo _matchRepo;
+        private readonly IPushNotificationService _pushNotificationService;
 
         private const double MinimumMatchScore = 0.70;
 
         public MatchingService(
             IFoundReportRepo foundRepo,
             ILostReportRepo lostRepo,
-            ILostFoundMatchRepo matchRepo)
+            ILostFoundMatchRepo matchRepo,
+            IPushNotificationService pushNotificationService)
         {
             _foundRepo = foundRepo;
             _lostRepo = lostRepo;
             _matchRepo = matchRepo;
+            _pushNotificationService = pushNotificationService;
         }
 
         // Direction 1: One FoundReport against many LostReports
@@ -75,6 +79,11 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             if (newMatches.Count > 0)
             {
                 _matchRepo.AddRange(newMatches);
+
+                await _pushNotificationService.SendMatchNotificationAsync(
+                    lostReport.UserId,
+                    newMatches,
+                    cancellationToken);
             }
         }
 

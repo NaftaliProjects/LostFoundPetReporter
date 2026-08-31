@@ -5,6 +5,7 @@ using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 
@@ -14,10 +15,12 @@ namespace LostFoundPetReporter.API.Controllers
     public class UserController : BaseCrudController<User, UserController, UserDto, CreateUserDto>
     {
         private readonly IJwtService _jwtService;
+        private readonly IUserDeviceRepo _userDeviceRepo;
 
-        public UserController(IUserRepo repo, IJwtService jwtService) : base(repo)
+        public UserController(IUserRepo repo, IJwtService jwtService, IUserDeviceRepo userDeviceRepo) : base(repo)
         {
             _jwtService = jwtService;
+            _userDeviceRepo = userDeviceRepo;
         }
 
         [ApiVersion("1.0")]
@@ -68,6 +71,57 @@ namespace LostFoundPetReporter.API.Controllers
             catch (Exception ex) { return BadRequest(ex); }
 
             return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, UserDto.FromEntity(entity));
+        }
+
+
+        [ApiVersion("1.0")]
+        [Authorize]
+        [HttpPost("RegisterDevice")]
+        public ActionResult RegisterDevice(RegisterDeviceTokenDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Token))
+            {
+                return BadRequest("FCM token is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Platform))
+            {
+                return BadRequest("Platform is required.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!int.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var createDto = new CreateUserDeviceDto
+            {
+                UserId = userId,
+                Token = dto.Token,
+                Platform = dto.Platform,
+                LastUpdated = DateTime.UtcNow
+            };
+
+            var entity = createDto.ToEntity();
+
+            _userDeviceRepo.RegisterDevice(entity);
+
+            return Ok(new
+            {
+                Message = "Device token registered successfully."
+            });
         }
 
 

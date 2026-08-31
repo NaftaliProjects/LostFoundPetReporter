@@ -15,6 +15,35 @@ namespace LostFoundPetReporter.CoreDb
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserDevice>(entity =>
+            {
+                entity.ToTable("UserDevices");
+
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Token)
+                    .IsRequired();
+
+                entity.Property(x => x.Platform)
+                    .IsRequired();
+
+                entity.Property(x => x.LastUpdated)
+                    .IsRequired();
+
+                entity.HasOne<User>()
+                    .WithOne()
+                    .HasForeignKey<UserDevice>(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => x.Token)
+                    .IsUnique();
+            });
+
+
+
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("Users");
@@ -112,6 +141,7 @@ namespace LostFoundPetReporter.CoreDb
             return base.SaveChangesAsync(cancellationToken);
         }
 
+        public DbSet<UserDevice> UserDevice { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LostReport> LostReports { get; set; }
         public DbSet<FoundReport> FoundReports { get; set; }

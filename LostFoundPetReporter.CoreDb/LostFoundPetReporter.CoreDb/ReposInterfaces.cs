@@ -35,6 +35,15 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
         int SaveChanges();
     }
 
+    public interface IUserDeviceRepo : IBaseRepo<UserDevice>
+    {
+        UserDevice? GetByUserId(int userId);
+
+        UserDevice? GetByToken(string token);
+
+        void RegisterDevice(UserDevice device);
+    }
+
     public interface IUserRepo : IBaseRepo<User>
     {
         IEnumerable<User> GetAllByUserId(int id);

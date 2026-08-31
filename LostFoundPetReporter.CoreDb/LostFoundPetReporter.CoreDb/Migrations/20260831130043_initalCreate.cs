@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LostFoundPetReporter.CoreDb.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class initalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -101,6 +101,28 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                     table.PrimaryKey("PK_LostReports", x => x.Id);
                     table.ForeignKey(
                         name: "FK_LostReports_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserDevices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Platform = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserDevices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserDevices_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -246,6 +268,18 @@ namespace LostFoundPetReporter.CoreDb.Migrations
                 name: "IX_LostReports_UserId",
                 table: "LostReports",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDevices_Token",
+                table: "UserDevices",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDevices_UserId",
+                table: "UserDevices",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -265,6 +299,9 @@ namespace LostFoundPetReporter.CoreDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "LostReportExtFiles");
+
+            migrationBuilder.DropTable(
+                name: "UserDevices");
 
             migrationBuilder.DropTable(
                 name: "FoundReports");

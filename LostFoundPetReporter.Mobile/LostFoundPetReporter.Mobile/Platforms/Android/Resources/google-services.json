@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "634776034896",
+    "project_id": "lostfoundpetreporter",
+    "storage_bucket": "lostfoundpetreporter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634776034896:android:e6a0cc1e1cc9b6a85d3b55",
+        "android_client_info": {
+          "package_name": "com.companyname.lostfoundpetreporter.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLR5sd13i8b2i1BZ-yTN7DlKnG7yJGK2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

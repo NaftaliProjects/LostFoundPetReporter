@@ -155,7 +155,57 @@ namespace LostFoundPetReporter.CoreDb.Repos
         }
     }
 
+
+
+
+
+
     //Entity-Specific Repositories Imp
+
+
+    public class UserDeviceRepo : BaseRepo<UserDevice>, IUserDeviceRepo
+    {
+        public UserDeviceRepo(PetReporterContext context)
+            : base(context)
+        {
+        }
+
+        internal UserDeviceRepo(
+            DbContextOptions<PetReporterContext> options)
+            : base(options)
+        {
+        }
+
+        public UserDevice? GetByUserId(int userId)
+        {
+            return Table.FirstOrDefault(x => x.UserId == userId);
+        }
+
+        public UserDevice? GetByToken(string token)
+        {
+            return Table.FirstOrDefault(x => x.Token == token);
+        }
+
+        public void RegisterDevice(UserDevice device)
+        {
+            var existingDevice = GetByUserId(device.UserId);
+
+            if (existingDevice == null)
+            {
+                Add(device);
+                return;
+            }
+
+            existingDevice.Token = device.Token;
+            existingDevice.Platform = device.Platform;
+            existingDevice.LastUpdated = device.LastUpdated;
+
+            Update(existingDevice);
+        }
+    }
+
+
+
     public class UserRepo : BaseRepo<User>, IUserRepo
     {
         public UserRepo(PetReporterContext context) : base(context)

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>    
+    <PackageReference Include="FirebaseAdmin" Version="3.6.0" />    
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />    
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
@@ -19,6 +20,10 @@
     <Reference Include="LostFoundPetReporter.CoreDb">
       <HintPath>..\..\LostFoundPetReporter.CoreDb\LostFoundPetReporter.CoreDb\bin\Debug\net10.0\LostFoundPetReporter.CoreDb.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Firebase\" />
   </ItemGroup>
 
 </Project>

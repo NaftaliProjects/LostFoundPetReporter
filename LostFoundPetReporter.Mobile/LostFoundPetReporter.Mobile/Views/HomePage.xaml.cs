@@ -25,6 +25,15 @@ namespace LostFoundPetReporter.Mobile.Views
         {
             base.OnAppearing();
 
+            #if ANDROID
+            var status = await Permissions.CheckStatusAsync<Permissions.PostNotifications>();
+
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.PostNotifications>();
+            }
+            #endif
+
             await _viewModel.LoadLostReportsAsync();
         }
 

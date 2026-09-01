@@ -1,6 +1,7 @@
 ﻿
 using LostFoundPetReporter.API.Services.Notification;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using System.Collections;
 
 
 namespace LostFoundPetReporter.API.Services.BackgroundServices
@@ -80,8 +81,9 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             {
                 _matchRepo.AddRange(newMatches);
 
+
                 await _pushNotificationService.SendMatchNotificationAsync(
-                    lostReport.UserId,
+                    new List<int> { lostReport.UserId },
                     newMatches,
                     cancellationToken);
             }
@@ -109,6 +111,8 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 
             var newMatches = new List<LostFoundMatch>();
 
+            HashSet<int> userIds = new(); 
+
             foreach (var lostReport in candidateLostReports)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -127,6 +131,8 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
                 if (result.Score < MinimumMatchScore)
                     continue;
 
+                userIds.Add(lostReport.UserId);
+
                 newMatches.Add(new LostFoundMatch
                 {
                     FoundReportId = foundReport.Id,
@@ -139,6 +145,11 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             if (newMatches.Count > 0)
             {
                 _matchRepo.AddRange(newMatches);
+
+                await _pushNotificationService.SendMatchNotificationAsync(
+                    userIds,
+                    newMatches,
+                    cancellationToken);
             }
         }
 

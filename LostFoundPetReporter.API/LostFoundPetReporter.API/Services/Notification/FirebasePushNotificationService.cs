@@ -1,6 +1,4 @@
-﻿
-
-using FirebaseAdmin.Messaging;
+﻿using FirebaseAdmin.Messaging;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
@@ -17,41 +15,68 @@ namespace LostFoundPetReporter.API.Services.Notification
         }
 
         public async Task SendMatchNotificationAsync(
-            int userId,
+            IEnumerable<int> userIds,
             IEnumerable<LostFoundMatch> matches,
             CancellationToken cancellationToken = default)
         {
-            var device = _userDeviceRepo.GetByUserId(userId);
+            var uniqueUserIds = userIds.Distinct().ToList();
 
-            if (device == null)
+            var matchList = matches.ToList();
+
+            if (uniqueUserIds.Count == 0 || matchList.Count == 0)
                 return;
 
-            if (string.IsNullOrWhiteSpace(device.Token))
-                return;
+            var matchCount = matchList.Count;
 
-            var matchCount = matches.Count();
-
-            var message = new FirebaseAdmin.Messaging.Message
+            foreach (var userId in uniqueUserIds)
             {
-                Token = device.Token,
+                cancellationToken.ThrowIfCancellationRequested();
 
-                Notification = new FirebaseAdmin.Messaging.Notification
+                var device = _userDeviceRepo.GetByUserId(userId);
+
+                if (device == null)
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(device.Token))
+                    continue;
+
+                var message = new FirebaseAdmin.Messaging.Message
                 {
-                    Title = "Possible match found!",
-                    Body = matchCount == 1
-            ? "We found a possible match for your lost pet."
-            : $"We found {matchCount} possible matches for your lost pet."
-                },
+                    Token = device.Token,
 
-                Data = new Dictionary<string, string>
-                {
-                    ["type"] = "lost_report_match"
-                }
-            };
+                    Notification = new FirebaseAdmin.Messaging.Notification
+                    {
+                        Title = "Possible match found!",
+                        Body = matchCount == 1
+                            ? "We found a possible match for your lost pet."
+                            : $"We found {matchCount} possible matches for your lost pet."
+                    },
 
-            await FirebaseMessaging.DefaultInstance.SendAsync(
-                message,
-                cancellationToken);
+                    Data = new Dictionary<string, string>
+                    {
+                        ["type"] = "lost_report_match"
+                    }
+                };
+
+                var response = await FirebaseMessaging.DefaultInstance.SendAsync(message, cancellationToken);
+
+
+
+                Console.WriteLine(
+                    $"================ FCM SENT ================");
+
+                Console.WriteLine(
+                    $"UserId: {userId}");
+
+                Console.WriteLine(
+                    $"Token: {device.Token}");
+
+                Console.WriteLine(
+                    $"FCM Message ID: {response}");
+
+                Console.WriteLine(
+                    $"===========================================");
+            }
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IPushNotificationService
     {
-        Task SendMatchNotificationAsync(int userId, IEnumerable<LostFoundMatch> matches, CancellationToken cancellationToken = default);
+        Task SendMatchNotificationAsync(IEnumerable<int> userIds, IEnumerable<LostFoundMatch> matches, CancellationToken cancellationToken = default);
     }
 }

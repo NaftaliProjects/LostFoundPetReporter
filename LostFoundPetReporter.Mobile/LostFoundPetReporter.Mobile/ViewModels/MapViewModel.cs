@@ -2,28 +2,34 @@
 using LostFoundPetReporter.Mobile.Models.Map;
 using LostFoundPetReporter.Mobile.Services.Api;
 using LostFoundPetReporter.Mobile.Services.Map;
+using LostFoundPetReporter.Mobile.Services.Maps.Routing;
 using LostFoundPetReporter.Mobile.Services.Session;
+using System.Diagnostics;
 
 namespace LostFoundPetReporter.Mobile.ViewModels;
 
 public class MapViewModel
 {
     private readonly IMapService _mapService;
+    private readonly IRouteService _routeService;
     private readonly ILostReportApiService _lostReportApiService;
     private readonly IUserSession _userSession;
 
     public MapPoint? CurrentLocation { get; private set; }
+    public RouteResult? CurrentRoute { get; private set; }
 
     public List<MapReportGroup> ReportGroups { get; private set; } = new();
 
     public MapViewModel(
         IMapService mapService,
         ILostReportApiService lostReportApiService,
+        IRouteService routeService,
         IUserSession userSession)
     {
         _mapService = mapService;
         _lostReportApiService = lostReportApiService;
         _userSession = userSession;
+        _routeService = routeService;
     }
 
     public async Task LoadAsync()
@@ -99,5 +105,64 @@ public class MapViewModel
 
             colorIndex++;
         }
+    }
+
+    public async Task ShowRouteAsync(MapPoint destination)
+    {
+        if (CurrentLocation == null)
+            return;
+
+        CurrentRoute = await _routeService.GetRouteAsync(
+            CurrentLocation,
+            destination);
+    }
+
+    public async Task<bool> CalculateRouteAsync(
+    MapPoint destination)
+    {
+        if (CurrentLocation == null)
+        {
+            Debug.WriteLine(
+                "ROUTE: Current location is null.");
+
+            return false;
+        }
+
+        Debug.WriteLine(
+            $"ROUTE: Start = " +
+            $"{CurrentLocation.Latitude}, " +
+            $"{CurrentLocation.Longitude}");
+
+        Debug.WriteLine(
+            $"ROUTE: Destination = " +
+            $"{destination.Latitude}, " +
+            $"{destination.Longitude}");
+
+        CurrentRoute =
+            await _routeService.GetRouteAsync(
+                CurrentLocation,
+                destination);
+
+        if (CurrentRoute == null)
+        {
+            Debug.WriteLine(
+                "ROUTE: RouteService returned NULL.");
+
+            return false;
+        }
+
+        Debug.WriteLine(
+            $"ROUTE: Distance = " +
+            $"{CurrentRoute.DistanceMeters} meters");
+
+        Debug.WriteLine(
+            $"ROUTE: Duration = " +
+            $"{CurrentRoute.DurationSeconds} seconds");
+
+        Debug.WriteLine(
+            $"ROUTE: Points = " +
+            $"{CurrentRoute.Points.Count}");
+
+        return CurrentRoute.Points.Count >= 2;
     }
 }

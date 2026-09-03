@@ -11,6 +11,7 @@ using SkiaSharp.Views.Maui.Controls.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 using LostFoundPetReporter.Mobile.Services.Notification;
 using LostFoundPetReporter.Mobile.Services.Maps.Routing;
+using LostFoundPetReporter.Mobile.Services.Compass;
 
 
 
@@ -90,14 +91,16 @@ public static class MauiProgram
         builder.Services.AddTransient<IMapService, MapService>();
 
         builder.Services.AddHttpClient<IRouteService, RouteService>(
-    client =>
-    {
-        client.BaseAddress = new Uri(
-            "https://router.project-osrm.org/");
+        client =>
+        {
+            client.BaseAddress = new Uri(
+                "https://router.project-osrm.org/");
 
-        client.DefaultRequestHeaders.UserAgent.ParseAdd(
-            "LostFoundPetReporter/1.0");
-    });
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                "LostFoundPetReporter/1.0");
+        });
+
+        builder.Services.AddSingleton<ICompassService, CompassService>();
 
 
         // =========================

@@ -1,5 +1,6 @@
 ﻿using LostFoundPetReporter.Mobile.Models.Map;
 using LostFoundPetReporter.Mobile.ViewModels;
+using LostFoundPetReporter.Mobile.Services.Compass;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
@@ -14,17 +15,18 @@ namespace LostFoundPetReporter.Mobile.Views;
 public partial class MapPage : ContentPage
 {
     private readonly MapViewModel _viewModel;
-
+    private readonly ICompassService _compassService;
     private readonly MapControl _mapControl;
     private readonly MyLocationLayer _myLocationLayer;
     private readonly MemoryLayer _reportsLayer;
     private readonly MemoryLayer _routeLayer;
 
-    public MapPage(MapViewModel viewModel)
+    public MapPage(MapViewModel viewModel, ICompassService compassService)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
+        _compassService = compassService;
 
         BindingContext = _viewModel;
 
@@ -155,10 +157,42 @@ public partial class MapPage : ContentPage
     {
         base.OnAppearing();
 
+        if (!_compassService.IsSupported)
+        {
+            Debug.WriteLine("COMPASS: Not supported.");
+            return;
+        }
+
+        Debug.WriteLine("COMPASS: Starting...");
+
+        _compassService.HeadingChanged += OnHeadingChanged;
+        _compassService.Start();
+
+
         await _viewModel.LoadAsync();
 
+
+        
         ShowCurrentLocation();
         ShowReports();
+
+
+    }
+
+    protected override void OnDisappearing()
+    {
+        _compassService.HeadingChanged -= OnHeadingChanged;
+        _compassService.Stop();
+
+        base.OnDisappearing();
+    }
+
+    private void OnHeadingChanged(
+    object? sender,
+    double heading)
+    {
+        Debug.WriteLine(
+            $"COMPASS: {heading:F1}°");
     }
 
     private void ShowCurrentLocation()

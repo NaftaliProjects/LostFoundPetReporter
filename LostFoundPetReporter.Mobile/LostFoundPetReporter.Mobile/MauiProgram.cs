@@ -74,7 +74,7 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            client.BaseAddress = new Uri("https://192.168.0.52:7074/");
+            client.BaseAddress = new Uri("https://10.100.102.27:7074/");
         })
         .AddHttpMessageHandler<JwtAuthorizationHandler>()
         .ConfigurePrimaryHttpMessageHandler(() => handler);

@@ -1,6 +1,6 @@
 ﻿using LostFoundPetReporter.Mobile.Models.Map;
-using LostFoundPetReporter.Mobile.ViewModels;
 using LostFoundPetReporter.Mobile.Services.Compass;
+using LostFoundPetReporter.Mobile.ViewModels;
 using Mapsui;
 using Mapsui.Layers;
 using Mapsui.Nts;
@@ -8,6 +8,7 @@ using Mapsui.Projections;
 using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
+using NetTopologySuite.Geometries;
 using System.Diagnostics;
 
 namespace LostFoundPetReporter.Mobile.Views;
@@ -20,6 +21,15 @@ public partial class MapPage : ContentPage
     private readonly MyLocationLayer _myLocationLayer;
     private readonly MemoryLayer _reportsLayer;
     private readonly MemoryLayer _routeLayer;
+
+
+
+    //Compass
+    private readonly MemoryLayer _directionLayer;
+    private double _currentHeading;
+    private CancellationTokenSource? _directionUpdateCts;
+
+
 
     public MapPage(MapViewModel viewModel, ICompassService compassService)
     {
@@ -42,6 +52,15 @@ public partial class MapPage : ContentPage
 
         _mapControl.Map?.Layers.Add(
             _myLocationLayer);
+
+        //Direction Layer
+        _directionLayer = new MemoryLayer
+        {
+            Name = "Direction"
+        };
+
+        _mapControl.Map?.Layers.Add(
+            _directionLayer);
 
         // Route
         _routeLayer = new MemoryLayer
@@ -66,6 +85,198 @@ public partial class MapPage : ContentPage
 
         MapContainer.Content = _mapControl;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (_compassService.IsSupported)
+        {
+            _compassService.HeadingChanged += OnHeadingChanged;
+            _compassService.Start();
+
+            StartDirectionUpdates();
+        }
+
+        await _viewModel.LoadAsync();
+
+        ShowCurrentLocation();
+        ShowReports();
+    }
+
+    private void StartDirectionUpdates()
+    {
+        _directionUpdateCts?.Cancel();
+        _directionUpdateCts = new CancellationTokenSource();
+
+        _ = DirectionUpdateLoopAsync(
+            _directionUpdateCts.Token);
+    }
+
+    private async Task DirectionUpdateLoopAsync(
+    CancellationToken cancellationToken)
+    {
+        var location = _viewModel.CurrentLocation;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await UpdateLocationAsync();
+                UpdateDirectionIndicator();
+            });
+
+            await Task.Delay(33, cancellationToken);
+        }
+    }
+
+    private async Task UpdateLocationAsync()
+    {
+        var location = await _viewModel.UpdateCurrentLocationAsync();
+
+        if (location == null)
+            return;
+
+        var point = SphericalMercator.FromLonLat(
+            new MPoint(
+                location.Longitude,
+                location.Latitude));
+
+        _myLocationLayer.UpdateMyLocation(point);
+
+        _mapControl.Refresh();
+    }
+
+    protected override void OnDisappearing()
+    {
+        _compassService.HeadingChanged -= OnHeadingChanged;
+        _compassService.Stop();
+
+        _directionUpdateCts?.Cancel();
+        _directionUpdateCts = null;
+
+        base.OnDisappearing();
+    }
+
+
+    private void OnHeadingChanged(
+       object? sender,
+       double heading)
+    {
+        _currentHeading = heading;
+    }
+
+
+    private void UpdateDirectionIndicator()
+    {
+        if (_mapControl.Map == null)
+            return;
+
+        var location = _viewModel.CurrentLocation;
+
+        if (location == null)
+            return;
+
+        const double lengthMeters = 80;
+        const double widthMeters = 35;
+
+        var heading = _currentHeading;
+
+        var center = SphericalMercator.FromLonLat(
+            new MPoint(
+                location.Longitude,
+                location.Latitude));
+
+        var headingRadians =
+            heading * Math.PI / 180.0;
+
+        var leftRadians =
+            (heading - 90) * Math.PI / 180.0;
+
+        var rightRadians =
+            (heading + 90) * Math.PI / 180.0;
+
+        // Approximate meters -> latitude/longitude.
+        const double metersPerDegreeLatitude = 111_320;
+
+        var metersPerDegreeLongitude =
+            111_320 *
+            Math.Cos(location.Latitude * Math.PI / 180.0);
+
+        var tipLatitude =
+            location.Latitude +
+            Math.Cos(headingRadians) *
+            lengthMeters /
+            metersPerDegreeLatitude;
+
+        var tipLongitude =
+            location.Longitude +
+            Math.Sin(headingRadians) *
+            lengthMeters /
+            metersPerDegreeLongitude;
+
+        var leftLatitude =
+            location.Latitude +
+            Math.Cos(leftRadians) *
+            widthMeters /
+            metersPerDegreeLatitude;
+
+        var leftLongitude =
+            location.Longitude +
+            Math.Sin(leftRadians) *
+            widthMeters /
+            metersPerDegreeLongitude;
+
+        var rightLatitude =
+            location.Latitude +
+            Math.Cos(rightRadians) *
+            widthMeters /
+            metersPerDegreeLatitude;
+
+        var rightLongitude =
+            location.Longitude +
+            Math.Sin(rightRadians) *
+            widthMeters /
+            metersPerDegreeLongitude;
+
+        var tip = SphericalMercator.FromLonLat(
+            new MPoint(
+                tipLongitude,
+                tipLatitude));
+
+        var left = SphericalMercator.FromLonLat(
+            new MPoint(
+                leftLongitude,
+                leftLatitude));
+
+        var right = SphericalMercator.FromLonLat(
+            new MPoint(
+                rightLongitude,
+                rightLatitude));
+
+        var ring =
+    new NetTopologySuite.Geometries.LinearRing(
+        new[]
+        {
+            new Coordinate(center.X, center.Y),
+            new Coordinate(left.X, left.Y),
+            new Coordinate(tip.X, tip.Y),
+            new Coordinate(right.X, right.Y),
+            new Coordinate(center.X, center.Y)
+        });
+
+        var polygon = new NetTopologySuite.Geometries.Polygon(ring);
+
+
+        var feature = new GeometryFeature(polygon);
+
+        _directionLayer.Features = new List<IFeature>
+        {
+            feature
+        };
+        _mapControl.Refresh();
+    }
+
 
     private async void OnMapTapped(
     object? sender,
@@ -153,65 +364,40 @@ public partial class MapPage : ContentPage
         e.Handled = true;
     }
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        if (!_compassService.IsSupported)
-        {
-            Debug.WriteLine("COMPASS: Not supported.");
-            return;
-        }
-
-        Debug.WriteLine("COMPASS: Starting...");
-
-        _compassService.HeadingChanged += OnHeadingChanged;
-        _compassService.Start();
 
 
-        await _viewModel.LoadAsync();
-
-
-        
-        ShowCurrentLocation();
-        ShowReports();
-
-
-    }
-
-    protected override void OnDisappearing()
-    {
-        _compassService.HeadingChanged -= OnHeadingChanged;
-        _compassService.Stop();
-
-        base.OnDisappearing();
-    }
-
-    private void OnHeadingChanged(
-    object? sender,
-    double heading)
-    {
-        Debug.WriteLine(
-            $"COMPASS: {heading:F1}°");
-    }
 
     private void ShowCurrentLocation()
     {
         var location = _viewModel.CurrentLocation;
 
+        Debug.WriteLine("========== CURRENT LOCATION ==========");
+
         if (location == null)
+        {
+            Debug.WriteLine("CurrentLocation is NULL");
             return;
+        }
+
+        Debug.WriteLine(
+            $"Latitude: {location.Latitude}, Longitude: {location.Longitude}");
 
         var point = SphericalMercator.FromLonLat(
             new MPoint(
                 location.Longitude,
                 location.Latitude));
 
+        Debug.WriteLine(
+            $"Map point: X={point.X}, Y={point.Y}");
+
         _myLocationLayer.UpdateMyLocation(point);
 
         _mapControl.Map?.Navigator.CenterOnAndZoomTo(
             point,
             _mapControl.Map.Navigator.Resolutions[16]);
+
+        Debug.WriteLine("Location sent to MyLocationLayer");
+        Debug.WriteLine("======================================");
     }
 
     private void ShowReports()

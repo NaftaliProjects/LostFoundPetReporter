@@ -165,4 +165,11 @@ public class MapViewModel
 
         return CurrentRoute.Points.Count >= 2;
     }
+
+    public async Task<MapPoint?> UpdateCurrentLocationAsync()
+    {
+        CurrentLocation = await _mapService.GetCurrentLocationAsync();
+
+        return CurrentLocation;
+    }
 }

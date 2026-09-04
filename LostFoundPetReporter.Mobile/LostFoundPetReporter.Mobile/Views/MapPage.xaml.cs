@@ -1,5 +1,6 @@
 ﻿using LostFoundPetReporter.Mobile.Models.Map;
 using LostFoundPetReporter.Mobile.Services.Compass;
+using LostFoundPetReporter.Mobile.Services.Maps.Routing;
 using LostFoundPetReporter.Mobile.ViewModels;
 using Mapsui;
 using Mapsui.Layers;
@@ -17,10 +18,13 @@ public partial class MapPage : ContentPage
 {
     private readonly MapViewModel _viewModel;
     private readonly ICompassService _compassService;
+    private readonly IRouteProgressService _routeProgressService;
+
     private readonly MapControl _mapControl;
     private readonly MyLocationLayer _myLocationLayer;
     private readonly MemoryLayer _reportsLayer;
     private readonly MemoryLayer _routeLayer;
+    private MapPoint? _lastRouteDrawLocation;
 
 
 
@@ -31,12 +35,13 @@ public partial class MapPage : ContentPage
 
 
 
-    public MapPage(MapViewModel viewModel, ICompassService compassService)
+    public MapPage(MapViewModel viewModel, ICompassService compassService, IRouteProgressService routeProgressService)
     {
         InitializeComponent();
 
         _viewModel = viewModel;
         _compassService = compassService;
+        _routeProgressService = routeProgressService;
 
         BindingContext = _viewModel;
 
@@ -113,39 +118,74 @@ public partial class MapPage : ContentPage
             _directionUpdateCts.Token);
     }
 
-    private async Task DirectionUpdateLoopAsync(
-    CancellationToken cancellationToken)
+    private async Task DirectionUpdateLoopAsync(CancellationToken cancellationToken)
     {
-        var location = _viewModel.CurrentLocation;
-
         while (!cancellationToken.IsCancellationRequested)
         {
-            await MainThread.InvokeOnMainThreadAsync(async () =>
+            try
             {
-                await UpdateLocationAsync();
-                UpdateDirectionIndicator();
-            });
+                var location = await _viewModel.UpdateCurrentLocationAsync();
 
-            await Task.Delay(33, cancellationToken);
+
+                if (location != null)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(
+                        () =>
+                        {
+                            UpdateMapLocation(location);
+                            UpdateDirectionIndicator();
+                        });
+                }
+
+                await Task.Delay(33, cancellationToken);
+
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Location/direction loop error: {ex}");
+
+                await Task.Delay(100, cancellationToken);
+            }
         }
     }
 
-    private async Task UpdateLocationAsync()
+    private void UpdateMapLocation(MapPoint location)
     {
-        var location = await _viewModel.UpdateCurrentLocationAsync();
-
-        if (location == null)
-            return;
-
-        var point = SphericalMercator.FromLonLat(
-            new MPoint(
-                location.Longitude,
-                location.Latitude));
+        var point = ToMapPoint(location);
 
         _myLocationLayer.UpdateMyLocation(point);
 
+        UpdateRouteProgress(location);
+
         _mapControl.Refresh();
     }
+
+
+    
+
+
+    private void UpdateRouteProgress(MapPoint location)
+    {
+        var route = _viewModel.CurrentRoute;
+
+        if (route == null)
+            return;
+
+        if (_lastRouteDrawLocation != null && _routeProgressService.GetDistanceMeters(_lastRouteDrawLocation, location) < 1.0)
+        {
+            return;
+        }
+
+        ShowRoute();
+
+        _lastRouteDrawLocation = location;
+    }
+
+    
 
     protected override void OnDisappearing()
     {
@@ -382,10 +422,7 @@ public partial class MapPage : ContentPage
         Debug.WriteLine(
             $"Latitude: {location.Latitude}, Longitude: {location.Longitude}");
 
-        var point = SphericalMercator.FromLonLat(
-            new MPoint(
-                location.Longitude,
-                location.Latitude));
+        var point = ToMapPoint(location);
 
         Debug.WriteLine(
             $"Map point: X={point.X}, Y={point.Y}");
@@ -414,10 +451,8 @@ public partial class MapPage : ContentPage
             // -------------------------
             if (group.LostPoint != null)
             {
-                var point = SphericalMercator.FromLonLat(
-                    new MPoint(
-                        group.LostPoint.Longitude,
-                        group.LostPoint.Latitude));
+                var point = ToMapPoint(group.LostPoint);
+
 
                 features.Add(
                     CreateMarker(
@@ -432,12 +467,7 @@ public partial class MapPage : ContentPage
             // -------------------------
             foreach (var foundPoint in group.FoundPoints)
             {
-                var point = SphericalMercator.FromLonLat(
-                    new MPoint(
-                        foundPoint.Longitude,
-                        foundPoint.Latitude));
-
-
+                var point = ToMapPoint(foundPoint);
 
                 features.Add(
                     CreateMarker(
@@ -516,20 +546,40 @@ public partial class MapPage : ContentPage
             return;
         }
 
-        var coordinates = route.Points
-            .Select(point =>
-                SphericalMercator.FromLonLat(
-                    new MPoint(
-                        point.Longitude,
-                        point.Latitude)))
-            .ToList();
+        var currentLocation = _viewModel.CurrentLocation;
 
-        var lineString = new NetTopologySuite.Geometries.LineString(
-            coordinates
-                .Select(p => new NetTopologySuite.Geometries.Coordinate(
-                    p.X,
-                    p.Y))
-                .ToArray());
+        if (currentLocation == null)
+            return;
+
+
+        var progress = _routeProgressService.GetProgress(currentLocation, route.Points);
+
+        var remainingRoute = progress.RemainingRoute;
+
+
+        if (remainingRoute.Count < 2)
+        {
+            _routeLayer.Features = new List<IFeature>();
+            return;
+        }
+
+
+        var coordinates = remainingRoute
+        .Select(point =>
+            SphericalMercator.FromLonLat(
+                new MPoint(
+                    point.Longitude,
+                    point.Latitude)))
+        .ToList();
+
+        var lineString =
+       new NetTopologySuite.Geometries.LineString(
+           coordinates
+               .Select(p =>
+                   new NetTopologySuite.Geometries.Coordinate(
+                       p.X,
+                       p.Y))
+               .ToArray());
 
         var feature = new GeometryFeature(lineString);
 
@@ -557,6 +607,8 @@ public partial class MapPage : ContentPage
         if (!success)
             return;
 
+        _lastRouteDrawLocation = null;
+
         ShowRoute();
 
         ZoomToRoute();
@@ -570,11 +622,7 @@ public partial class MapPage : ContentPage
             return;
 
         var points = route.Points
-            .Select(point =>
-                SphericalMercator.FromLonLat(
-                    new MPoint(
-                        point.Longitude,
-                        point.Latitude)))
+            .Select(point => ToMapPoint(point))
             .ToList();
 
         if (points.Count == 0)
@@ -594,5 +642,18 @@ public partial class MapPage : ContentPage
             _mapControl.Map.Navigator.Resolutions[14]);
     }
 
+
+
+
+    //Helper Functions 
+    private static MPoint ToMapPoint(MapPoint point)
+    {
+        return SphericalMercator.FromLonLat(new MPoint(point.Longitude, point.Latitude));
+    }
+
+    
+    
+
+    
 
 }

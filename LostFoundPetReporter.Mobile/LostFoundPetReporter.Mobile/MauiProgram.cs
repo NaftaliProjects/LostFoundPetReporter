@@ -100,6 +100,8 @@ public static class MauiProgram
                 "LostFoundPetReporter/1.0");
         });
 
+        builder.Services.AddSingleton<IRouteProgressService, RouteProgressService>();
+
         builder.Services.AddSingleton<ICompassService, CompassService>();
 
 

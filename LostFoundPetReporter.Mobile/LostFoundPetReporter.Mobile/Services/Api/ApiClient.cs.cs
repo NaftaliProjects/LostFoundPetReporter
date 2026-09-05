@@ -27,6 +27,14 @@ namespace LostFoundPetReporter.Mobile.Services.Api
 
         public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest request)
         {
+            var json = JsonSerializer.Serialize(request);
+
+            System.Diagnostics.Debug.WriteLine(
+                $"POST {endpoint}");
+
+            System.Diagnostics.Debug.WriteLine(
+                $"JSON: {json}");
+
             var response = await _httpClient.PostAsJsonAsync(endpoint, request);
 
             var content = await response.Content.ReadAsStringAsync();

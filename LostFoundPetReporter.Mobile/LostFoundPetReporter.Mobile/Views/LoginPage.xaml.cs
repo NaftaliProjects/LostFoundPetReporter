@@ -17,6 +17,9 @@ public partial class LoginPage : ContentPage
 
     private async void OnLoginClicked(object? sender, EventArgs e)
     {
+        var email = _viewModel.LoginUser.Email;
+        var password = _viewModel.LoginUser.Password;
+
         var success = await _viewModel.LoginAsync(_viewModel.LoginUser);
 
         if (!success)

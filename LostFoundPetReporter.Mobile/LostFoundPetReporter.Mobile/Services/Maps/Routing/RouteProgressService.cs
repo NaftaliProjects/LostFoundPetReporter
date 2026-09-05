@@ -183,7 +183,7 @@ namespace LostFoundPetReporter.Mobile.Services.Maps.Routing
         }
 
 
-        public static double DistanceMeters(MapPoint a, MapPoint b)
+        public double GetDistanceMeters(MapPoint a, MapPoint b)
         {
             const double earthRadius = 6371000;
 

@@ -4,6 +4,7 @@
     x:Class="LostFoundPetReporter.Mobile.Views.MyReportsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:LostFoundPetReporter.Mobile.Models"
     xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
     Title="My Reports">
 
@@ -36,34 +37,36 @@
             <!-- Reports -->
             <CollectionView
                 Grid.Row="1"
-                ItemsSource="{Binding Reports}">
+                ItemsSource="{Binding Reports}"
+                SelectionMode="Single"
+                SelectionChanged="OnReportSelected">
 
-                <CollectionView.EmptyView>
+                            <CollectionView.EmptyView>
 
-                    <VerticalStackLayout
+                                <VerticalStackLayout
                         HorizontalOptions="Center"
                         VerticalOptions="Center"
                         Spacing="15">
 
-                        <Label
+                                    <Label
                             Text="You don't have any lost reports yet."
                             FontSize="18"
                             HorizontalTextAlignment="Center" />
 
-                        <Button
+                                    <Button
                             Text="Create your first report"
                             Command="{Binding NewReportCommand}" />
 
-                    </VerticalStackLayout>
+                                </VerticalStackLayout>
 
-                </CollectionView.EmptyView>
+                            </CollectionView.EmptyView>
 
 
-                <CollectionView.ItemTemplate>
+                            <CollectionView.ItemTemplate>
 
-                    <DataTemplate>
+                                <DataTemplate x:DataType="model:LostReport">
 
-                        <Border
+                                    <Border
                             Padding="15"
                             Margin="0,0,0,12">
 
@@ -71,17 +74,17 @@
 
                                 <!-- Report ID -->
                                 <Label
-                                    Text="{Binding Id, StringFormat='Report #{0}'}"
-                                    FontSize="18"
-                                    FontAttributes="Bold" />
+                        Text="{Binding Id, StringFormat='Report #{0}'}"
+                        FontSize="18"
+                        FontAttributes="Bold" />
 
                                 <!-- Date -->
                                 <Label
-                                    Text="{Binding dateTime, StringFormat='Date: {0:dd/MM/yyyy HH:mm}'}" />
+                        Text="{Binding DateTime, StringFormat='Date: {0:dd/MM/yyyy HH:mm}'}" />
 
                                 <!-- Location -->
                                 <Label
-                                    Text="{Binding Coordinates, StringFormat='Location: {0}'}" />
+                        Text="{Binding LostCoordinate, StringFormat='Location: {0}'}" />
 
                             </VerticalStackLayout>
 

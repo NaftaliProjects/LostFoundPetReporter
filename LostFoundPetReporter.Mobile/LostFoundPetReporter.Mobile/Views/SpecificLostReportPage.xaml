@@ -311,20 +311,20 @@
                                     <Label Text="Photos" FontAttributes="Bold" FontSize="14" />
 
                                     <Border
-        HeightRequest="90"
-        Padding="3"
-        StrokeThickness="0"
-        StrokeShape="RoundRectangle 12"
-        BackgroundColor="{AppThemeBinding Light=#EEEEEE, Dark=#2A2A2A}">
+                                        HeightRequest="90"
+                                        Padding="3"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{AppThemeBinding Light=#EEEEEE, Dark=#2A2A2A}">
 
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer
-                Tapped="OnPhotoCollectionTapped" />
-                                        </Border.GestureRecognizers>
+                                                                        <Border.GestureRecognizers>
+                                                                            <TapGestureRecognizer
+                                                Tapped="OnPhotoCollectionTapped" />
+                                                                        </Border.GestureRecognizers>
 
-                                        <HorizontalStackLayout
-            BindableLayout.ItemsSource="{Binding PictureBase64List}"
-            Spacing="4">
+                                                                    <HorizontalStackLayout
+                                            BindableLayout.ItemsSource="{Binding PictureBase64List}"
+                                            Spacing="4">        
 
                                             <BindableLayout.ItemTemplate>
 
@@ -340,15 +340,24 @@
                                     </Border>
 
                                     <Label
-        Text="Tap to view photos"
-        FontSize="11"
-        TextColor="Gray" />
+                                        Text="Tap to view photos"
+                                        FontSize="11"
+                                        TextColor="Gray" />
 
                                 </VerticalStackLayout>
+
+                                <!-- Remove match button -->
+                                <Button
+                                    Text="Remove"
+                                    HorizontalOptions="End"
+                                    Command="{Binding BindingContext.RemoveMatchCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                    CommandParameter="{Binding .}" />
 
                             </VerticalStackLayout>
 
                         </Border>
+                        
+                        
 
                     </DataTemplate>
 

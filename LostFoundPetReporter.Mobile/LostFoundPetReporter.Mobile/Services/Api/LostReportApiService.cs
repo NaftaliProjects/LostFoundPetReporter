@@ -72,5 +72,11 @@ namespace LostFoundPetReporter.Mobile.Services.Api
                 request);
         }
 
+        public async Task RemoveLostFoundMatchAsync(int lostReportId, int foundReportId)
+        {
+            await _apiClient.DeleteAsync($"api/v1/LostFoundMatch/{lostReportId}/{foundReportId}");
+
+        }
+
     }
 }

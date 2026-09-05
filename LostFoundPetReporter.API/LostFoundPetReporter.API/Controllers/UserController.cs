@@ -23,6 +23,7 @@ namespace LostFoundPetReporter.API.Controllers
             _userDeviceRepo = userDeviceRepo;
         }
 
+
         [ApiVersion("1.0")]
         [AllowAnonymous]
         [HttpPost("Login")]
@@ -45,8 +46,10 @@ namespace LostFoundPetReporter.API.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            var token = _jwtService.CreateToken(user.Id, user.Email, out var expiresAt);
-
+            var token = _jwtService.CreateToken(
+                user.Id,
+                user.Email,
+                out var expiresAt);
 
             return Ok(new LoginResponseDto
             {
@@ -77,7 +80,7 @@ namespace LostFoundPetReporter.API.Controllers
         [ApiVersion("1.0")]
         [Authorize]
         [HttpPost("RegisterDevice")]
-        public ActionResult RegisterDevice(RegisterDeviceTokenDto dto)
+        public ActionResult RegisterDevice( RegisterDeviceTokenDto dto)
         {
             if (!ModelState.IsValid)
             {

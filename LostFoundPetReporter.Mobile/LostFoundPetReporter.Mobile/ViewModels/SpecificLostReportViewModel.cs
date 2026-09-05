@@ -11,6 +11,7 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
 {
     private readonly ILostReportApiService _lostReportApiService;
 
+
     private LostReport? _lostReport;
     private string _errorMessage = string.Empty;
     private bool _isLoading;
@@ -73,6 +74,7 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
     }
 
     public ICommand CloseImageViewerCommand { get; }
+    public ICommand RemoveMatchCommand { get; }
 
     public SpecificLostReportViewModel(
         ILostReportApiService lostReportApiService)
@@ -80,6 +82,8 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
         _lostReportApiService = lostReportApiService;
 
         CloseImageViewerCommand = new Command(CloseImageViewer);
+        RemoveMatchCommand = new Command<FoundReport>(async (foundReport) => await RemoveMatchAsync(foundReport));
+
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -182,6 +186,37 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
         IsImageViewerVisible = false;
         SelectedImages.Clear();
     }
+
+
+    private async Task RemoveMatchAsync(FoundReport? foundReport)
+    {
+        if (foundReport == null || LostReport == null)
+            return;
+
+        try
+        {
+            IsLoading = true;
+            ErrorMessage = string.Empty;
+
+            await _lostReportApiService.RemoveLostFoundMatchAsync(
+                LostReport.Id,
+                foundReport.Id);
+
+            FoundReports.Remove(foundReport);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+
+            System.Diagnostics.Debug.WriteLine(
+                $"ERROR removing match: {ex}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

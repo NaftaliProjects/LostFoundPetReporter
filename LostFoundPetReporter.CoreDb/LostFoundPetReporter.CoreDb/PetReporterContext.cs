@@ -17,6 +17,8 @@ namespace LostFoundPetReporter.CoreDb
         {
             base.OnModelCreating(modelBuilder);
 
+
+            //UserDevice Builder
             modelBuilder.Entity<UserDevice>(entity =>
             {
                 entity.ToTable("UserDevices");
@@ -44,6 +46,7 @@ namespace LostFoundPetReporter.CoreDb
 
 
 
+            //User Builder 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("Users");
@@ -55,6 +58,8 @@ namespace LostFoundPetReporter.CoreDb
 
             });
 
+
+            //LostReport Builder
             modelBuilder.Entity<LostCoordinate>()
              .HasKey(x => x.LostReportId);
 
@@ -71,7 +76,16 @@ namespace LostFoundPetReporter.CoreDb
                 x => x.LostReportId)
             .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<LostReportExtFile>(entity =>
+            {
+                entity.ToTable("LostReportExtFiles");
+                entity.Property(p => p.FilePath).HasMaxLength(70);
+                entity.Property(p => p.Description).HasMaxLength(30);
+                entity.Property(p => p.FileName).HasMaxLength(30);
+            });
 
+
+            //FoundReport Builder
             modelBuilder.Entity<FoundCoordinate>()
                .HasKey(x => x.FoundReportId);
 
@@ -98,14 +112,8 @@ namespace LostFoundPetReporter.CoreDb
                 
             });
 
-            modelBuilder.Entity<LostReportExtFile>(entity =>
-            {
-                entity.ToTable("LostReportExtFiles");
-                entity.Property(p => p.FilePath).HasMaxLength(70);
-                entity.Property(p => p.Description).HasMaxLength(30);
-                entity.Property(p => p.FileName).HasMaxLength(30);
-            });
-
+            
+            //LostFoundMatch Builder
             modelBuilder.Entity<LostFoundMatch>(builder =>
             {
                 builder.HasIndex(m => new { m.LostReportId, m.FoundReportId })

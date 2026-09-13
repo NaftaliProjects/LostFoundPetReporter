@@ -103,8 +103,8 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             var fromDate = foundReport.dateTime.AddMonths(-3);
             var toDate = foundReport.dateTime.AddDays(1);
 
-            var candidateLostReports =
-                _lostRepo.GetReportsInDateRange(fromDate, toDate);
+            var candidateLostReports = _lostRepo.GetReportsInDateRange(fromDate, toDate);
+
 
             if (!candidateLostReports.Any())
                 return;

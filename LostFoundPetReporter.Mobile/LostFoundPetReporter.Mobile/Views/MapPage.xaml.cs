@@ -49,7 +49,7 @@ public partial class MapPage : ContentPage
 
         // OpenStreetMap
         _mapControl.Map?.Layers.Add(
-            OpenStreetMap.CreateTileLayer());
+            OpenStreetMap.CreateTileLayer("LostFoundPetReporter.Mobile/1.0"));
 
         // Current device location
         _myLocationLayer = new MyLocationLayer(

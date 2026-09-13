@@ -5,8 +5,25 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:model="clr-namespace:LostFoundPetReporter.Mobile.Models"
+    xmlns:converters="clr-namespace:LostFoundPetReporter.Mobile.Converters"
     xmlns:controls="clr-namespace:LostFoundPetReporter.Mobile.Controls"
     Title="Lost Pets">
+
+    <ContentPage.Resources>
+
+        <ResourceDictionary>
+
+            <converters:Base64ToImageSourceConverter
+            x:Key="Base64ToImageSourceConverter" />
+
+            <converters:StringNotEmptyConverter
+          x:Key="StringNotEmptyConverter" />
+
+            <converters:ListNotEmptyConverter x:Key="ListNotEmptyConverter" />
+
+        </ResourceDictionary>
+
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
 
@@ -64,66 +81,78 @@
                         Padding="12"
                         StrokeShape="RoundRectangle 10">
 
-                        <Grid
-                            ColumnDefinitions="90,*"
-                            ColumnSpacing="15">
+                        <VerticalStackLayout Spacing="10">
 
-                            <!-- Pet image -->
-                            <Border
-                                Grid.Column="0"
-                                HeightRequest="90"
-                                WidthRequest="90"
-                                StrokeShape="RoundRectangle 8"
-                                StrokeThickness="0"
-                                VerticalOptions="Center">
+                            <!-- Photos -->
+                            <ScrollView
+                                Orientation="Horizontal"
+                                HorizontalScrollBarVisibility="Never">
 
-                                <Image
-                                    Source="dotnet_bot.png"
-                                    Aspect="AspectFill" />
+                                <HorizontalStackLayout
+                                    BindableLayout.ItemsSource="{Binding PictureBase64List}"
+                                    Spacing="6">
 
-                            </Border>
+                                    <BindableLayout.ItemTemplate>
+
+                                        <DataTemplate x:DataType="x:String">
+
+                                            <Border
+                                                WidthRequest="90"
+                                                HeightRequest="90"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 8">
+
+                                                <Image
+                                                    Source="{Binding .,
+                                                        Converter={StaticResource Base64ToImageSourceConverter}}"
+                                                    Aspect="AspectFill" />
+
+                                            </Border>
+
+                                        </DataTemplate>
+
+                                    </BindableLayout.ItemTemplate>
+
+                                </HorizontalStackLayout>
+
+                            </ScrollView>
 
 
-                            <VerticalStackLayout
-                                Grid.Column="1"
-                                VerticalOptions="Center"
-                                Spacing="4">
+                            <!-- Report information -->
+                            <VerticalStackLayout Spacing="4">
 
-                                                            <!-- Pet -->
-                                                            <Label
+                                <Label
                                     Text="{Binding PetDescription.Type}"
                                     FontSize="18"
                                     FontAttributes="Bold" />
 
-                                                            <Label
+                                <Label
                                     Text="{Binding PetDescription.Breed, StringFormat='Breed: {0}'}"
                                     FontSize="14" />
 
-                                                            <Label
+                                <Label
                                     Text="{Binding PetDescription.Colors, StringFormat='Colors: {0}'}"
                                     FontSize="14" />
 
-                                                            <!-- Reporter -->
-                                                            <Label
+                                <Label
                                     Text="{Binding User.Name, StringFormat='Reporter: {0}'}"
                                     FontSize="14" />
 
-                                                            <Label
+                                <Label
                                     Text="{Binding User.Email, StringFormat='Email: {0}'}"
                                     FontSize="13" />
 
-                                                            <Label
+                                <Label
                                     Text="{Binding User.Phone, StringFormat='Phone: {0}'}"
                                     FontSize="13" />
 
-                                                            <!-- Report -->
-                                                            <Label
+                                <Label
                                     Text="{Binding DateTime, StringFormat='Reported: {0:dd/MM/yyyy HH:mm}'}"
                                     FontSize="12" />
 
                             </VerticalStackLayout>
 
-                        </Grid>
+                        </VerticalStackLayout>
 
                     </Border>
 

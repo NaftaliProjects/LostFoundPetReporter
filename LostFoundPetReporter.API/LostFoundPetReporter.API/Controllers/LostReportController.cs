@@ -32,10 +32,9 @@ namespace LostFoundPetReporter.API.Controllers
             var actionResult = base.AddOne(createDto);
 
             if (actionResult.Result is CreatedAtActionResult createdResult && createdResult.Value is LostReportDto createdDto)
-
             {        
                _matchingQueue.QueueForMatchingAsync(createdDto.Id.Value, ReportType.Lost);
-                _extFileQueue.QueueForExtFileAsync(createdDto.Id.Value, ReportType.Found, createDto.PictureBase64List ?? new List<string>());
+                _extFileQueue.QueueForExtFileAsync(createdDto.Id.Value, ReportType.Lost, createDto.PictureBase64List ?? new List<string>());
             }
 
             return actionResult;

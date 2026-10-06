@@ -5,32 +5,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class LostFoundMatchController
-        : BaseCrudController<
-            LostFoundMatch,
-            LostFoundMatchController,
-            LostFoundMatchDto,
-            CreateLostFoundMatchDto>
+    public class LostFoundMatchController : BaseCrudController<LostFoundMatch, LostFoundMatchDto, CreateLostFoundMatchDto>
     {
         private readonly ILostFoundMatchRepo _repo;
 
-        public LostFoundMatchController(
-            ILostFoundMatchRepo repo)
-            : base(repo)
+        public LostFoundMatchController(ILostFoundMatchRepo repo) : base(repo)
         {
             _repo = repo;
         }
 
         [ApiVersion("1.0")]
         [HttpDelete("{lostReportId}/{foundReportId}")]
-        public ActionResult RemoveMatch(
-            int lostReportId,
-            int foundReportId)
+        public ActionResult RemoveMatch(int lostReportId, int foundReportId)
         {
             var match = _repo
                 .GetByLostReportId(lostReportId)
-                .FirstOrDefault(
-                    m => m.FoundReportId == foundReportId);
+                .FirstOrDefault(m => m.FoundReportId == foundReportId);
 
             if (match == null)
                 return NotFound();

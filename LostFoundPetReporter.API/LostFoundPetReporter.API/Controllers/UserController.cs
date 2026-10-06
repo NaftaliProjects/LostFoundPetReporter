@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class UserController : BaseCrudController<User, UserController, UserDto, CreateUserDto>
+    public class UserController : BaseCrudController<User, UserDto, CreateUserDto>
     {
         private readonly IJwtService _jwtService;
         private readonly IUserDeviceRepo _userDeviceRepo;
@@ -29,12 +29,8 @@ namespace LostFoundPetReporter.API.Controllers
         [HttpPost("Login")]
         public ActionResult<LoginResponseDto> Login(LoginUserDto loginDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
 
-            var user = ((IUserRepo)MainRepo).GetByEmail(loginDto.Email);
+            var user = ((IUserRepo)_mainRepo).GetByEmail(loginDto.Email);
 
             if (user == null)
             {
@@ -65,12 +61,11 @@ namespace LostFoundPetReporter.API.Controllers
         [HttpPost("Register")]
         public virtual ActionResult<UserDto> AddOne(CreateUserDto createDto)
         {
-            if (!ModelState.IsValid) { return ValidationProblem(ModelState); }
             if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
 
             var entity = createDto.ToEntity();
 
-            try { MainRepo.Add(entity); }
+            try { _mainRepo.Add(entity); }
             catch (Exception ex) { return BadRequest(ex); }
 
             return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, UserDto.FromEntity(entity));
@@ -82,10 +77,6 @@ namespace LostFoundPetReporter.API.Controllers
         [HttpPost("RegisterDevice")]
         public ActionResult RegisterDevice( RegisterDeviceTokenDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
 
             if (string.IsNullOrWhiteSpace(dto.Token))
             {
@@ -97,21 +88,17 @@ namespace LostFoundPetReporter.API.Controllers
                 return BadRequest("Platform is required.");
             }
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = GetCurrentUserId();
 
-            if (userIdClaim == null)
+            if (userId == null)
             {
                 return Unauthorized();
             }
 
-            if (!int.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized();
-            }
 
             var createDto = new CreateUserDeviceDto
             {
-                UserId = userId,
+                UserId = userId.Value,
                 Token = dto.Token,
                 Platform = dto.Platform,
                 LastUpdated = DateTime.UtcNow

@@ -19,20 +19,6 @@ namespace LostFoundPetReporter.API.DTO
     }
 
 
-    public class LostReportExtFileDto
-     : IResponseDto<LostReportExtFile, LostReportExtFileDto>
-    {
-        public string PictureBase64 { get; set; } = "";
-
-        public static LostReportExtFileDto FromEntity(
-            LostReportExtFile entity)
-        {
-            return new LostReportExtFileDto
-            {
-
-            };
-        }
-    }
 
 
     public class LostReportDto : IResponseDto<LostReport, LostReportDto> , IHasId

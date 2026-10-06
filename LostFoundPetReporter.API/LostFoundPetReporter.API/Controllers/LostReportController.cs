@@ -11,7 +11,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class LostReportController : BaseCrudController<LostReport, LostReportController ,LostReportDto, CreateLostReportDto>
+    public class LostReportController : BaseCrudController<LostReport ,LostReportDto, CreateLostReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
         private readonly IExtFileQueue _extFileQueue;
@@ -53,14 +53,12 @@ namespace LostFoundPetReporter.API.Controllers
         {
             if (id.HasValue && id.Value > 0)
             {
-                var entities = ((ILostReportRepo)MainRepo).GetAllByUserId(id.Value);
+                var entities = ((ILostReportRepo)_mainRepo).GetAllByUserId(id.Value);
                 var dtos = entities.Select(LostReportDto.FromEntity);
                 return Ok(dtos);
             }
 
-            var allEntities = MainRepo.GetAllIgnoreQueryFillters();
-            var allDtos = allEntities.Select(LostReportDto.FromEntity);
-            return Ok(allDtos);
+            return NoContent();
         }
 
         [ApiVersion("1.0")]

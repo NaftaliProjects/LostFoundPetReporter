@@ -10,20 +10,15 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class FoundReportController : BaseCrudController<
-        FoundReport,
-        FoundReportController,
-        FoundReportDto,
-        CreateFoundReportDto>
+    public class FoundReportController : BaseCrudController<FoundReport, FoundReportDto, CreateFoundReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
         private readonly IExtFileQueue _extFileQueue;
 
         private readonly IAnimalDescriptionService _animalDescriptionService;
 
-        // Inject IMatchingQueue alongside your repository
+       
         public FoundReportController(IFoundReportRepo repo, IMatchingQueue matchingQueue, IExtFileQueue extFileQueue , IAnimalDescriptionService animalDescriptionService) : base(repo)
-
         {
             _extFileQueue = extFileQueue;
             _matchingQueue = matchingQueue;
@@ -61,16 +56,12 @@ namespace LostFoundPetReporter.API.Controllers
         {
             if (id.HasValue && id.Value > 0)
             {
-                var entities = ((IFoundReportRepo)MainRepo).GetAllByUserId(id.Value);
+                var entities = ((IFoundReportRepo)_mainRepo).GetAllByUserId(id.Value);
                 var dtos = entities.Select(FoundReportDto.FromEntity);
                 return Ok(dtos);
             }
 
-            var allEntities = MainRepo.GetAllIgnoreQueryFillters();
-
-            var allDtos = allEntities.Select(FoundReportDto.FromEntity);
-
-            return Ok(allDtos);
+            return NoContent();
         }
 
 

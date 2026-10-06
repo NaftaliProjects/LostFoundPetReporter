@@ -3,8 +3,8 @@ using LostFoundPetReporter.CoreDb.Models;
 
 namespace LostFoundPetReporter.API.DTO
 {
-    public class LostFoundMatchDto
-        : IResponseDto<LostFoundMatch, LostFoundMatchDto>, IHasId
+    public class LostFoundMatchDto : IResponseDto<LostFoundMatch, LostFoundMatchDto>, IHasId
+
     {
         public int? Id { get; set; }
 
@@ -13,8 +13,7 @@ namespace LostFoundPetReporter.API.DTO
         public int FoundReportId { get; set; }
 
 
-        public static LostFoundMatchDto FromEntity(
-            LostFoundMatch entity)
+        public static LostFoundMatchDto FromEntity(LostFoundMatch entity)
         {
             return new LostFoundMatchDto
             {
@@ -26,8 +25,7 @@ namespace LostFoundPetReporter.API.DTO
     }
 
 
-    public class CreateLostFoundMatchDto
-        : IEntityDto<LostFoundMatch>, IHasId
+    public class CreateLostFoundMatchDto : IEntityDto<LostFoundMatch>, IHasId
     {
         public int? Id { get; set; }
 

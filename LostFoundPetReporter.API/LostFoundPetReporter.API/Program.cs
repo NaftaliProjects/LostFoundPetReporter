@@ -27,25 +27,22 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile(
-        "Firebase/firebase-service-account.json")
+    Credential = GoogleCredential.FromFile("Firebase/firebase-service-account.json")
 });
 
-MvcOptions options = new MvcOptions();
-options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-
-// Add services to the container.
-builder.Services.AddControllers(options)
-   .AddJsonOptions(options =>
-      {
-          options.JsonSerializerOptions.PropertyNamingPolicy = null;
-          options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-          options.JsonSerializerOptions.WriteIndented = true;
-          options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-      });
+builder.Services.AddControllers(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+})
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.WriteIndented = true;
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

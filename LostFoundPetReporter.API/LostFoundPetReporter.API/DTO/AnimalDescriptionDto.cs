@@ -2,8 +2,7 @@
 
 namespace LostFoundPetReporter.API.DTO
 {
-    public class CreateAnimalDescriptionDto
-        : IEntityDto<AnimalDescription>
+    public class CreateAnimalDescriptionDto : IEntityDto<AnimalDescription>
     {
         public string Name { get; set; } = "";
 

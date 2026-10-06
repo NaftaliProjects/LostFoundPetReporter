@@ -10,37 +10,22 @@ namespace LostFoundPetReporter.API.Controllers.Base
     [Route("api/[controller]")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
-    public abstract class BaseCrudController<
-        TEntity,
-        TController,
-        TResponseDto,
-        TCreateOrUpdateDto> : ControllerBase
-
+    public abstract class BaseCrudController<TEntity, TResponseDto, TCreateOrUpdateDto> : ControllerBase
         where TEntity : BaseModel, new()
-
-        where TResponseDto :
-            IResponseDto<TEntity, TResponseDto>
-
-        where TCreateOrUpdateDto :
-            IEntityDto<TEntity>,
-            IHasId
-
-        where TController : class
+        where TResponseDto : IResponseDto<TEntity, TResponseDto>
+        where TCreateOrUpdateDto : IEntityDto<TEntity>, IHasId 
     {
-
-        protected readonly IBaseRepo<TEntity> MainRepo;
+        protected readonly IBaseRepo<TEntity> _mainRepo;
 
         protected BaseCrudController(IBaseRepo<TEntity> repo)
         {
-            MainRepo = repo;
-          
+            _mainRepo = repo;
         }
 
-        //Helper Methods
+       
         protected int? GetCurrentUserId()
         {
-            var userId = User.FindFirst(
-                JwtRegisteredClaimNames.Sub)?.Value;
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
             if (!int.TryParse(userId, out var id))
             {
@@ -59,7 +44,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [HttpGet]
         public ActionResult<IEnumerable<TResponseDto>> GetAll()
         {
-            var entities = MainRepo.GetAllIgnoreQueryFillters();
+            var entities = _mainRepo.GetAllIgnoreQueryFillters();
 
             var dtos = entities.Select(TResponseDto.FromEntity);
 
@@ -75,7 +60,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [HttpGet("{id}")]
         public ActionResult<TResponseDto> GetOne(int id)
         {
-            var entity = MainRepo.Find(id);
+            var entity = _mainRepo.Find(id);
 
             if (entity == null)
             {
@@ -100,25 +85,19 @@ namespace LostFoundPetReporter.API.Controllers.Base
                 return BadRequest();
             }
 
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem(ModelState);
-            }
-
             try
             {
-                var existingEntity =
-                    MainRepo.FindAsNoTracking(id);
+                var existingEntity = _mainRepo.FindAsNoTracking(id);
+
 
                 if (existingEntity == null)
                 {
                     return NotFound();
                 }
 
-
                 var updatedEntity = updateDto.ToEntity();
                 
-                MainRepo.Update(existingEntity,updatedEntity);
+                _mainRepo.Update(existingEntity,updatedEntity);
             }
             catch (Exception ex)
             {
@@ -136,13 +115,12 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [ApiVersion("1.0")]
         [HttpPost]
         public virtual ActionResult<TResponseDto> AddOne(TCreateOrUpdateDto createDto)
-        {
-            if (!ModelState.IsValid) { return ValidationProblem(ModelState);  }
+        {   
             if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
 
             var entity = createDto.ToEntity();
 
-            try { MainRepo.Add(entity); }
+            try { _mainRepo.Add(entity); }
             catch (Exception ex) { return BadRequest(ex); }
 
             return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, TResponseDto.FromEntity(entity));
@@ -157,7 +135,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [HttpDelete("{id}")]
         public ActionResult DeleteOne(int id)
         {
-            var entity = MainRepo.Find(id);
+            var entity = _mainRepo.Find(id);
 
             if (entity == null)
             {
@@ -166,12 +144,12 @@ namespace LostFoundPetReporter.API.Controllers.Base
 
             try
             {
-                MainRepo.Delete(entity);
+                _mainRepo.Delete(entity);
             }
             catch (Exception ex)
             {
-                return BadRequest(
-                    ex.GetBaseException()?.Message);
+                return BadRequest(ex.GetBaseException()?.Message);
+
             }
 
             return NoContent();

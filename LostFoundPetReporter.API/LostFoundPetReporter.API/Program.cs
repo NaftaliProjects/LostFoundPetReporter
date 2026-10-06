@@ -34,12 +34,11 @@ FirebaseApp.Create(new AppOptions
         "Firebase/firebase-service-account.json")
 });
 
+MvcOptions options = new MvcOptions();
+options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+
 // Add services to the container.
-builder.Services.AddControllers(options =>
-    {
-        // Prevents ASP.NET from automatically requiring non-nullable navigation properties
-        options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-    })
+builder.Services.AddControllers(options)
    .AddJsonOptions(options =>
       {
           options.JsonSerializerOptions.PropertyNamingPolicy = null;

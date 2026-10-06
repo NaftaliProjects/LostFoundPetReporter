@@ -17,7 +17,7 @@
 
         <Button
             Grid.Column="1"
-            Text="PostFoundReport"
+            Text="Report"
             Clicked="OnPostFoundReport" />
 
         <Button
@@ -32,7 +32,7 @@
 
         <Button
             Grid.Column="4"
-            Text="Reports"
+            Text="MyReports"
             Clicked="OnReportsClicked" />
 
     </Grid>

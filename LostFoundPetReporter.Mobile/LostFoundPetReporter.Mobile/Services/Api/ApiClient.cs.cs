@@ -29,11 +29,9 @@ namespace LostFoundPetReporter.Mobile.Services.Api
         {
             var json = JsonSerializer.Serialize(request);
 
-            System.Diagnostics.Debug.WriteLine(
-                $"POST {endpoint}");
+            System.Diagnostics.Debug.WriteLine($"POST {endpoint}");
+            System.Diagnostics.Debug.WriteLine($"JSON: {json}");
 
-            System.Diagnostics.Debug.WriteLine(
-                $"JSON: {json}");
 
             var response = await _httpClient.PostAsJsonAsync(endpoint, request);
 

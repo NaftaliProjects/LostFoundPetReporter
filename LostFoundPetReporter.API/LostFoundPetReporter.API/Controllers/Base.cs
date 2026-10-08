@@ -1,8 +1,9 @@
 ﻿using LostFoundPetReporter.API.DTO.Interfaces;
+using LostFoundPetReporter.API.Services.Authentication;
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
-using LostFoundPetReporter.API.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace LostFoundPetReporter.API.Controllers.Base
 {
@@ -25,7 +26,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
        
         protected int? GetCurrentUserId()
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(userId, out var id))
             {

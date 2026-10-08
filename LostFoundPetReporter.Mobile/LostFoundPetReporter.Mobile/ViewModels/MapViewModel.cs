@@ -89,17 +89,11 @@ public class MapViewModel
                     lostReport.LostCoordinate.Longitude);
             }
 
-            // Found report locations
-            foreach (var foundReport in lostReport.FoundReports)
-            {
-                if (foundReport.FoundCoordinate == null)
-                    continue;
+            // Found reports sorted chronologically
+            group.FoundReports = lostReport.FoundReports
+            .OrderBy(foundReport => foundReport.DateTime)
+            .ToList();
 
-                group.FoundPoints.Add(
-                    new MapPoint(
-                        foundReport.FoundCoordinate.Latitude,
-                        foundReport.FoundCoordinate.Longitude));
-            }
 
             ReportGroups.Add(group);
 

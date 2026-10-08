@@ -74,7 +74,7 @@ public static class MauiProgram
 
         builder.Services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            client.BaseAddress = new Uri("https://10.100.102.27:7074/");
+            client.BaseAddress = new Uri("https://192.168.0.67:7074/");
         })
         .AddHttpMessageHandler<JwtAuthorizationHandler>()
         .ConfigurePrimaryHttpMessageHandler(() => handler);
@@ -93,11 +93,11 @@ public static class MauiProgram
         builder.Services.AddHttpClient<IRouteService, RouteService>(
         client =>
         {
-            client.BaseAddress = new Uri(
-                "https://router.project-osrm.org/");
+            client.BaseAddress = new Uri("https://router.project-osrm.org/");
 
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(
-                "LostFoundPetReporter/1.0");
+
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("LostFoundPetReporter/1.0");
+
         });
 
         builder.Services.AddSingleton<IRouteProgressService, RouteProgressService>();

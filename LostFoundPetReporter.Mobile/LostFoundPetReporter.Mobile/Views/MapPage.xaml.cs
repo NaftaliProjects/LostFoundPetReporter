@@ -11,6 +11,8 @@ using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using NetTopologySuite.Geometries;
 using System.Diagnostics;
+using NetTopologySuite.Geometries;
+using Mapsui.Nts;
 
 namespace LostFoundPetReporter.Mobile.Views;
 
@@ -48,15 +50,15 @@ public partial class MapPage : ContentPage
         _mapControl = new MapControl();
 
         // OpenStreetMap
-        _mapControl.Map?.Layers.Add(
-            OpenStreetMap.CreateTileLayer("LostFoundPetReporter.Mobile/1.0"));
+        _mapControl.Map?.Layers.Add(OpenStreetMap.CreateTileLayer("LostFoundPetReporter.Mobile/1.0"));
+
 
         // Current device location
-        _myLocationLayer = new MyLocationLayer(
-            _mapControl.Map!);
+        _myLocationLayer = new MyLocationLayer(_mapControl.Map!);
 
-        _mapControl.Map?.Layers.Add(
-            _myLocationLayer);
+
+        _mapControl.Map?.Layers.Add(_myLocationLayer);
+
 
         //Direction Layer
         _directionLayer = new MemoryLayer
@@ -64,8 +66,8 @@ public partial class MapPage : ContentPage
             Name = "Direction"
         };
 
-        _mapControl.Map?.Layers.Add(
-            _directionLayer);
+        _mapControl.Map?.Layers.Add(_directionLayer);
+
 
         // Route
         _routeLayer = new MemoryLayer
@@ -73,8 +75,8 @@ public partial class MapPage : ContentPage
             Name = "Route"
         };
 
-        _mapControl.Map?.Layers.Add(
-            _routeLayer);
+        _mapControl.Map?.Layers.Add(_routeLayer);
+
 
         // Lost / Found reports
         _reportsLayer = new MemoryLayer
@@ -82,8 +84,8 @@ public partial class MapPage : ContentPage
             Name = "Reports"
         };
 
-        _mapControl.Map?.Layers.Add(
-            _reportsLayer);
+        _mapControl.Map?.Layers.Add(_reportsLayer);
+
 
         // Handle map taps
         _mapControl.Map!.Tapped += OnMapTapped;
@@ -114,8 +116,8 @@ public partial class MapPage : ContentPage
         _directionUpdateCts?.Cancel();
         _directionUpdateCts = new CancellationTokenSource();
 
-        _ = DirectionUpdateLoopAsync(
-            _directionUpdateCts.Token);
+        _ = DirectionUpdateLoopAsync(_directionUpdateCts.Token);
+
     }
 
     private async Task DirectionUpdateLoopAsync(CancellationToken cancellationToken)
@@ -199,9 +201,7 @@ public partial class MapPage : ContentPage
     }
 
 
-    private void OnHeadingChanged(
-       object? sender,
-       double heading)
+    private void OnHeadingChanged(object? sender, double heading)
     {
         _currentHeading = heading;
     }
@@ -437,6 +437,164 @@ public partial class MapPage : ContentPage
         Debug.WriteLine("======================================");
     }
 
+
+
+
+    private IFeature CreateLine(
+    MPoint start,
+    MPoint end,
+    string color)
+    {
+        var line =
+            new NetTopologySuite.Geometries.LineString(
+                new[]
+                {
+                new NetTopologySuite.Geometries.Coordinate(
+                    start.X,
+                    start.Y),
+
+                new NetTopologySuite.Geometries.Coordinate(
+                    end.X,
+                    end.Y)
+                });
+
+        var feature = new GeometryFeature
+        {
+            Geometry = line
+        };
+
+        feature["Type"] = "FoundPath";
+        feature["Color"] = color;
+
+        feature.Styles.Add(
+            new VectorStyle
+            {
+                Line = new Pen(
+                    GetGroupColor(color),
+                    3)
+            });
+
+        return feature;
+    }
+
+
+
+    private List<IFeature> CreateArrow(
+    MPoint start,
+    MPoint end,
+    string color,
+    double resolution)
+    {
+        var features = new List<IFeature>();
+
+        var dx = end.X - start.X;
+        var dy = end.Y - start.Y;
+
+        var length = Math.Sqrt(
+            dx * dx +
+            dy * dy);
+
+        if (length == 0)
+            return features;
+
+        // Direction: old report -> new report
+        var ux = dx / length;
+        var uy = dy / length;
+
+        // Perpendicular direction
+        var px = -uy;
+        var py = ux;
+
+        // Arrowhead size in screen pixels
+        const double arrowLengthPixels = 14;
+        const double arrowWidthPixels = 9;
+
+        // Convert pixels to map units
+        var arrowLength = arrowLengthPixels * resolution;
+        var arrowWidth = arrowWidthPixels * resolution;
+
+        // Don't allow the arrowhead to become too large
+        // compared to the line itself.
+        arrowLength = Math.Min(
+            arrowLength,
+            length * 0.35);
+
+        arrowWidth = Math.Min(
+            arrowWidth,
+            length * 0.20);
+
+        // Base of the arrowhead
+        var baseX = end.X - ux * arrowLength;
+        var baseY = end.Y - uy * arrowLength;
+
+        // Left corner of arrowhead
+        var left = new MPoint(
+            baseX + px * arrowWidth,
+            baseY + py * arrowWidth);
+
+        // Right corner of arrowhead
+        var right = new MPoint(
+            baseX - px * arrowWidth,
+            baseY - py * arrowWidth);
+
+        // -------------------------
+        // Main line
+        // -------------------------
+
+        features.Add(
+            CreateLine(
+                start,
+                end,
+                color));
+
+        // -------------------------
+        // Filled arrowhead
+        // -------------------------
+
+        var arrowPolygon =
+            new NetTopologySuite.Geometries.Polygon(
+                new NetTopologySuite.Geometries.LinearRing(
+                    new[]
+                    {
+                    new NetTopologySuite.Geometries.Coordinate(
+                        left.X,
+                        left.Y),
+
+                    new NetTopologySuite.Geometries.Coordinate(
+                        end.X,
+                        end.Y),
+
+                    new NetTopologySuite.Geometries.Coordinate(
+                        right.X,
+                        right.Y),
+
+                    new NetTopologySuite.Geometries.Coordinate(
+                        left.X,
+                        left.Y)
+                    }));
+
+        var arrowFeature = new GeometryFeature
+        {
+            Geometry = arrowPolygon
+        };
+
+        arrowFeature["Type"] = "FoundPathArrow";
+        arrowFeature["Color"] = color;
+
+        arrowFeature.Styles.Add(
+            new VectorStyle
+            {
+                Fill = new Mapsui.Styles.Brush(
+                    GetGroupColor(color))
+            });
+
+        features.Add(arrowFeature);
+
+        return features;
+    }
+
+
+
     private void ShowReports()
     {
         if (_mapControl.Map == null)
@@ -444,15 +602,21 @@ public partial class MapPage : ContentPage
 
         var features = new List<IFeature>();
 
+        // Current map resolution.
+        // Used to keep arrowheads visually consistent
+        // when the distance between reports changes.
+        var resolution =
+            _mapControl.Map.Navigator.Viewport.Resolution;
+
         foreach (var group in _viewModel.ReportGroups)
         {
             // -------------------------
             // Lost report marker
             // -------------------------
+
             if (group.LostPoint != null)
             {
                 var point = ToMapPoint(group.LostPoint);
-
 
                 features.Add(
                     CreateMarker(
@@ -465,16 +629,91 @@ public partial class MapPage : ContentPage
             // -------------------------
             // Found report markers
             // -------------------------
-            foreach (var foundPoint in group.FoundPoints)
+
+            foreach (var foundReport in group.FoundReports)
             {
-                var point = ToMapPoint(foundPoint);
+                if (foundReport.FoundCoordinate == null)
+                    continue;
+
+                var geographicPoint = new MapPoint(
+                    foundReport.FoundCoordinate.Latitude,
+                    foundReport.FoundCoordinate.Longitude);
+
+                var point = ToMapPoint(geographicPoint);
 
                 features.Add(
                     CreateMarker(
                         point,
-                        foundPoint,
+                        geographicPoint,
                         group.Color,
                         "Found"));
+            }
+
+            // -------------------------
+            // Lost -> first Found
+            // -------------------------
+
+            if (group.LostPoint != null &&
+                group.FoundReports.Count > 0 &&
+                group.FoundReports[0].FoundCoordinate != null)
+            {
+                var start = ToMapPoint(
+                    new MapPoint(
+                        group.LostPoint.Latitude,
+                        group.LostPoint.Longitude));
+
+                var firstFound =
+                    group.FoundReports[0].FoundCoordinate;
+
+                var end = ToMapPoint(
+                    new MapPoint(
+                        firstFound.Latitude,
+                        firstFound.Longitude));
+
+                features.AddRange(
+                    CreateArrow(
+                        start,
+                        end,
+                        group.Color,
+                        resolution));
+            }
+
+            // -------------------------
+            // Found -> Found
+            // -------------------------
+
+            for (int i = 0;
+                 i < group.FoundReports.Count - 1;
+                 i++)
+            {
+                var currentReport =
+                    group.FoundReports[i];
+
+                var nextReport =
+                    group.FoundReports[i + 1];
+
+                if (currentReport.FoundCoordinate == null ||
+                    nextReport.FoundCoordinate == null)
+                {
+                    continue;
+                }
+
+                var start = ToMapPoint(
+                    new MapPoint(
+                        currentReport.FoundCoordinate.Latitude,
+                        currentReport.FoundCoordinate.Longitude));
+
+                var end = ToMapPoint(
+                    new MapPoint(
+                        nextReport.FoundCoordinate.Latitude,
+                        nextReport.FoundCoordinate.Longitude));
+
+                features.AddRange(
+                    CreateArrow(
+                        start,
+                        end,
+                        group.Color,
+                        resolution));
             }
         }
 

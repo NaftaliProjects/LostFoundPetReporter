@@ -10,7 +10,7 @@ namespace LostFoundPetReporter.Mobile.Models.Map
 
         public MapPoint? LostPoint { get; set; }
 
-        public List<MapPoint> FoundPoints { get; set; } = new();
+        public List<FoundReport> FoundReports { get; set; } = new();
 
         // Color identifier for this group
         public string Color { get; set; } = string.Empty;

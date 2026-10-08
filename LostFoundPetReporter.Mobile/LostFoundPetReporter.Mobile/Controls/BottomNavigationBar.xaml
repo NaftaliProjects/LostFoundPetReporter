@@ -1,40 +1,113 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <ContentView
     x:Class="LostFoundPetReporter.Mobile.Controls.BottomNavigationBar"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Grid
-        Padding="5"
-        ColumnDefinitions="*,*,*,*,*"
-        HeightRequest="70">
+    <Border
+        BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}"
+        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#2C2C2C}"
+        StrokeShape="Rectangle"
+        StrokeThickness="1"
+        Padding="0"
+        Margin="0">
 
-        <Button
-            Grid.Column="0"
-            Text="Profile"
-            Clicked="OnProfileClicked" />
+        <Grid
+            ColumnDefinitions="*,*,*,*,*"
+            HeightRequest="60"
+            VerticalOptions="End">
 
-        <Button
-            Grid.Column="1"
-            Text="Report"
-            Clicked="OnPostFoundReport" />
+            <Button
+                Grid.Column="0"
+                Text="Profile"
+                Clicked="OnProfileClicked"
+                FontSize="11"
+                Padding="0"
+                Margin="0"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
+                ContentLayout="Top,2">
+                <Button.ImageSource>
+                    <FontImageSource
+                        Glyph="👤"
+                        Size="18"
+                        Color="{AppThemeBinding Light=#555555, Dark=#B0B0B0}" />
+                </Button.ImageSource>
+            </Button>
 
-        <Button
-            Grid.Column="2"
-            Text="Home"
-            Clicked="OnHomeClicked" />
+            <Button
+                Grid.Column="1"
+                Text="Report"
+                Clicked="OnPostFoundReport"
+                FontSize="11"
+                Padding="0"
+                Margin="0"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
+                ContentLayout="Top,2">
+                <Button.ImageSource>
+                    <FontImageSource
+                        Glyph="➕"
+                        Size="18"
+                        Color="{AppThemeBinding Light=#555555, Dark=#B0B0B0}" />
+                </Button.ImageSource>
+            </Button>
 
-        <Button
-            Grid.Column="3"
-            Text="Map"
-            Clicked="OnMapClicked" />
+            <Button
+                Grid.Column="2"
+                Text="Home"
+                Clicked="OnHomeClicked"
+                FontSize="11"
+                Padding="0"
+                Margin="0"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
+                ContentLayout="Top,2">
+                <Button.ImageSource>
+                    <FontImageSource
+                        Glyph="🏠"
+                        Size="18"
+                        Color="{AppThemeBinding Light=#555555, Dark=#B0B0B0}" />
+                </Button.ImageSource>
+            </Button>
 
-        <Button
-            Grid.Column="4"
-            Text="MyReports"
-            Clicked="OnReportsClicked" />
+            <Button
+                Grid.Column="3"
+                Text="Map"
+                Clicked="OnMapClicked"
+                FontSize="11"
+                Padding="0"
+                Margin="0"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
+                ContentLayout="Top,2">
+                <Button.ImageSource>
+                    <FontImageSource
+                        Glyph="📍"
+                        Size="18"
+                        Color="{AppThemeBinding Light=#555555, Dark=#B0B0B0}" />
+                </Button.ImageSource>
+            </Button>
 
-    </Grid>
+            <Button
+                Grid.Column="4"
+                Text="My Reports"
+                Clicked="OnReportsClicked"
+                FontSize="11"
+                Padding="0"
+                Margin="0"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}"
+                ContentLayout="Top,2">
+                <Button.ImageSource>
+                    <FontImageSource
+                        Glyph="📋"
+                        Size="18"
+                        Color="{AppThemeBinding Light=#555555, Dark=#B0B0B0}" />
+                </Button.ImageSource>
+            </Button>
+
+        </Grid>
+    </Border>
 
 </ContentView>

@@ -1,6 +1,8 @@
 ﻿
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using Microsoft.IdentityModel.Tokens;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace LostFoundPetReporter.CoreDb.Repos
@@ -177,11 +179,30 @@ namespace LostFoundPetReporter.CoreDb.Repos
         }
 
 
-        internal IOrderedQueryable<Report> ApplayFullInclude(IQueryable<Report> query)
-            => query.Include(x => x.ReportExtFilesNevigation).Include(c => c.ReportCoordinateNavigation).OrderBy(o => o.DateReported);
+        internal IQueryable<Report> ApplayFullInclude(IQueryable<Report> query)
+            => query.Include(x => x.ReportExtFilesNevigation).Include(c => c.ReportCoordinateNavigation)
 
+        internal IQueryable<Report> ApplpyReportType(string type, IQueryable<Report> query)
+        {
+            if (type.IsNullOrEmpty())
+                return query;
 
-        public override IOrderedQueryable<Report> GetAll() => ApplayFullInclude(base.GetAll());
+            if (type.ToLower().Equals("l"))
+                return query.Where(r => r.ReportType.ToLower().Equals("l"));
+            else
+                return query.Where(r => r.ReportType.ToLower().Equals("f"));
+        }
+
+        internal IOrderedQueryable<Report> BuildBaseQuey(string type)
+        {
+            
+            if (type.IsNullOrEmpty())
+                return Table.OrderBy(r => r.DateReported);
+            else
+                return ApplpyReportType(type,ApplayFullInclude(Table)).OrderBy(r => r.DateReported);
+        }
+
+        public  IOrderedQueryable<Report> GetAll(string type) => BuildBaseQuey(type).Base.GetAll();
 
         public override IOrderedQueryable<Report> GetAllIgnoreQueryFillters() => ApplayFullInclude(base.GetAllIgnoreQueryFillters());
 

@@ -1,5 +1,6 @@
 ﻿using LostFoundPetReporter.API.DTO.Interfaces;
 using LostFoundPetReporter.CoreDb.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LostFoundPetReporter.API.DTO
 {
@@ -28,9 +29,17 @@ namespace LostFoundPetReporter.API.DTO
     public class CreateUserDto : IEntityDto<User>, IHasId
     {
         public int? Id { get; set; }
+
+        [Required]
         public string Name { get; set; } = string.Empty;
+
+        [Required]
         public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+
         public string Phone { get; set; } = string.Empty;
 
 
@@ -51,8 +60,11 @@ namespace LostFoundPetReporter.API.DTO
 
     public class LoginUserDto
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+        [Required]
         public string Password { get; set; } = string.Empty;
     }
 

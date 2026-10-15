@@ -8,23 +8,17 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
         TRepo CreateRepository<TRepo>() where TRepo : class;
     }
 
-    public interface IBaseViewRepo<T> : IDisposable where T : class, new()
+
+
+    public interface IBaseRepo<T>  where T : BaseModel
     {
         PetReporterContext Context { get; }
-        IEnumerable<T> ExcuteSqlString(string sql);
-        IEnumerable<T> GetAll();
-        IEnumerable<T> GetAllIgnoreQueryFillters();
+        IQueryable<T> GetAll();
+        IQueryable<T> GetAllIgnoreQueryFillters();
 
-    }
-
-
-
-    public interface IBaseRepo<T> : IBaseViewRepo<T> where T : BaseModel, new()
-    {
         T Find(int? id);
         T FindAsNoTracking(int id);
         T FindIgnoreQueryFilters(int id);
-        void ExecuteQueryFilters(int id);
         int Add(T entity, bool persist = true);
         int AddRange(IEnumerable<T> entities, bool persist = true);
         int Update(T entity, bool persist = true);
@@ -46,31 +40,38 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 
     public interface IUserRepo : IBaseRepo<User>
     {
-        IEnumerable<User> GetAllByUserId(int id);
-
         public User? GetByEmail(string email);
     }
 
+
+    public interface IReportRepo : IBaseRepo<Report>
+    {
+        IOrderedQueryable<Report> GetAllByUserId(int userId);
+        IQueryable<Report> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
+
+    }
+
+
     public interface IFoundReportRepo : IBaseRepo<FoundReport>
     {
-        IEnumerable<FoundReport> GetAllByUserId(int userId);
-        IEnumerable<FoundReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
+        IOrderedQueryable<FoundReport> GetAllByUserId(int userId);
+        IQueryable<FoundReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
 
     }
 
     public interface ILostReportRepo : IBaseRepo<LostReport>
     {
-        IEnumerable<LostReport> GetAllByUserId(int userId);
-        IEnumerable<LostReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
+        IQueryable<LostReport> GetAllByUserId(int userId);
+        IQueryable<LostReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
     }
 
     public interface ILostFoundMatchRepo : IBaseRepo<LostFoundMatch>
     {
-        IEnumerable<LostFoundMatch> GetByLostReportId(int lostReportId);
-        IEnumerable<LostFoundMatch> GetByFoundReportId(int foundReportId);
+        IQueryable<LostFoundMatch> GetByLostReportId(int lostReportId);
+        IQueryable<LostFoundMatch> GetByFoundReportId(int foundReportId);
         bool MatchExists(int lostReportId, int foundReportId);
-        IEnumerable<int> GetFoundReportIdsForLostReport(int lostReportId);
-        IEnumerable<int> GetLostReportIdsForFoundReport(int foundReportId);
+        IQueryable<int> GetFoundReportIdsForLostReport(int lostReportId);
+        IQueryable<int> GetLostReportIdsForFoundReport(int foundReportId);
     }
 
 

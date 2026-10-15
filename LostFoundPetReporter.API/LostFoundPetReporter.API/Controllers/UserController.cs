@@ -5,6 +5,7 @@ using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 
@@ -17,10 +18,15 @@ namespace LostFoundPetReporter.API.Controllers
         private readonly IJwtService _jwtService;
         private readonly IUserDeviceRepo _userDeviceRepo;
 
-        public UserController(IUserRepo repo, IJwtService jwtService, IUserDeviceRepo userDeviceRepo) : base(repo)
+        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly ILogger<UserController> _logger;
+
+        public UserController(IUserRepo repo, IJwtService jwtService, IUserDeviceRepo userDeviceRepo, IPasswordHasher<User> passwordHasher, ILogger<UserController> logger) : base(repo)
         {
             _jwtService = jwtService;
             _userDeviceRepo = userDeviceRepo;
+            _passwordHasher = passwordHasher;
+            _logger = logger;
         }
 
 
@@ -37,15 +43,14 @@ namespace LostFoundPetReporter.API.Controllers
                 return Unauthorized("Invalid Email or password.");
             }
 
-            if (user.HashedPassword != loginDto.Password)
+            var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, loginDto.Password);
+
+            if (verificationResult == PasswordVerificationResult.Failed)
             {
                 return Unauthorized("Invalid email or password.");
             }
 
-            var token = _jwtService.CreateToken(
-                user.Id,
-                user.Email,
-                out var expiresAt);
+            var token = _jwtService.CreateToken(user.Id, user.Email, out var expiresAt);
 
             return Ok(new LoginResponseDto
             {
@@ -65,8 +70,21 @@ namespace LostFoundPetReporter.API.Controllers
 
             var entity = createDto.ToEntity();
 
-            try { _mainRepo.Add(entity); }
-            catch (Exception ex) { return BadRequest(ex); }
+            entity.HashedPassword = _passwordHasher.HashPassword(entity, createDto.Password);
+
+
+            try
+            {
+                _mainRepo.Add(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to register user.");
+
+                return Problem(
+                    title: "Registration failed.",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
 
             return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, UserDto.FromEntity(entity));
         }

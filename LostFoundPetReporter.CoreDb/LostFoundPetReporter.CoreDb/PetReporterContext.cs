@@ -53,7 +53,7 @@ namespace LostFoundPetReporter.CoreDb
                 entity.Property(p => p.Name).HasMaxLength(20);
                 entity.Property(p => p.Email).HasMaxLength(30);
                 entity.Property(p => p.Phone).HasMaxLength(12);
-                entity.Property(p => p.HashedPassword).HasMaxLength(64);
+                entity.Property(p => p.HashedPassword).HasMaxLength(256);
 
 
             });

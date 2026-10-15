@@ -18,19 +18,26 @@ using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using LostFoundPetReporter.Services.API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
-
-
-
 var builder = WebApplication.CreateBuilder(args);
+
+using StreamReader reader = new("Firebase/firebase-service-account.json");
+
+
+
+//Credential = GoogleCredential.FromFile("Firebase/firebase-service-account.json")
 
 FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile("Firebase/firebase-service-account.json")
+
+    Credential = CredentialFactory.FromFile<AppOptions>("Firebase/firebase-service-account.json").Credential
 });
+
 
 builder.Services.AddControllers(options =>
 {
@@ -116,6 +123,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             )
         };
     });
+
+
+//Hasher
+builder.Services.AddScoped<
+    IPasswordHasher<User>,
+    PasswordHasher<User>>();
+
 
 
 

@@ -16,14 +16,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="LostFoundPetReporter.CoreDb">
-      <HintPath>..\..\LostFoundPetReporter.CoreDb\LostFoundPetReporter.CoreDb\bin\Debug\net10.0\LostFoundPetReporter.CoreDb.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+
 
   <ItemGroup>
     <Folder Include="Firebase\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\LostFoundPetReporter.CoreDb\LostFoundPetReporter.CoreDb\LostFoundPetReporter.CoreDb.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,21 +1,24 @@
 ﻿
 using LostFoundPetReporter.CoreDb.Models;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
-using Microsoft.IdentityModel.Tokens;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace LostFoundPetReporter.CoreDb.Repos
 {
-    
-    public abstract class BaseRepo<T> :  IBaseRepo<T> where T : BaseModel
+    // =========================================================
+    // Base Repository
+    // =========================================================
+
+    public abstract class BaseRepo<T> : IBaseRepo<T>
+        where T : BaseModel
     {
         protected DbSet<T> Table { get; }
+
         public PetReporterContext Context { get; }
+
         public int LimitResult { get; set; } = 100;
 
-
-        protected BaseRepo(PetReporterContext context) 
+        protected BaseRepo(PetReporterContext context)
         {
             Context = context;
             Table = Context.Set<T>();
@@ -23,39 +26,70 @@ namespace LostFoundPetReporter.CoreDb.Repos
 
         protected IQueryable<T> ApplyLimit(IQueryable<T> query)
         {
-            if (LimitResult > 0)
-                query = query.Take(LimitResult);
-
-            return query;
+            return LimitResult > 0
+                ? query.Take(LimitResult)
+                : query;
         }
 
+        // Query builders: derived repositories can customize these.
+        protected virtual IQueryable<T> BuildGetAllQuery()
+            => Table.OrderByDescending(x => x.Id);
 
-        public virtual IQueryable<T> GetAll() => ApplyLimit(Table.OrderByDescending(x => x.Id));
+        protected virtual IQueryable<T> BuildGetAllIgnoreQueryFiltersQuery()
+            => Table.IgnoreQueryFilters()
+                     .OrderByDescending(x => x.Id);
 
+        // Public read methods: execute queries before returning.
+        public virtual IEnumerable<T> GetAll()
+            => ApplyLimit(BuildGetAllQuery()).ToList();
 
-        public virtual IQueryable<T> GetAllIgnoreQueryFillters() => ApplyLimit(Table.IgnoreQueryFilters().OrderByDescending(x => x.Id));
+        public virtual IEnumerable<T> GetAllIgnoreQueryFillters()
+            => ApplyLimit(BuildGetAllIgnoreQueryFiltersQuery())
+                .ToList();
 
-        public virtual T Find(int? id) => Table.Find(id)!;
-        public virtual T FindAsNoTracking(int id) => Table.AsNoTracking().FirstOrDefault(x => x.Id == id)!;
-        public virtual T FindIgnoreQueryFilters(int id) => Table.IgnoreQueryFilters().FirstOrDefault(x => x.Id == id)!;
+        public virtual T Find(int? id)
+            => Table.Find(id)!;
 
+        public virtual T FindAsNoTracking(int id)
+            => Table.AsNoTracking()
+                    .FirstOrDefault(x => x.Id == id)!;
+
+        public virtual T FindIgnoreQueryFilters(int id)
+            => Table.IgnoreQueryFilters()
+                    .FirstOrDefault(x => x.Id == id)!;
+
+        // Create
         public virtual int Add(T entity, bool persist = true)
         {
             Table.Add(entity);
             return persist ? SaveChanges() : 0;
         }
 
-        public virtual int AddRange(IEnumerable<T> entities, bool persist = true)
+        public virtual int AddRange(
+            IEnumerable<T> entities,
+            bool persist = true)
         {
             Table.AddRange(entities);
             return persist ? SaveChanges() : 0;
         }
-        public virtual int Update(T entity,T updatedEntity, bool persist = true)
+
+        // Update using non-null/non-empty values from updatedEntity.
+        public virtual int Update(
+            T entity,
+            T updatedEntity,
+            bool persist = true)
         {
             var properties = typeof(T).GetProperties();
 
             foreach (var property in properties)
             {
+                if (!property.CanRead || !property.CanWrite)
+                    continue;
+
+                // Never update the primary key through this method.
+                if (property.Name == nameof(BaseModel.Id))
+                    continue;
+
                 var updatedValue = property.GetValue(updatedEntity);
 
                 if (updatedValue == null)
@@ -73,27 +107,35 @@ namespace LostFoundPetReporter.CoreDb.Repos
             return persist ? SaveChanges() : 0;
         }
 
-
         public virtual int Update(T entity, bool persist = true)
         {
             Table.Update(entity);
             return persist ? SaveChanges() : 0;
         }
-        public virtual int UpdateRange(IEnumerable<T> entities, bool persist = true)
+
+        public virtual int UpdateRange(
+            IEnumerable<T> entities,
+            bool persist = true)
         {
             Table.UpdateRange(entities);
-            return persist ? SaveChanges() : 0; 
+            return persist ? SaveChanges() : 0;
         }
+
+        // Delete
         public virtual int Delete(T entity, bool persist = true)
         {
             Table.Remove(entity);
             return persist ? SaveChanges() : 0;
         }
-        public virtual int DeleteRange(IEnumerable<T> entities, bool persist = true)
+
+        public virtual int DeleteRange(
+            IEnumerable<T> entities,
+            bool persist = true)
         {
             Table.RemoveRange(entities);
             return persist ? SaveChanges() : 0;
         }
+
         public virtual int Delete(int id, bool persist = true)
         {
             var entity = Table.Find(id);
@@ -106,7 +148,7 @@ namespace LostFoundPetReporter.CoreDb.Repos
             return persist ? SaveChanges() : 0;
         }
 
-
+        // Persistence
         public int SaveChanges()
         {
             try
@@ -115,30 +157,30 @@ namespace LostFoundPetReporter.CoreDb.Repos
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred updating the database", ex);
+                throw new Exception(
+                    "An error occurred updating the database", ex);
             }
         }
     }
 
 
+    // =========================================================
+    // User Device Repository
+    // =========================================================
 
-
-
-
-    //Entity-Specific Repositories Imp
-    public class UserDeviceRepo : BaseRepo<UserDevice>, IUserDeviceRepo
+    public class UserDeviceRepo
+        : BaseRepo<UserDevice>, IUserDeviceRepo
     {
-        public UserDeviceRepo(PetReporterContext context) : base(context) { }
+        public UserDeviceRepo(PetReporterContext context)
+            : base(context)
+        {
+        }
 
         public UserDevice? GetByUserId(int userId)
-        {
-            return Table.FirstOrDefault(x => x.UserId == userId);
-        }
+            => Table.FirstOrDefault(x => x.UserId == userId);
 
         public UserDevice? GetByToken(string token)
-        {
-            return Table.FirstOrDefault(x => x.Token == token);
-        }
+            => Table.FirstOrDefault(x => x.Token == token);
 
         public void RegisterDevice(UserDevice device)
         {
@@ -159,189 +201,279 @@ namespace LostFoundPetReporter.CoreDb.Repos
     }
 
 
+    // =========================================================
+    // User Repository
+    // =========================================================
 
     public class UserRepo : BaseRepo<User>, IUserRepo
     {
-        public UserRepo(PetReporterContext context) : base(context)
+        public UserRepo(PetReporterContext context)
+            : base(context)
         {
         }
 
-        public User GetByEmail(string email) => ApplyLimit(Table.Where(u => u.Email == email)).FirstOrDefault()!;
-
+        public User? GetByEmail(string email)
+            => Table.FirstOrDefault(u => u.Email == email);
     }
 
 
+    // =========================================================
+    // Report Repository
+    // Responsible for report type and report-specific filters.
+    // =========================================================
 
     public class ReportRepo : BaseRepo<Report>, IReportRepo
     {
-        public ReportRepo(PetReporterContext context) : base(context)
+        private readonly string _type;
+
+        public ReportRepo(PetReporterContext context, string type)
+            : base(context)
+        {
+            _type = type;
+        }
+
+        protected override IQueryable<Report> BuildGetAllQuery()
+            => base.BuildGetAllQuery()
+                .Where(r => r.ReportType == _type);
+
+        protected override IQueryable<Report>
+            BuildGetAllIgnoreQueryFiltersQuery()
+            => base.BuildGetAllIgnoreQueryFiltersQuery()
+                .Where(r => r.ReportType == _type);
+
+        protected virtual IQueryable<Report> BuildGetAllByUserIdQuery(
+            int userId)
+            => Table.Where(r =>
+                    r.UserId == userId &&
+                    r.ReportType == _type)
+                .OrderByDescending(r => r.Id);
+
+        protected virtual IQueryable<Report>
+            BuildGetReportsInDateRangeQuery(
+                DateTime fromDate,
+                DateTime toDate)
+            => Table.Where(r =>
+                    r.ReportType == _type &&
+                    r.DateReported >= fromDate &&
+                    r.DateReported <= toDate)
+                .OrderByDescending(r => r.Id);
+
+        public virtual IEnumerable<Report> GetAllByUserId(int userId)
+            => ApplyLimit(
+                BuildGetAllByUserIdQuery(userId))
+                .ToList();
+
+        public virtual IEnumerable<Report> GetReportsInDateRange(
+            DateTime fromDate,
+            DateTime toDate)
+            => ApplyLimit(
+                BuildGetReportsInDateRangeQuery(fromDate, toDate))
+                .ToList();
+
+        public override Report Find(int? id)
+        {
+            if (!id.HasValue)
+                return null!;
+
+            return Table.FirstOrDefault(r =>
+                r.Id == id.Value &&
+                r.ReportType == _type)!;
+        }
+
+        public override Report FindAsNoTracking(int id)
+    => Table
+        .AsNoTracking()
+        .FirstOrDefault(r =>
+            r.Id == id &&
+            r.ReportType == _type)!;
+
+        public override Report FindIgnoreQueryFilters(int id)
+            => Table
+                .IgnoreQueryFilters()
+                .FirstOrDefault(r =>
+                    r.Id == id &&
+                    r.ReportType == _type)!;
+    }
+
+
+    // =========================================================
+    // Found Report Repository
+    // Responsible only for loading found-report navigation data.
+    // =========================================================
+
+    public class FoundReportRepo
+        : ReportRepo, IFoundReportRepo
+    {
+        public FoundReportRepo(PetReporterContext context)
+            : base(context, "f")
         {
         }
 
+        protected override IQueryable<Report> BuildGetAllQuery()
+            => base.BuildGetAllQuery()
+                .Include(x => x.ReportExtFilesNevigation)
+                .Include(x => x.ReportCoordinateNavigation);
 
-        internal IQueryable<Report> ApplayFullInclude(IQueryable<Report> query)
-            => query.Include(x => x.ReportExtFilesNevigation).Include(c => c.ReportCoordinateNavigation)
+        protected override IQueryable<Report>
+            BuildGetAllIgnoreQueryFiltersQuery()
+            => base.BuildGetAllIgnoreQueryFiltersQuery()
+                .Include(x => x.ReportExtFilesNevigation)
+                .Include(x => x.ReportCoordinateNavigation);
 
-        internal IQueryable<Report> ApplpyReportType(string type, IQueryable<Report> query)
-        {
-            if (type.IsNullOrEmpty())
-                return query;
 
-            if (type.ToLower().Equals("l"))
-                return query.Where(r => r.ReportType.ToLower().Equals("l"));
-            else
-                return query.Where(r => r.ReportType.ToLower().Equals("f"));
-        }
-
-        internal IOrderedQueryable<Report> BuildBaseQuey(string type)
-        {
-            
-            if (type.IsNullOrEmpty())
-                return Table.OrderBy(r => r.DateReported);
-            else
-                return ApplpyReportType(type,ApplayFullInclude(Table)).OrderBy(r => r.DateReported);
-        }
-
-        public  IOrderedQueryable<Report> GetAll(string type) => BuildBaseQuey(type).Base.GetAll();
-
-        public override IOrderedQueryable<Report> GetAllIgnoreQueryFillters() => ApplayFullInclude(base.GetAllIgnoreQueryFillters());
-
-        public IOrderedQueryable<Report> GetAllByUserId(int userId) => ApplayFullInclude(ApplyLimit(Table.Where(u => u.UserId == userId)));
-
-        public IQueryable<Report> GetReportsInDateRange(DateTime fromDate, DateTime toDate)
-        {
-            return GetAll().Where(x => x.DateReported >= fromDate && x.DateReported <= toDate);
-        }
 
 
     }
 
 
+    // =========================================================
+    // Lost Report Repository
+    // Adds minimal Includes for lists and full Includes for Find.
+    // =========================================================
 
-
-
-
-    public class FoundReportRepo : BaseRepo<FoundReport>, IFoundReportRepo
+    public class LostReportRepo
+        : ReportRepo, ILostReportRepo
     {
-        public FoundReportRepo(PetReporterContext context) : base(context)
+        public LostReportRepo(PetReporterContext context)
+            : base(context, "l")
         {
         }
 
-
-        internal IOrderedQueryable<FoundReport> ApplayFullInclude(IQueryable<FoundReport> query)
-            => query.Include(x => x.FoundReportExtFilesNevigation).Include(c => c.FoundCoordinateNavigation).OrderBy(o=>o.dateTime);
-
-       
-        public override IOrderedQueryable<FoundReport> GetAll() => ApplayFullInclude(base.GetAll());
-
-        public override IOrderedQueryable<FoundReport> GetAllIgnoreQueryFillters() => ApplayFullInclude(base.GetAllIgnoreQueryFillters());
-
-        public IOrderedQueryable<FoundReport> GetAllByUserId(int userId) => ApplayFullInclude(ApplyLimit(Table.Where(u => u.UserId == userId)));
-
-        public IQueryable<FoundReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate)
-        {
-            return GetAll().Where(x => x.dateTime >= fromDate && x.dateTime <= toDate);
-        }
-
-
-    }
-
-
-    public class LostReportRepo : BaseRepo<LostReport>, ILostReportRepo
-    {
-        public LostReportRepo(PetReporterContext context) : base(context)
-        {
-        }
-
-
-        internal IOrderedQueryable<FoundReport> ApplayFullInclude(IQueryable<FoundReport> query)
-            => query.Include(x => x.FoundReportExtFilesNevigation).Include(c => c.FoundCoordinateNavigation).OrderBy(o => o.dateTime);
-
-
-
-        internal IOrderedQueryable<LostReport> ApplayMinimalInclude(IQueryable<LostReport> query)
+        private IQueryable<Report> ApplyMinimalIncludes(
+            IQueryable<Report> query)
             => query
-                .Include(x => x.LostReportExtFilesNevigation)
-                .Include(x => x.User)
-                .OrderBy(x => x.dateTime);
+                .Include(x => x.ReportExtFilesNevigation)
+                .Include(x => x.UserNevigation);
 
-                
+        private IQueryable<Report> ApplyFullIncludes(
+            IQueryable<Report> query)
+            => query
+                .Include(x => x.UserNevigation)
+                .Include(x => x.ReportExtFilesNevigation)
+                .Include(x => x.ReportCoordinateNavigation)
+                .Include(x => x.LostFoundMatchNevigation)
+                    .ThenInclude(x => x.LostReportNevigation)
+                    .ThenInclude(x => x.ReportCoordinateNavigation)
+                .Include(x => x.LostFoundMatchNevigation)
+                    .ThenInclude(x => x.FoundReportNevigation)
+                    .ThenInclude(x => x.ReportExtFilesNevigation);
 
-        internal IQueryable<LostReport> ApplayFullInclude(IQueryable<LostReport> table)
-        => table
-            .Include(x => x.User)
-            .Include(x => x.LostReportExtFilesNevigation)
-            .Include(c => c.LostCoordinateNavigation)
-            .Include(x => x.LostFoundMatchNevigation)
-                .ThenInclude(x => x.FoundReportNevigation)
-                .ThenInclude(x => x.FoundCoordinateNavigation)
-            .Include(x => x.LostFoundMatchNevigation)
-                .ThenInclude(x => x.FoundReportNevigation)
-                .ThenInclude(x => x.FoundReportExtFilesNevigation);
+        protected override IQueryable<Report> BuildGetAllQuery()
+            => ApplyMinimalIncludes(base.BuildGetAllQuery());
 
-        public override LostReport Find(int? id) => ApplayFullInclude(Table).FirstOrDefault(x => x.Id == id!.Value)!;
+        protected override IQueryable<Report>
+            BuildGetAllIgnoreQueryFiltersQuery()
+            => ApplyMinimalIncludes(
+                base.BuildGetAllIgnoreQueryFiltersQuery());
 
-        public override IOrderedQueryable<LostReport> GetAll() => ApplayMinimalInclude(base.GetAll());
+        protected override IQueryable<Report>
+            BuildGetAllByUserIdQuery(int userId)
+            => ApplyMinimalIncludes(
+                base.BuildGetAllByUserIdQuery(userId));
 
-        public override IOrderedQueryable<LostReport> GetAllIgnoreQueryFillters() => ApplayMinimalInclude(base.GetAllIgnoreQueryFillters());
+        protected override IQueryable<Report>
+            BuildGetReportsInDateRangeQuery(
+                DateTime fromDate,
+                DateTime toDate)
+            => ApplyMinimalIncludes(
+                base.BuildGetReportsInDateRangeQuery(
+                    fromDate, toDate));
 
-        public IQueryable<LostReport> GetAllByUserId(int userId) => ApplayMinimalInclude(ApplyLimit(Table.Where(u => u.UserId == userId)));
+        public override Report Find(int? id)
+        {
+            if (!id.HasValue)
+                return null!;
 
-
-        public IQueryable<LostReport> GetReportsInDateRange(DateTime fromDate, DateTime toDate)
-            => ApplayMinimalInclude(Table.Where(x => x.dateTime >= fromDate && x.dateTime <= toDate)).OrderBy(x => x.dateTime);
-        
+            return ApplyFullIncludes(
+                    Table.Where(x =>
+                        x.Id == id.Value &&
+                        x.ReportType == "l"))
+                .FirstOrDefault()!;
+        }
     }
 
 
-    public class LostFoundMatchRepo : BaseRepo<LostFoundMatch>, ILostFoundMatchRepo
+    // =========================================================
+    // Lost/Found Match Repository
+    // =========================================================
+
+    public class LostFoundMatchRepo
+        : BaseRepo<LostFoundMatch>, ILostFoundMatchRepo
     {
-        public LostFoundMatchRepo(PetReporterContext context) : base(context)
+        public LostFoundMatchRepo(PetReporterContext context)
+            : base(context)
         {
         }
 
-
-
-        protected virtual IQueryable<LostFoundMatch> ApplyFullInclude(IQueryable<LostFoundMatch> query)
-        {
-            return query
+        protected IQueryable<LostFoundMatch> ApplyFullIncludes(
+            IQueryable<LostFoundMatch> query)
+            => query
                 .Include(m => m.LostReportNevigation)
-                    .ThenInclude(l => l.LostReportExtFilesNevigation)
+                    .ThenInclude(l => l.ReportExtFilesNevigation)
                 .Include(m => m.FoundReportNevigation)
-                    .ThenInclude(f => f.FoundReportExtFilesNevigation);
-        }
+                    .ThenInclude(f => f.ReportExtFilesNevigation);
 
-        
+        protected override IQueryable<LostFoundMatch> BuildGetAllQuery()
+            => ApplyFullIncludes(base.BuildGetAllQuery());
 
-        public override IQueryable<LostFoundMatch> GetAll()
-            => ApplyFullInclude(base.GetAll());
-
-        public override IQueryable<LostFoundMatch> GetAllIgnoreQueryFillters()
-            => ApplyFullInclude(base.GetAllIgnoreQueryFillters());
+        protected override IQueryable<LostFoundMatch>
+            BuildGetAllIgnoreQueryFiltersQuery()
+            => ApplyFullIncludes(
+                base.BuildGetAllIgnoreQueryFiltersQuery());
 
         public override LostFoundMatch Find(int? id)
-            => ApplyFullInclude(Table).FirstOrDefault(x => x.Id == id!.Value)!;
+        {
+            if (!id.HasValue)
+                return null!;
 
-        public IQueryable<LostFoundMatch> GetByLostReportId(int lostReportId)
-            => ApplyFullInclude(Table.Where(m => m.LostReportId == lostReportId));
+            return ApplyFullIncludes(
+                    Table.Where(x => x.Id == id.Value))
+                .FirstOrDefault()!;
+        }
 
+        public IEnumerable<LostFoundMatch> GetByLostReportId(
+            int lostReportId)
+            => ApplyLimit(
+                ApplyFullIncludes(
+                    Table.Where(m => m.LostReportId == lostReportId)))
+                .ToList();
 
+        public IEnumerable<LostFoundMatch> GetByFoundReportId(
+            int foundReportId)
+            => ApplyLimit(
+                ApplyFullIncludes(
+                    Table.Where(m => m.FoundReportId == foundReportId)))
+                .ToList();
 
-        public IQueryable<LostFoundMatch> GetByFoundReportId(int foundReportId)
-            => ApplyFullInclude(Table.Where(m => m.FoundReportId == foundReportId));
+        public bool MatchExists(
+            int lostReportId,
+            int foundReportId)
+            => Table.Any(m =>
+                m.LostReportId == lostReportId &&
+                m.FoundReportId == foundReportId);
 
-              
+        public IEnumerable<int> GetFoundReportIdsForLostReport(
+            int lostReportId)
+        {
+            var query = Table
+                .Where(m => m.LostReportId == lostReportId)
+                .Select(m => m.FoundReportId);
 
-        public bool MatchExists(int lostReportId, int foundReportId)
-            => Table.Any(m => m.LostReportId == lostReportId && m.FoundReportId == foundReportId);
+            return LimitResult > 0
+                ? query.Take(LimitResult).ToList()
+                : query.ToList();
+        }
 
+        public IEnumerable<int> GetLostReportIdsForFoundReport(
+            int foundReportId)
+        {
+            var query = Table
+                .Where(m => m.FoundReportId == foundReportId)
+                .Select(m => m.LostReportId);
 
-        public IQueryable<int> GetFoundReportIdsForLostReport(int lostReportId)
-            => base.GetAll().Where(m => m.LostReportId == lostReportId).Select(m => m.FoundReportId);
-
-
-        public IQueryable<int> GetLostReportIdsForFoundReport(int foundReportId)
-            => base.GetAll().Where(m => m.FoundReportId == foundReportId).Select(m => m.LostReportId);
-
+            return LimitResult > 0
+                ? query.Take(LimitResult).ToList()
+                : query.ToList();
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
     public abstract class BaseCrudController<TEntity, TResponseDto, TCreateOrUpdateDto> : ControllerBase
-        where TEntity : BaseModel, new()
+        where TEntity : BaseModel
         where TResponseDto : IResponseDto<TEntity, TResponseDto>
         where TCreateOrUpdateDto : IEntityDto<TEntity>, IHasId 
     {
@@ -61,7 +61,7 @@ namespace LostFoundPetReporter.API.Controllers.Base
         [HttpGet("{id}")]
         public ActionResult<TResponseDto> GetOne(int id)
         {
-            var entity = _mainRepo.Find(id);
+            var entity = GetOneEntity(id);
 
             if (entity == null)
             {
@@ -69,8 +69,10 @@ namespace LostFoundPetReporter.API.Controllers.Base
             }
 
             return Ok(TResponseDto.FromEntity(entity));
-
         }
+
+        protected virtual TEntity? GetOneEntity(int id)
+         => _mainRepo.Find(id);
 
 
         // =========================

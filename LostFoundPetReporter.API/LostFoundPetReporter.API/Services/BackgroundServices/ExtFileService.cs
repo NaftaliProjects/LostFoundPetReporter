@@ -51,7 +51,7 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             IBaseRepo<TReport> repo,
             ReportType type,
             CancellationToken cancellationToken)
-            where TReport : BaseModel, new()
+            where TReport : BaseModel
         {
             var entity = repo.Find(reportId);
 
@@ -70,12 +70,12 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 
                 if (type == ReportType.Found)
                 {
-                    var foundReport = (FoundReport)(object)entity;
+                    var foundReport = (Report)(object)entity;
 
-                    foundReport.FoundReportExtFilesNevigation.Add(
-                        new FoundReportExtFile
+                    foundReport.ReportExtFilesNevigation.Add(
+                        new ExtFile
                         {
-                            FoundReportId = reportId,
+                            ReportId = reportId,
                             FilePath = storedFile.FilePath,
                             FileName = storedFile.FileName,
                             Description = storedFile.FileType
@@ -83,12 +83,12 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
                 }
                 else
                 {
-                    var lostReport = (LostReport)(object)entity;
+                    var lostReport = (Report)(object)entity;
 
-                    lostReport.LostReportExtFilesNevigation.Add(
-                        new LostReportExtFile
+                    lostReport.ReportExtFilesNevigation.Add(
+                        new ExtFile
                         {
-                            LostReportId = reportId,
+                            ReportId = reportId,
                             FilePath = storedFile.FilePath,
                             FileName = storedFile.FileName,
                             Description = storedFile.FileType

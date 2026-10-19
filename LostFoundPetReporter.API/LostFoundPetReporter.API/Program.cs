@@ -35,7 +35,7 @@ using StreamReader reader = new("Firebase/firebase-service-account.json");
 FirebaseApp.Create(new AppOptions
 {
 
-    Credential = CredentialFactory.FromFile<AppOptions>("Firebase/firebase-service-account.json").Credential
+    Credential = GoogleCredential.FromFile("Firebase/firebase-service-account.json")
 });
 
 

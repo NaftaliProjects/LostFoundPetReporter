@@ -1,5 +1,6 @@
 ﻿
 using LostFoundPetReporter.CoreDb.Models;
+using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 {
@@ -8,32 +9,30 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
         TRepo CreateRepository<TRepo>() where TRepo : class;
     }
 
-    public interface IBaseRepo<T> where T : BaseModel
+    public interface IBaseViewRepo<T> : IDisposable where T : class
     {
         PetReporterContext Context { get; }
-
-        // Read operations
+        IEnumerable<T> ExcuteSqlString(string sql);
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAllIgnoreQueryFillters();
 
-        T Find(int? id);
+    }
+
+
+
+    public interface IBaseRepo<T> : IBaseViewRepo<T> where T : BaseModel
+    {
+        T? Find(int? id);
         T FindAsNoTracking(int id);
         T FindIgnoreQueryFilters(int id);
-
-        // Create operations
+        void ExecuteQueryFilters(int id);
         int Add(T entity, bool persist = true);
         int AddRange(IEnumerable<T> entities, bool persist = true);
-
-        // Update operations
         int Update(T entity, bool persist = true);
-        int Update(T entity, T updatedEntity, bool persist = true);
+        int Update(T entity,T updatedEntity, bool persist = true);
         int UpdateRange(IEnumerable<T> entities, bool persist = true);
-
-        // Delete operations
         int Delete(T entity, bool persist = true);
         int DeleteRange(IEnumerable<T> entities, bool persist = true);
-
-        // Persistence
         int SaveChanges();
     }
 
@@ -48,22 +47,25 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
 
     public interface IUserRepo : IBaseRepo<User>
     {
-        User? GetByEmail(string email);
+        IEnumerable<User> GetAllByUserId(int id);
+
+        public User? GetByEmail(string email);
     }
+
 
     public interface IReportRepo : IBaseRepo<Report>
     {
         IEnumerable<Report> GetAllByUserId(int userId);
+        IEnumerable<Report> GetReportsInDateRange(DateTime fromDate, DateTime toDate);
 
-        IEnumerable<Report> GetReportsInDateRange(
-            DateTime fromDate,
-            DateTime toDate);
     }
+
 
     public interface IFoundReportRepo : IReportRepo
     {
-
+        
     }
+}
 
     public interface ILostReportRepo : IReportRepo
     {
@@ -73,13 +75,12 @@ namespace LostFoundPetReporter.CoreDb.ReposInterfaces
     public interface ILostFoundMatchRepo : IBaseRepo<LostFoundMatch>
     {
         IEnumerable<LostFoundMatch> GetByLostReportId(int lostReportId);
-
         IEnumerable<LostFoundMatch> GetByFoundReportId(int foundReportId);
-
         bool MatchExists(int lostReportId, int foundReportId);
-
         IEnumerable<int> GetFoundReportIdsForLostReport(int lostReportId);
-
         IEnumerable<int> GetLostReportIdsForFoundReport(int foundReportId);
     }
-}
+
+
+
+

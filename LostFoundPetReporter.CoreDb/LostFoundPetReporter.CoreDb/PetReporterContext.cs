@@ -59,82 +59,55 @@ namespace LostFoundPetReporter.CoreDb
             });
 
 
-            //LostReport Builder
-            modelBuilder.Entity<LostCoordinate>()
-             .HasKey(x => x.LostReportId);
+            //Report Builder
+            modelBuilder.Entity<Coordinate>()
+             .HasKey(x => x.ReportId);
 
-            modelBuilder.Entity<LostReport>(entity =>
+            modelBuilder.Entity<Report>(entity =>
             {
-                entity.ToTable("LostReports");
+                entity.ToTable("Reports");
                 entity.OwnsOne(lr => lr.PetDescription);    
             });
 
-            modelBuilder.Entity<LostReport>()
-            .HasOne(x => x.LostCoordinateNavigation)
-            .WithOne(x => x.LostReportNavigation)
-            .HasForeignKey<LostCoordinate>(
-                x => x.LostReportId)
+            modelBuilder.Entity<Report>()
+            .HasOne(x => x.ReportCoordinateNavigation)
+            .WithOne(x => x.ReportNavigation)
+            .HasForeignKey<Coordinate>(
+                x => x.ReportId)
             .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<LostReportExtFile>(entity =>
+            modelBuilder.Entity<ExtFile>(entity =>
             {
-                entity.ToTable("LostReportExtFiles");
+                entity.ToTable("ExtFiles");
                 entity.Property(p => p.FilePath).HasMaxLength(70);
                 entity.Property(p => p.Description).HasMaxLength(30);
                 entity.Property(p => p.FileName).HasMaxLength(30);
             });
 
 
-            //FoundReport Builder
-            modelBuilder.Entity<FoundCoordinate>()
-               .HasKey(x => x.FoundReportId);
 
 
-            modelBuilder.Entity<FoundReport>(entity =>
-            {
-                entity.ToTable("FoundReports");
-                entity.OwnsOne(fr => fr.PetDescription);
-            });
 
-            modelBuilder.Entity<FoundReport>()
-            .HasOne(x => x.FoundCoordinateNavigation)
-            .WithOne(x => x.FoundReportNavigation)
-            .HasForeignKey<FoundCoordinate>(
-                x => x.FoundReportId)
-            .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<FoundReportExtFile>(entity =>
-            {
-                entity.ToTable("FoundReportExtFiles");
-                entity.Property(p => p.FilePath).HasMaxLength(70);
-                entity.Property(p => p.Description).HasMaxLength(30);
-                entity.Property(p => p.FileName).HasMaxLength(30);
-                
-            });
 
-            
             //LostFoundMatch Builder
-            modelBuilder.Entity<LostFoundMatch>(builder =>
-            {
-                builder.HasIndex(m => new { m.LostReportId, m.FoundReportId })
-                       .IsUnique();
+            modelBuilder.Entity<LostFoundMatch>()
+            .HasOne(match => match.LostReportNevigation)
+            .WithMany(report => report.LostMatches)
+            .HasForeignKey(match => match.LostReportId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(m => m.LostReportNevigation)
-                       .WithMany(r => r.LostFoundMatchNevigation)
-                       .HasForeignKey(m => m.LostReportId)
-                       .OnDelete(DeleteBehavior.Cascade); 
-
-                builder.HasOne(m => m.FoundReportNevigation)
-                       .WithMany(r => r.LostFoundMatchNevigation)
-                       .HasForeignKey(m => m.FoundReportId)
-                       .OnDelete(DeleteBehavior.NoAction); 
-            });
+            modelBuilder.Entity<LostFoundMatch>()
+                .HasOne(match => match.FoundReportNevigation)
+                .WithMany(report => report.FoundMatches)
+                .HasForeignKey(match => match.FoundReportId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var deletedFoundReports = ChangeTracker.Entries<FoundReport>()
+            var deletedFoundReports = ChangeTracker.Entries<Report>()
                 .Where(e => e.State == EntityState.Deleted)
                 .Select(e => e.Entity)
                 .ToList();
@@ -151,10 +124,8 @@ namespace LostFoundPetReporter.CoreDb
 
         public DbSet<UserDevice> UserDevice { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<LostReport> LostReports { get; set; }
-        public DbSet<FoundReport> FoundReports { get; set; }
-        public DbSet<FoundReportExtFile> FoundReportExtFiles { get; set; }
-        public DbSet<LostReportExtFile> LostReportExtFiles { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<ExtFile> ExtFiles { get; set; }
         public DbSet<LostFoundMatch> LostFoundMatches { get; set; }
 
     }

@@ -3,6 +3,7 @@ using LostFoundPetReporter.API.DTO.Interfaces;
 using LostFoundPetReporter.API.Services.API;
 using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.CoreDb.Models;
+using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using System.Reflection.Metadata.Ecma335;
 
@@ -11,7 +12,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class LostReportController : BaseCrudController<LostReport ,LostReportDto, CreateLostReportDto>
+    public class LostReportController : BaseCrudController<Report ,ReportDto, CreateLostReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
         private readonly IExtFileQueue _extFileQueue;
@@ -24,14 +25,17 @@ namespace LostFoundPetReporter.API.Controllers
             _animalDescriptionService = animalDescriptionService;
         }
 
+        protected override Report? GetOneEntity(int id)
+             => ((ReportRepo)_mainRepo).FindDetailed(id);
+
 
         [ApiVersion("1.0")]
         [HttpPost]
-        public override ActionResult<LostReportDto> AddOne(CreateLostReportDto createDto)
+        public override ActionResult<ReportDto> AddOne(CreateLostReportDto createDto)
         {
             var actionResult = base.AddOne(createDto);
 
-            if (actionResult.Result is CreatedAtActionResult createdResult && createdResult.Value is LostReportDto createdDto)
+            if (actionResult.Result is CreatedAtActionResult createdResult && createdResult.Value is ReportDto createdDto)
             {        
                _matchingQueue.QueueForMatchingAsync(createdDto.Id.Value, ReportType.Lost);
                 _extFileQueue.QueueForExtFileAsync(createdDto.Id.Value, ReportType.Lost, createDto.PictureBase64List ?? new List<string>());
@@ -49,12 +53,12 @@ namespace LostFoundPetReporter.API.Controllers
         /// <returns> All LostReports for a user</returns>
         [ApiVersion("1.0")]
         [HttpGet("ByUser/{id}")]
-        public ActionResult<IEnumerable<LostReportDto>> GetLostReportsByUserId(int? id)
+        public ActionResult<IEnumerable<ReportDto>> GetLostReportsByUserId(int? id)
         {
             if (id.HasValue && id.Value > 0)
             {
                 var entities = ((ILostReportRepo)_mainRepo).GetAllByUserId(id.Value);
-                var dtos = entities.Select(LostReportDto.FromEntity);
+                var dtos = entities.Select(ReportDto.FromEntity);
                 return Ok(dtos);
             }
 
@@ -75,6 +79,9 @@ namespace LostFoundPetReporter.API.Controllers
 
             return Ok(animalDescription);
         }
+
+
+
 
 
     }

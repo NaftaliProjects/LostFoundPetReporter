@@ -37,8 +37,8 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var fromDate = lostReport.dateTime.AddDays(-1);
-            var toDate = lostReport.dateTime.AddMonths(3);
+            var fromDate = lostReport.DateReported.AddDays(-1);
+            var toDate = lostReport.DateReported.AddMonths(3);
 
             var candidateFoundReports = _foundRepo.GetReportsInDateRange(fromDate, toDate);
 
@@ -100,8 +100,8 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var fromDate = foundReport.dateTime.AddMonths(-3);
-            var toDate = foundReport.dateTime.AddDays(1);
+            var fromDate = foundReport.DateReported.AddMonths(-3);
+            var toDate = foundReport.DateReported.AddDays(1);
 
             var candidateLostReports = _lostRepo.GetReportsInDateRange(fromDate, toDate);
 
@@ -155,7 +155,7 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
 
       
 
-        private MatchResult CalculateMatchScore(FoundReport found, LostReport lost)
+        private MatchResult CalculateMatchScore(Report found, Report lost)
         {
             var f = found.PetDescription;
             var l = lost.PetDescription;
@@ -267,7 +267,7 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             };
         }
 
-        private static string BuildMatchReason(FoundReport found, LostReport lost, double score)
+        private static string BuildMatchReason(Report found, Report lost, double score)
         {
             var reasons = new List<string>();
 
@@ -306,13 +306,13 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
             return string.Join(". ", reasons) + ".";
         }
 
-        private static double? GetDistanceKm(FoundReport found, LostReport lost)
+        private static double? GetDistanceKm(Report found, Report lost)
         {
             var foundCoordinate =
-                found.FoundCoordinateNavigation;
+                found.ReportCoordinateNavigation;
 
             var lostCoordinate =
-                lost.LostCoordinateNavigation;
+                lost.ReportCoordinateNavigation;
 
             if (foundCoordinate == null ||
                 lostCoordinate == null)
@@ -433,13 +433,13 @@ namespace LostFoundPetReporter.API.Services.BackgroundServices
         }
 
 
-        private static double CompareDistance(FoundReport found, LostReport lost)
+        private static double CompareDistance(Report found, Report lost)
         {
             var foundCoordinate =
-                found.FoundCoordinateNavigation;
+                found.ReportCoordinateNavigation;
 
             var lostCoordinate =
-                lost.LostCoordinateNavigation;
+                lost.ReportCoordinateNavigation;
 
             if (foundCoordinate == null ||
                 lostCoordinate == null)

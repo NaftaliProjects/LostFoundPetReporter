@@ -11,7 +11,7 @@ namespace LostFoundPetReporter.CoreDb.Models
 
     public abstract class BaseModel
     {
-        required public int Id { get; set; }
+        public int Id { get; set; }
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ namespace LostFoundPetReporter.CoreDb.Models
         public String Description { get; set; } = "";
 
         //Foreign keys 
-        required public int ReportId { get; set; }
+        public int ReportId { get; set; }
     }
 
 
@@ -129,8 +129,8 @@ namespace LostFoundPetReporter.CoreDb.Models
         required public double Latitude { get; set; }
         required public double Longitude { get; set; }
 
-        required public int ReportId { get; set; }
-        required public Report ReportNavigation { get; set; }
+        public int ReportId { get; set; }
+        public Report ReportNavigation { get; set; } = null!;
     }
 
     
@@ -149,11 +149,12 @@ namespace LostFoundPetReporter.CoreDb.Models
 
 
         //Nevigation properties 
-        required public User UserNevigation { get; set; }
-        public Coordinate? ReportCoordinateNavigation { get; set; }
+        public User? UserNevigation { get; set; }
+        public Coordinate? ReportCoordinateNavigation { get; set; } 
         public List<ExtFile>? ReportExtFilesNevigation { get; set; } = new();
         public AnimalDescription PetDescription { get; set; } = new();
-        public List<LostFoundMatch> LostFoundMatchNevigation { get; set; } = new();
+        public List<LostFoundMatch> LostMatches { get; set; } = new();
+        public List<LostFoundMatch> FoundMatches { get; set; } = new();
 
     }
 
@@ -172,9 +173,8 @@ namespace LostFoundPetReporter.CoreDb.Models
     /// </summary>
     public class LostFoundMatch : BaseModel
     {
-        required public int LostReportId { get; set; }
-
-        required public int FoundReportId { get; set; }
+        public int LostReportId { get; set; }
+        public int FoundReportId { get; set; }
 
         /// <summary>
         /// Overall matching confidence from 0 to 1.
@@ -186,9 +186,8 @@ namespace LostFoundPetReporter.CoreDb.Models
         /// </summary>
         public string MatchReason { get; set; } = "";
 
-        required public Report LostReportNevigation { get; set; }
-
-        required public Report FoundReportNevigation { get; set; }
+        public Report LostReportNevigation { get; set; } = null!;
+        public Report FoundReportNevigation { get; set; } = null!;
 
     }
 

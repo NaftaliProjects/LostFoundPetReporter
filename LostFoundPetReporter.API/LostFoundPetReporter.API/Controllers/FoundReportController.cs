@@ -10,7 +10,7 @@ using LostFoundPetReporter.CoreDb.ReposInterfaces;
 
 namespace LostFoundPetReporter.API.Controllers
 {
-    public class FoundReportController : BaseCrudController<FoundReport, FoundReportDto, CreateFoundReportDto>
+    public class FoundReportController : BaseCrudController<Report, ReportDto, CreateFoundReportDto>
     {
         private readonly IMatchingQueue _matchingQueue;
         private readonly IExtFileQueue _extFileQueue;
@@ -28,11 +28,11 @@ namespace LostFoundPetReporter.API.Controllers
 
         [ApiVersion("1.0")]
         [HttpPost]
-        public override ActionResult<FoundReportDto> AddOne(CreateFoundReportDto createDto)
+        public override ActionResult<ReportDto> AddOne(CreateFoundReportDto createDto)
         {
             var actionResult = base.AddOne(createDto);
 
-            if (actionResult.Result is CreatedAtActionResult createdResult && createdResult.Value is FoundReportDto createdDto)
+            if (actionResult.Result is CreatedAtActionResult createdResult && createdResult.Value is ReportDto createdDto)
 
             {
                 _matchingQueue.QueueForMatchingAsync(createdDto.Id.Value, ReportType.Found);
@@ -52,12 +52,12 @@ namespace LostFoundPetReporter.API.Controllers
         /// <returns>All FoundReports for a user</returns>
         [ApiVersion("1.0")]
         [HttpGet("ByUser/{id}")]
-        public ActionResult<IEnumerable<FoundReportDto>> GetFoundReportsByUserId(int? id)
+        public ActionResult<IEnumerable<ReportDto>> GetFoundReportsByUserId(int? id)
         {
             if (id.HasValue && id.Value > 0)
             {
                 var entities = ((IFoundReportRepo)_mainRepo).GetAllByUserId(id.Value);
-                var dtos = entities.Select(FoundReportDto.FromEntity);
+                var dtos = entities.Select(ReportDto.FromEntity);
                 return Ok(dtos);
             }
 

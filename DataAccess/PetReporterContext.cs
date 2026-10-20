@@ -1,13 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using  LostFoundPetReporter.CoreDb.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+    using  LostFoundPetReporter.CoreDb.Models;
 
 
 namespace LostFoundPetReporter.CoreDb
 {
     public class PetReporterContext : DbContext
     {
+        public DbSet<UserDevice> UserDevice { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<ExtFile> ExtFiles { get; set; }
+        public DbSet<LostFoundMatch> LostFoundMatches { get; set; }
+
         public PetReporterContext(DbContextOptions<PetReporterContext> options) : base(options)
         {
 
@@ -42,9 +48,6 @@ namespace LostFoundPetReporter.CoreDb
                 entity.HasIndex(x => x.Token)
                     .IsUnique();
             });
-
-
-
 
             //User Builder 
             modelBuilder.Entity<User>(entity =>
@@ -85,11 +88,6 @@ namespace LostFoundPetReporter.CoreDb
             });
 
 
-
-
-
-
-
             //LostFoundMatch Builder
             modelBuilder.Entity<LostFoundMatch>()
             .HasOne(match => match.LostReportNevigation)
@@ -122,11 +120,7 @@ namespace LostFoundPetReporter.CoreDb
             return base.SaveChangesAsync(cancellationToken);
         }
 
-        public DbSet<UserDevice> UserDevice { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Report> Reports { get; set; }
-        public DbSet<ExtFile> ExtFiles { get; set; }
-        public DbSet<LostFoundMatch> LostFoundMatches { get; set; }
+        
 
     }
 

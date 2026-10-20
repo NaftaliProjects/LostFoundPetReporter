@@ -1,0 +1,6 @@
+@LostFoundPetReporter_HostAddress = http://localhost:5032
+
+GET {{LostFoundPetReporter_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

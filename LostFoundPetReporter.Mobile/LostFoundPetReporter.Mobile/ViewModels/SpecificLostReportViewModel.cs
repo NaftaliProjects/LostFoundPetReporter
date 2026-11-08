@@ -1,5 +1,6 @@
 ﻿using LostFoundPetReporter.Mobile.Models;
 using LostFoundPetReporter.Mobile.Services.Api;
+using LostFoundPetReporter.Mobile.Services.Session;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -10,12 +11,14 @@ namespace LostFoundPetReporter.Mobile.ViewModels;
 public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttributable
 {
     private readonly ILostReportApiService _lostReportApiService;
-
+    private readonly IUserSession _userSession;
 
     private LostReport? _lostReport;
     private string _errorMessage = string.Empty;
     private bool _isLoading;
     private bool _isImageViewerVisible;
+
+    private bool _isUserOwner;
 
     public LostReport? LostReport
     {
@@ -26,6 +29,17 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
                 return;
 
             _lostReport = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsUserOwner
+    {
+        get => _isUserOwner;
+        private set
+        {
+            if (_isUserOwner == value) return;
+            _isUserOwner = value;
             OnPropertyChanged();
         }
     }
@@ -76,10 +90,11 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
     public ICommand CloseImageViewerCommand { get; }
     public ICommand RemoveMatchCommand { get; }
 
-    public SpecificLostReportViewModel(
-        ILostReportApiService lostReportApiService)
+    public SpecificLostReportViewModel(ILostReportApiService lostReportApiService, IUserSession userSession)
+
     {
         _lostReportApiService = lostReportApiService;
+        _userSession = userSession;
 
         CloseImageViewerCommand = new Command(CloseImageViewer);
         RemoveMatchCommand = new Command<FoundReport>(async (foundReport) => await RemoveMatchAsync(foundReport));
@@ -113,7 +128,10 @@ public class SpecificLostReportViewModel : INotifyPropertyChanged, IQueryAttribu
             return;
         }
 
-        System.Diagnostics.Debug.WriteLine(
+            var currentUserId = _userSession.CurrentUser?.Id;
+            IsUserOwner = currentUserId.HasValue && report.User?.Id == currentUserId.Value;
+
+            System.Diagnostics.Debug.WriteLine(
             $"LOST REPORT ID: {report.Id}");
 
         System.Diagnostics.Debug.WriteLine(

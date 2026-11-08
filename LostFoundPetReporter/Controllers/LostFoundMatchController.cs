@@ -18,12 +18,28 @@ namespace LostFoundPetReporter.API.Controllers
         [HttpDelete("{lostReportId}/{foundReportId}")]
         public ActionResult RemoveMatch(int lostReportId, int foundReportId)
         {
+
+
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized(); // 401: User is not logged in
+            }
+
             var match = _repo
                 .GetByLostReportId(lostReportId)
                 .FirstOrDefault(m => m.FoundReportId == foundReportId);
 
             if (match == null)
                 return NotFound();
+
+            //check if the lostReport is owned by the user 
+            var lostReportOwnerId = match.LostReportNevigation?.UserNevigation?.Id;
+
+            if (lostReportOwnerId == null || userId.Value != lostReportOwnerId.Value)
+            {
+                return Forbid(); 
+            }
 
             _repo.Delete(match);
 

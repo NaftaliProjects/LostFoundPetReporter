@@ -17,6 +17,7 @@ using LostFoundPetReporter.API.Services.Notification;
 using LostFoundPetReporter.CoreDb.Repos;
 using LostFoundPetReporter.CoreDb.ReposInterfaces;
 using LostFoundPetReporter.Services.API;
+using LostFoundPetReporter.Services.UserServie;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.Identity;
@@ -67,7 +68,7 @@ builder.Services.AddDbContext<PetReporterContext>(options =>
     options.UseSqlServer(connetionString, sqlOptions =>
         sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
 );
-
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserDeviceRepo, UserDeviceRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ILostReportRepo, LostReportRepo>();

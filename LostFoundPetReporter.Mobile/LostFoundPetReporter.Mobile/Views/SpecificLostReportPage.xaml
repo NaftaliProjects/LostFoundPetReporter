@@ -350,6 +350,7 @@
                                 <Button
                                     Text="Remove"
                                     HorizontalOptions="End"
+                                    IsVisible="{Binding BindingContext.IsUserOwner, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                                     Command="{Binding BindingContext.RemoveMatchCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                                     CommandParameter="{Binding .}" />
 

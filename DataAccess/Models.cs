@@ -1,160 +1,87 @@
-﻿using System;
+﻿global using KeyType = int;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Text;
 
 
+
 namespace LostFoundPetReporter.CoreDb.Models
 {
-   
+    public enum ReportType { Lost, Found }
+    public enum DevicePlatform { Android, iOS, Web }
+    public enum MatchStatus { Pending, Confirmed, Rejected }
 
-    public abstract class BaseModel
-    {
-        public int Id { get; set; }
-    }
 
     /// <summary>
     /// Holds the info for Push notification system
     /// </summary>
-    public class UserDevice : BaseModel
+    public class UserDevice 
     {
-        //properties
-        public int UserId { get; set; }
-        public string Token { get; set; } = "";
-        public string Platform { get; set; } = "";
-        public DateTime LastUpdated { get; set; }
+        required public KeyType Id { get; set; }
+        required public string Token { get; set; }
+        public DevicePlatform Platform { get; set; }
+        required public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
+        required public User UserNavigation { get; set; }
     }
 
     /// <summary>
     /// Holds the profile and contact information for a system user.
     /// </summary>
-    public class User : BaseModel
+    public class User 
     {
-        //properties
+        required public KeyType Id { get; set; }
         required public String Name { get; set; }
-
         required public String HashedPassword { get; set; }
-
-        public String Email { get; set; } = "";
-        public String Phone { get; set; } = "";
+        public String? Email { get; set; } = null;
+        public String? Phone { get; set; } = null;
+        public ICollection<UserDevice> Devices { get; set; } = [];
+        public ICollection<Report> Reports { get; set; } = [];
 
     }
 
 
-
-    /// <summary>
-    /// Holds the description of a pet in a LostReport or a FoundReport.
-    /// <para>
-    /// Colors examples:
-    /// - "Red"
-    /// - "White,Black,Grey"
-    /// </para>
-    /// </summary>
-    public class AnimalDescription
+   
+    public class ExtFile 
     {
-        public string Name { get; set; } = "";
-
-        // "Dog", "Cat", etc.
-        public string Type { get; set; } = "";
-
-        // "Labrador", "German Shepherd", "Mixed", etc.
-        public string Breed { get; set; } = "";
-
-        // "white,black", "brown", etc.
-        public string Colors { get; set; } = "";
-
-        // "Male", "Female", "Unknown"
-        public string Sex { get; set; } = "";
-
-        // Approximate age in years
-        public double? Age { get; set; }
-
-        // "Small", "Medium", "Large"
-        public string Size { get; set; } = "";
-
-        // Optional approximate weight
-        public double? WeightKg { get; set; }
-
-        // "Short", "Medium", "Long"
-        public string CoatLength { get; set; } = "";
-
-        // "Straight", "Curly", "Wavy", etc.
-        public string CoatType { get; set; } = "";
-
-        // "Solid", "Spotted", "Striped", "Tabby", etc.
-        public string Pattern { get; set; } = "";
-
-        // Human-readable unique features
-        // Example: "white patch on chest, scar above left eye"
-        public string DistinctiveMarkings { get; set; } = "";
-
-        // "Brown", "Blue", "Green", etc.
-        public string EyeColor { get; set; } = "";
-
-        // Example: "Left ear folded"
-        public string EarDescription { get; set; } = "";
-
-        // Example: "Long tail with white tip"
-        public string TailDescription { get; set; } = "";
-
-        // Collar/accessories
-        public bool? CollarPresent { get; set; }
-
-        public string CollarColor { get; set; } = "";
-
-        public string CollarType { get; set; } = "";
-
-        public bool? HarnessPresent { get; set; }
-
-        public string HarnessColor { get; set; } = "";
-    }
-
-
-    public class ExtFile : BaseModel
-    {
-        //properties
+        required public KeyType Id { get; set; }
         required public String FilePath { get; set; }
 
         required public String FileName { get; set; }
-        public String Description { get; set; } = "";
+        public String? Description { get; set; } = null;
 
-        //Foreign keys 
-        public int ReportId { get; set; }
+        required public Report ReportNavigation { get; set; }
     }
 
 
-    public class Coordinate : BaseModel
+    //Complex Type
+    public class Coordinate 
     {
-        required public double Latitude { get; set; }
-        required public double Longitude { get; set; }
-
-        public int ReportId { get; set; }
-        public Report ReportNavigation { get; set; } = null!;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 
-    
 
-
-    public class Report : BaseModel
+    public class Report 
     {
+        required public KeyType Id { get; set; }
         //properties
-        public DateTime DateReported { get; set; }
+        public DateTime DateReported { get; set; } = DateTime.UtcNow;
 
-        //(L : Lost, F : Found)
-        required public string ReportType { get; set; }
-
-        //Foreign keys 
-        public int UserId { get; set; }
+        required public ReportType Type { get; set; }
 
 
-        //Nevigation properties 
-        public User? UserNevigation { get; set; }
-        public Coordinate? ReportCoordinateNavigation { get; set; } 
-        public List<ExtFile>? ReportExtFilesNevigation { get; set; } = new();
-        public AnimalDescription PetDescription { get; set; } = new();
-        public List<LostFoundMatch> LostMatches { get; set; } = new();
-        public List<LostFoundMatch> FoundMatches { get; set; } = new();
+        //Navigation properties 
+        public User? UserNavigation { get; set; }
+        public Coordinate? Coordinate { get; set; } = null;
+        public ICollection<ExtFile>? ExtFilesNavigation { get; set; } = [];
+        public IDictionary<string, string>? AnimalDescriptions { get; set; } = null;
+        public ICollection<LostFoundMatch> MatchesAsLost { get; set; } = [];
+        public ICollection<LostFoundMatch> MatchesAsFound { get; set; } = [];
+
+
 
     }
 
@@ -171,11 +98,9 @@ namespace LostFoundPetReporter.CoreDb.Models
     /// <summary>
     /// Costume and extandable Many To Many Table for Lost/Found Report tables 
     /// </summary>
-    public class LostFoundMatch : BaseModel
+    public class LostFoundMatch
     {
-        public int LostReportId { get; set; }
-        public int FoundReportId { get; set; }
-
+        required public KeyType Id { get; set; }
         /// <summary>
         /// Overall matching confidence from 0 to 1.
         /// </summary>
@@ -186,8 +111,8 @@ namespace LostFoundPetReporter.CoreDb.Models
         /// </summary>
         public string MatchReason { get; set; } = "";
 
-        public Report LostReportNevigation { get; set; } = null!;
-        public Report FoundReportNevigation { get; set; } = null!;
+        public Report LostReportNavigation { get; set; } = null!;
+        public Report FoundReportNavigation { get; set; } = null!;
 
     }
 

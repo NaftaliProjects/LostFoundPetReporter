@@ -14,17 +14,14 @@ namespace LostFoundPetReporter.API.Services.Authentication
             _configuration = configuration;
         }
 
-        public string CreateToken(int userId, string email, out DateTime expiresAt)
-        {
+        public string CreateToken(string username, out DateTime expiresAt)
+        { 
             expiresAt = DateTime.UtcNow.AddHours(2);
 
             var claims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub,userId.ToString()),
-
-                    new Claim(JwtRegisteredClaimNames.Email,email),
-
-                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.NameIdentifier, username),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));

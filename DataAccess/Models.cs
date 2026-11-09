@@ -32,9 +32,10 @@ namespace LostFoundPetReporter.CoreDb.Models
     /// </summary>
     public class User 
     {
-        required public KeyType Id { get; set; }
-        required public String Name { get; set; }
+        required public string UserName { get; set; }
         required public String HashedPassword { get; set; }
+        required public String? Name { get; set; } = null;
+        required public String? LastName { get; set; } = null;
         public String? Email { get; set; } = null;
         public String? Phone { get; set; } = null;
         public ICollection<UserDevice> Devices { get; set; } = [];

@@ -2,6 +2,6 @@
 {
     public interface IJwtService
     {
-        string CreateToken(int userId, string name, out DateTime expiresAt);
+        string CreateToken(string username, out DateTime expiresAt);
     }
 }

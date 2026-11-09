@@ -14,10 +14,10 @@ using LostFoundPetReporter.API.Services.API;
 using LostFoundPetReporter.API.Services.Authentication;
 using LostFoundPetReporter.API.Services.BackgroundServices;
 using LostFoundPetReporter.API.Services.Notification;
-using LostFoundPetReporter.CoreDb.Repos;
-using LostFoundPetReporter.CoreDb.ReposInterfaces;
+using LostFoundPetReporter.Services.UserService;
+
 using LostFoundPetReporter.Services.API;
-using LostFoundPetReporter.Services.UserServie;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.AspNetCore.Identity;
@@ -69,11 +69,7 @@ builder.Services.AddDbContext<PetReporterContext>(options =>
         sqlOptions.EnableRetryOnFailure().CommandTimeout(60))
 );
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserDeviceRepo, UserDeviceRepo>();
-builder.Services.AddScoped<IUserRepo, UserRepo>();
-builder.Services.AddScoped<ILostReportRepo, LostReportRepo>();
-builder.Services.AddScoped<IFoundReportRepo, FoundReportRepo>();
-builder.Services.AddScoped<ILostFoundMatchRepo, LostFoundMatchRepo>();
+
 
 builder.Services.AddSingleton<IMatchingQueue, MatchingQueue>();
 builder.Services.AddHostedService<MatchingBackgroundService>();

@@ -2,8 +2,9 @@
 using LostFoundPetReporter.API.DTO.Interfaces;
 using LostFoundPetReporter.API.Services.Authentication;
 using LostFoundPetReporter.CoreDb.Models;
-using LostFoundPetReporter.Services.UserServie;
+using LostFoundPetReporter.Services.UserService;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using System.Security.Claims;
@@ -23,179 +24,99 @@ namespace LostFoundPetReporter.API.Controllers
         private readonly IUserService _users;
         public UserController(IUserService users) => _users = users;
 
-        private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private string CurrentUsername => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserResponse>> Register(RegisterUserRequest req, CancellationToken ct)
+        public async Task<ActionResult<UserResponse>> Register(UserRequest req, CancellationToken ct)
         {
-            var result = await _users.RegisterAsync(req, ct);                
+            if ( string.IsNullOrEmpty(req.Password) || string.IsNullOrEmpty(req.UserName))
+                return BadRequest(new ProblemDetails { Title = "Password and UserName is required.", Status = StatusCodes.Status404NotFound });
 
-            if (result.Error == UserError.EmailTaken)
+            var newUserResult = await _users.RegisterAsync(req, ct);                
+
+            if (newUserResult.Error == UserError.EmailTaken)
                 return Conflict(new ProblemDetails { Title = "Email already registered" });
 
-            return CreatedAtAction(nameof(GetMe), result.Value);
+            return CreatedAtAction(nameof(GetCurrentUser), newUserResult.Value);
 
         }
 
         [HttpPost("login"), AllowAnonymous]
-        public async Task<ActionResult> Login(LoginRequest req, CancellationToken ct)
+        public async Task<ActionResult> Login(UserLoginRequest req, CancellationToken ct)
         {
+            if (string.IsNullOrEmpty(req.Password) || string.IsNullOrEmpty(req.UserName))
+                return BadRequest("Password and UserName is required.");
+
             var result = await _users.LoginAsync(req, ct);
-            return result.Succeeded ? Ok(new { token = result.Value }) : Unauthorized();
+
+            if (result.Error == UserError.NotFound)
+                return NotFound(new ProblemDetails { Title = "User not found", Status = StatusCodes.Status404NotFound });
+
+            if (result.Error == UserError.InvalidCredentials)
+                return Unauthorized(new ProblemDetails { Title = "Invalid credentials", Status = StatusCodes.Status401Unauthorized });
+
+            if (result.Error == UserError.EmailTaken)
+                return Conflict(new ProblemDetails { Title = "Email already registered", Status = StatusCodes.Status409Conflict });
+
+            return Ok(new { token = result.Value });
         }
 
-        [HttpGet("me")]
-        public async Task<ActionResult<UserResponse>> GetMe(CancellationToken ct)
+        [HttpGet("CurrentUser")]
+        public async Task<ActionResult<UserResponse>> GetCurrentUser(CancellationToken ct)
         {
-            var dto = await _users.GetAsync(CurrentUserId, ct);
-            return dto is null ? NotFound() : Ok(dto);
+            var currentUserResult = await _users.GetCurrentUserAsync(CurrentUsername, ct);
+
+            if (currentUserResult.Error == UserError.NotFound)
+                return NotFound(new ProblemDetails { Title = "User not found", Status = StatusCodes.Status404NotFound });
+
+            return Ok(currentUserResult.Value);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateOne(int id, UpdateUserRequest req, CancellationToken ct)
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateOne(string username, UserRequest req, CancellationToken ct)
         {
-            if (id != CurrentUserId) return Forbid();
+            if (username != CurrentUsername) return Forbid();
 
-            var result = await _users.UpdateAsync(id, req, ct);
-            return result.Error switch
-            {
-                UserError.None => NoContent(),
-                UserError.NotFound => NotFound(),
-                UserError.EmailTaken => Conflict(new ProblemDetails { Title = "Email already in use" }),
-                _ => Problem()
-            };
+            var result = await _users.UpdateAsync(username, req, ct);
+
+            if (result.Error == UserError.NotFound)
+                return NotFound(new ProblemDetails { Title = "User not found", Status = StatusCodes.Status404NotFound });
+
+            if (result.Error == UserError.EmailTaken)
+                return Conflict(new ProblemDetails { Title = "Email already registered", Status = StatusCodes.Status409Conflict });
+
+            return Ok();
         }
 
 
-
-        // =========================
-        // POST
-        // =========================
-
-        [ApiVersion("1.0")]
-        [HttpPost]
-        public virtual ActionResult<TResponseDto> AddOne(TCreateOrUpdateDto createDto)
-        {
-            if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
-
-            var entity = createDto.ToEntity();
-
-            try { _mainRepo.Add(entity); }
-            catch (Exception ex) { return BadRequest(ex); }
-
-            return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, TResponseDto.FromEntity(entity));
-        }
-
-
-        // =========================
-        // DELETE
-        // =========================
 
         [ApiVersion("1.0")]
         [HttpDelete("{id}")]
-        public ActionResult DeleteOne(int id)
+        public ActionResult DeleteUser(string username, CancellationToken ct)
         {
-            var entity = _mainRepo.Find(id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            try
-            {
-                _mainRepo.Delete(entity);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.GetBaseException()?.Message);
-
-            }
-
-            return NoContent();
+            return BadRequest(); 
         }
 
 
-        [ApiVersion("1.0")]
-        [AllowAnonymous]
-        [HttpPost("Login")]
-        public ActionResult<LoginResponseDto> Login(LoginUserDto loginDto)
-        {
-
-            var user = ((IUserRepo)_mainRepo).GetByEmail(loginDto.Email);
-
-            if (user == null)
-            {
-                return Unauthorized("Invalid Email or password.");
-            }
-
-            var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, loginDto.Password);
-
-            if (verificationResult == PasswordVerificationResult.Failed)
-            {
-                return Unauthorized("Invalid email or password.");
-            }
-
-            var token = _jwtService.CreateToken(user.Id, user.Email, out var expiresAt);
-
-            return Ok(new LoginResponseDto
-            {
-                Token = token,
-                ExpiresAt = expiresAt,
-                User = UserDto.FromEntity(user)
-            });
-        }
-
-
-        [ApiVersion("1.0")]
-        [AllowAnonymous]
-        [HttpPost("Register")]
-        public virtual ActionResult<UserDto> AddOne(CreateUserDto createDto)
-        {
-            if (createDto.Id.HasValue && createDto.Id.Value > 0) { return BadRequest("POST requests cannot specify an existing Id."); }
-
-            var entity = createDto.ToEntity();
-
-            entity.HashedPassword = _passwordHasher.HashPassword(entity, createDto.Password);
-
-
-            try
-            {
-                _mainRepo.Add(entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to register user.");
-
-                return Problem(
-                    title: "Registration failed.",
-                    statusCode: StatusCodes.Status500InternalServerError);
-            }
-
-            return CreatedAtAction(nameof(GetOne), new { id = entity.Id }, UserDto.FromEntity(entity));
-        }
-
-
+   
         [ApiVersion("1.0")]
         [Authorize]
         [HttpPost("RegisterDevice")]
-        public ActionResult RegisterDevice( RegisterDeviceTokenDto dto)
+        public ActionResult RegisterDevice( RegisterDeviceRequest req)
         {
 
-            if (string.IsNullOrWhiteSpace(dto.Token))
+            if (string.IsNullOrEmpty(req.Token))
             {
-                return BadRequest("FCM token is required.");
+                return BadRequest(new ProblemDetails { Title = "FCM token is required", Status = StatusCodes.Status400BadRequest });
             }
 
-            if (string.IsNullOrWhiteSpace(dto.Platform))
+            if (string.IsNullOrEmpty(req.Platform))
             {
-                return BadRequest("Platform is required.");
+                return BadRequest(new ProblemDetails { Title = "Platform is required", Status = StatusCodes.Status400BadRequest });
             }
 
-            var userId = GetCurrentUserId();
-
-            if (userId == null)
+            if (CurrentUsername == null)
             {
                 return Unauthorized();
             }
@@ -203,9 +124,9 @@ namespace LostFoundPetReporter.API.Controllers
 
             var createDto = new CreateUserDeviceDto
             {
-                UserId = userId.Value,
-                Token = dto.Token,
-                Platform = dto.Platform,
+                UserName = CurrentUsername,
+                Token = req.Token,
+                Platform = req.Platform,
                 LastUpdated = DateTime.UtcNow
             };
 
